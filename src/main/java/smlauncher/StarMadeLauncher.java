@@ -122,7 +122,6 @@ public class StarMadeLauncher extends JFrame {
 	private UpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
-	private String userArgs;
 	private JPanel mainPanel;
 	private JPanel centerPanel;
 	private JPanel versionPanel;
@@ -430,21 +429,90 @@ public class StarMadeLauncher extends JFrame {
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		footerPanel.add(bottomPanel, BorderLayout.SOUTH);
 
-		JButton installationSettingsLabel = new JButton("Memory Settings");
-		installationSettingsLabel.setIcon(getIcon("memory_options_gear.png"));
-		installationSettingsLabel.setFont(new Font("Roboto", Font.BOLD, 12));
-		installationSettingsLabel.setDoubleBuffered(true);
-		installationSettingsLabel.setOpaque(false);
-		installationSettingsLabel.setContentAreaFilled(false);
-		bottomPanel.add(installationSettingsLabel);
+		JButton launchSettings = new JButton("Launch Settings");
+		launchSettings.setIcon(getIcon("memory_options_gear.png"));
+		launchSettings.setFont(new Font("Roboto", Font.BOLD, 12));
+		launchSettings.setDoubleBuffered(true);
+		launchSettings.setOpaque(false);
+		launchSettings.setContentAreaFilled(false);
+		bottomPanel.add(launchSettings);
+		launchSettings.addActionListener(e -> {
+			//Create dialog with memory slider
+			JDialog dialog = new JDialog();
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setModal(true);
+			dialog.setResizable(false);
+			dialog.setTitle("Memory Settings");
+			dialog.setSize(500, 350);
+			dialog.setLocationRelativeTo(null);
+			dialog.setLayout(new BorderLayout());
+			dialog.setAlwaysOnTop(true);
 
-		JButton launchSettingsLabel = new JButton("Launch Settings");
-		launchSettingsLabel.setIcon(getIcon("launch_options_gear.png"));
-		launchSettingsLabel.setFont(new Font("Roboto", Font.BOLD, 12));
-		launchSettingsLabel.setDoubleBuffered(true);
-		launchSettingsLabel.setOpaque(false);
-		launchSettingsLabel.setContentAreaFilled(false);
-		bottomPanel.add(launchSettingsLabel);
+			JPanel dialogPanel = new JPanel();
+			dialogPanel.setDoubleBuffered(true);
+			dialogPanel.setOpaque(false);
+			dialogPanel.setLayout(new BorderLayout());
+			dialog.add(dialogPanel);
+
+			JSlider slider = new JSlider(JSlider.HORIZONTAL, 1024, getSystemMemory(), getLaunchSettings().getInt("memory"));
+			slider.setDoubleBuffered(true);
+			slider.setOpaque(false);
+			slider.setMajorTickSpacing(1024);
+			slider.setMinorTickSpacing(256);
+			slider.setPaintTicks(true);
+			slider.setPaintLabels(true);
+			slider.setSnapToTicks(true);
+			slider.setLabelTable(slider.createStandardLabels(1024));
+			dialogPanel.add(slider, BorderLayout.NORTH);
+
+			JTextArea launchArgs = new JTextArea();
+			launchArgs.setDoubleBuffered(true);
+			launchArgs.setOpaque(false);
+			launchArgs.setText(getLaunchSettings().getString("launchArgs"));
+			launchArgs.setLineWrap(true);
+			launchArgs.setWrapStyleWord(true);
+			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			dialogPanel.add(launchArgs, BorderLayout.CENTER);
+
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setDoubleBuffered(true);
+			buttonPanel.setOpaque(false);
+			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			dialogPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+			JButton saveButton = new JButton("Save");
+			saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
+			saveButton.setDoubleBuffered(true);
+			saveButton.setOpaque(false);
+			saveButton.setContentAreaFilled(false);
+			saveButton.setBorderPainted(false);
+			buttonPanel.add(saveButton);
+
+			JButton cancelButton = new JButton("Cancel");
+			cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
+			cancelButton.setDoubleBuffered(true);
+			cancelButton.setOpaque(false);
+			cancelButton.setContentAreaFilled(false);
+			cancelButton.setBorderPainted(false);
+			buttonPanel.add(cancelButton);
+
+			saveButton.addActionListener(e1 -> {
+				getLaunchSettings().put("memory", slider.getValue());
+				getLaunchSettings().put("launchArgs", launchArgs.getText());
+				saveLaunchSettings();
+				dialog.dispose();
+			});
+			cancelButton.addActionListener(e1 -> dialog.dispose());
+			dialog.setVisible(true);
+		});
+
+		JButton installSettings = new JButton("Installation Settings");
+		installSettings.setIcon(getIcon("launch_options_gear.png"));
+		installSettings.setFont(new Font("Roboto", Font.BOLD, 12));
+		installSettings.setDoubleBuffered(true);
+		installSettings.setOpaque(false);
+		installSettings.setContentAreaFilled(false);
+		bottomPanel.add(installSettings);
 
 		serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
@@ -507,6 +575,7 @@ public class StarMadeLauncher extends JFrame {
 				file.createNewFile();
 				JSONObject object = new JSONObject();
 				object.put("memory", 2048);
+				object.put("launchArgs", "");
 				FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
 				writer.write(object.toString());
 				writer.flush();
@@ -651,7 +720,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private String getUserArgs() {
-		return userArgs.trim() + " -Xms2048g -Xmx" + getLaunchSettings().getInt("memory") + "g";
+		return getLaunchSettings().getString("launchArgs").trim() + " -Xms2048g -Xmx" + getLaunchSettings().getInt("memory") + "g";
 	}
 
 	public void runStarMade() { //Todo: Support Linux and Mac
