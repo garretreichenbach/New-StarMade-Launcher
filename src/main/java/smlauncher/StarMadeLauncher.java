@@ -596,6 +596,17 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.addActionListener(e -> {
 				if(updaterThread == null || !updaterThread.isAlive()) updateGame(updateButton);
 			});
+			updateButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					updateButton.setIcon(getIcon("update_roll.png"));
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					updateButton.setIcon(getIcon("update_btn.png"));
+				}
+			});
 			playPanelButtons.add(updateButton);
 		} else {
 			JButton playButton = new JButton(getIcon("launch_btn.png")); //Todo: Reduce button glow so this doesn't look weird

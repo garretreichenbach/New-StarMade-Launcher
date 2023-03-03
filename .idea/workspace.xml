@@ -5,41 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/StackLayout.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/close_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/empty_star.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/featured_content_frame.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/footer_dedicated_bg.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/footer_normalplay_bg.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/full_star.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/header_top.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/launch_btn.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/launch_options_gear.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/launch_roll.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/launch_settings_option_gear.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/launch_tooltip_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/launcher_schine_logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/left_panel.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/memory_options_gear.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/minimize_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/nav_options_gear_btn.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/popup_notification_header_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/popup_settings_header_close.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/popup_settings_header_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/tooltip_popup_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/update_btn.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/update_load_empty.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/update_load_full.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/update_roll.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/7.4/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.4/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -185,7 +150,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1677864438828</updated>
-      <workItem from="1677864440314" duration="8512000" />
+      <workItem from="1677864440314" duration="8693000" />
     </task>
     <servers />
   </component>
