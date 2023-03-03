@@ -18,8 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 
-import static main.StarMadeLauncher.deselectedColor;
-import static main.StarMadeLauncher.selectedColor;
+import static smlauncher.StarMadeLauncher.deselectedColor;
+import static smlauncher.StarMadeLauncher.selectedColor;
 
 /**
  * Panel for displaying launcher news.

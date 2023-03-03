@@ -1,7 +1,5 @@
 package smlauncher.util;
 
-import org.schema.common.util.StringTools;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -98,8 +96,7 @@ public class ChecksumFile {
 				checksumsToDownload.add(e);
 				o.totalSize += e.size;
 			}
-
-			cb.update("Determining files to download... " + (StringTools.formatPointZero(g * p * 100.0f)) + "%  selected " + checksumsToDownload.size() + " / " + checksums.size() + "(" + (o.totalSize / 1024) / 1024 + " MB)");
+			//cb.update("Determining files to download... " + (StringTools.formatPointZero(g * p * 100.0f)) + "%  selected " + checksumsToDownload.size() + " / " + checksums.size() + "(" + (o.totalSize / 1024) / 1024 + " MB)");
 			g++;
 		}
 		o.startTime = System.currentTimeMillis();

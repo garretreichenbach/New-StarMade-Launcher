@@ -44,6 +44,7 @@ public class StarMadeLauncher extends JFrame {
 	private static boolean devMode;
 	private static int backup = Updater.BACK_DB;
 	public static String installDir = "./StarMade/";
+	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
 
 	public static void main(String[] args) {
 		//FlatDarculaLaf.setup();
@@ -54,10 +55,10 @@ public class StarMadeLauncher extends JFrame {
 				arg = arg.toLowerCase();
 				if(arg.contains("-version")) {
 					selectVersion = true;
-//					if(arg.contains("-dev")) UpdatePanel.buildBranch = Updater.VersionFile.DEV;
-//					else if(arg.contains("-pre")) UpdatePanel.buildBranch = Updater.VersionFile.PRE;
-//					else if(arg.contains("-archive")) UpdatePanel.buildBranch = Updater.VersionFile.ARCHIVE;
-//					else UpdatePanel.buildBranch = Updater.VersionFile.RELEASE;
+					if(arg.contains("-dev")) buildBranch = Updater.VersionFile.DEV;
+					else if(arg.contains("-pre")) buildBranch = Updater.VersionFile.PRE;
+					else if(arg.contains("-archive")) buildBranch = Updater.VersionFile.ARCHIVE;
+					else buildBranch = Updater.VersionFile.RELEASE;
 				} else if("-no_gui".equals(arg) || "-nogui".equals(arg)) {
 					if(GraphicsEnvironment.isHeadless()) {
 						displayHelp();
@@ -84,7 +85,6 @@ public class StarMadeLauncher extends JFrame {
 							backup = Updater.BACK_NONE;
 							break;
 					}
-					Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
 					Updater.withoutGUI((args.length > 1 && "-force".equals(args[1])), installDir, buildBranch, backup, selectVersion);
 				} else startup();
 			}
@@ -632,6 +632,17 @@ public class StarMadeLauncher extends JFrame {
 			playButton.setBorderPainted(false);
 			playButton.addActionListener(e -> {
 				dispose();
+				if(!checkJavaVersion()) {
+					JDialog dialog = new JDialog(this, "Java not found", true);
+					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+					dialog.setResizable(false);
+					dialog.setLayout(new BorderLayout());
+					dialog.setSize(400, 200);
+					dialog.setLocationRelativeTo(null);
+					dialog.setVisible(true);
+					flagForRepair();
+					return;
+				}
 				runStarMade();
 				System.exit(0);
 			});
@@ -648,6 +659,11 @@ public class StarMadeLauncher extends JFrame {
 			});
 			playPanelButtons.add(playButton);
 		}
+	}
+
+	private boolean checkJavaVersion() {
+		if(GAME_VERSION.build.startsWith("0.2")) return new File("./jre8/java.exe").exists();
+		else return new File("./jre11/java.exe").exists();
 	}
 
 	private String getUserArgs() {
