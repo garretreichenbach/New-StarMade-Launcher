@@ -749,7 +749,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private String getUserArgs() {
-		return getLaunchSettings().getString("launchArgs").trim() + " -Xms1024m -Xmx" + getLaunchSettings().getInt("memory") + "m";
+		return Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").trim() + " -Xms1024m -Xmx" + getLaunchSettings().getInt("memory") + "m";
 	}
 
 	public void runStarMade() { //Todo: Support Linux and Mac
