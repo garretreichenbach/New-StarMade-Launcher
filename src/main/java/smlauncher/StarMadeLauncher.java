@@ -140,7 +140,6 @@ public class StarMadeLauncher extends JFrame {
 			if(resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
 		} catch(Exception exception) {
 			exception.printStackTrace();
-			flagForRepair();
 		}
 		try {
 			loadVersionList();
@@ -149,11 +148,8 @@ public class StarMadeLauncher extends JFrame {
 			//Todo: Offline Mode
 		}
 		GAME_VERSION = getCurrentVersion();
-		boolean needsRepair = false;
-		if(GAME_VERSION == null || GAME_VERSION.build == null) {
-			needsRepair = true;
-			lastUsedBranch = 0;
-		} else {
+		if(GAME_VERSION == null || GAME_VERSION.build == null) lastUsedBranch = 0;
+		else {
 			switch(GAME_VERSION.build) {
 				case "RELEASE":
 					lastUsedBranch = 0;
@@ -169,11 +165,6 @@ public class StarMadeLauncher extends JFrame {
 					break;
 			}
 		}
-		//		File launcherFolder = new File("launcher");
-		//		if(!launcherFolder.exists()) {
-		//			launcherFolder.mkdirs();
-		//			repairLauncher();
-		//		}
 		try {
 			setIconImage(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/icon.png"))));
 		} catch(IOException exception) {
@@ -193,8 +184,6 @@ public class StarMadeLauncher extends JFrame {
 		setResizable(false);
 		getRootPane().setDoubleBuffered(true);
 		setVisible(true);
-
-		if(needsRepair) flagForRepair();
 	}
 
 	private void createMainPanel() {
@@ -276,7 +265,6 @@ public class StarMadeLauncher extends JFrame {
 			leftLabel.setIcon(new ImageIcon(image));
 		} catch(IOException exception) {
 			exception.printStackTrace();
-			flagForRepair();
 		}
 		//Stretch the image to the left panel
 		leftPanel.add(leftLabel, StackLayout.BOTTOM);
@@ -472,12 +460,22 @@ public class StarMadeLauncher extends JFrame {
 			northPanel.add(sliderLabel, BorderLayout.NORTH);
 			slider.setDoubleBuffered(true);
 			slider.setOpaque(false);
-			slider.setMajorTickSpacing(1024);
-			slider.setMinorTickSpacing(256);
+			if(getSystemMemory() > 16384) { //Make sure the slider is not too squished for those with really epic gamer pc's
+				slider.setMajorTickSpacing(2048);
+				slider.setMajorTickSpacing(1024);
+				slider.setLabelTable(slider.createStandardLabels(4096));
+			} else if(getSystemMemory() > 8192) {
+				slider.setMajorTickSpacing(1024);
+				slider.setMinorTickSpacing(512);
+				slider.setLabelTable(slider.createStandardLabels(2048));
+			} else {
+				slider.setMajorTickSpacing(1024);
+				slider.setMinorTickSpacing(256);
+				slider.setLabelTable(slider.createStandardLabels(1024));
+			}
 			slider.setPaintTicks(true);
 			slider.setPaintLabels(true);
 			slider.setSnapToTicks(true);
-			slider.setLabelTable(slider.createStandardLabels(1024));
 			northPanel.add(slider, BorderLayout.CENTER);
 			slider.addChangeListener(e1 -> sliderLabel.setText("Memory: " + slider.getValue() + " MB"));
 
@@ -574,7 +572,6 @@ public class StarMadeLauncher extends JFrame {
 			background.setIcon(new ImageIcon(image));
 		} catch(IOException exception) {
 			exception.printStackTrace();
-			flagForRepair();
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
 		//createNewsPanel();
@@ -591,7 +588,6 @@ public class StarMadeLauncher extends JFrame {
 			writer.close();
 		} catch(IOException exception) {
 			exception.printStackTrace();
-			flagForRepair();
 		}
 	}
 
@@ -616,21 +612,14 @@ public class StarMadeLauncher extends JFrame {
 				return object;
 			} catch(IOException e) {
 				e.printStackTrace();
-				flagForRepair();
 			}
 			return null;
 		}
 	}
 
 	private int getSystemMemory() {
-		try {
-			OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-			Method method = operatingSystemMXBean.getClass().getDeclaredMethod("getTotalPhysicalMemorySize");
-			method.setAccessible(true);
-			return (int) (Long.parseLong(method.invoke(operatingSystemMXBean).toString()) / 1024 / 1024);
-		} catch(Exception exception) {
-			return (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
-		}
+		com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+		return (int) (os.getTotalPhysicalMemorySize() / 1024 / 1024);
 	}
 
 	private void createPlayPanel(JPanel footerPanel) {
@@ -722,7 +711,6 @@ public class StarMadeLauncher extends JFrame {
 					dialog.setSize(400, 200);
 					dialog.setLocationRelativeTo(null);
 					dialog.setVisible(true);
-					flagForRepair();
 					return;
 				}
 				runStarMade();
@@ -806,7 +794,6 @@ public class StarMadeLauncher extends JFrame {
 			public void onError(Exception exception) {
 				exception.printStackTrace();
 				updateButton.setIcon(getIcon("update_btn.png", 280, 85));
-				flagForRepair();
 			}
 		}).start();
 	}
@@ -885,14 +872,6 @@ public class StarMadeLauncher extends JFrame {
 		return lookForGame(installDir);
 	}
 
-	private void flagForRepair() {
-		//Create dialog asking if user wants to repair
-		int choice = JOptionPane.showConfirmDialog(this, "The launcher or game installation is invalid. Would you like to repair it?", "Repair", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if(choice == JOptionPane.YES_OPTION) {
-			//Todo: Repair launcher
-		}
-	}
-
 	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
 		switch(branch) {
 			case RELEASE:
@@ -904,7 +883,6 @@ public class StarMadeLauncher extends JFrame {
 			case ARCHIVE:
 				return archiveVersions.get(0);
 			default:
-				flagForRepair();
 				return null;
 		}
 	}
