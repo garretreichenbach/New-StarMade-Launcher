@@ -17,8 +17,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +25,7 @@ import java.util.Collections;
 import java.util.Objects;
 
 /**
- * [Description]
+ * Main class for the StarMade Launcher.
  *
  * @author TheDerpGamer (TheDerpGamer#0027)
  */
@@ -38,8 +36,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public static final Color selectedColor = Color.decode("#438094");
 	public static final Color deselectedColor = Color.decode("#325561");
-
-	public static boolean useSteam ;
+	public static boolean useSteam;
 	private static boolean selectVersion;
 	private static boolean devMode;
 	private static int backup = Updater.BACK_DB;
@@ -131,6 +128,7 @@ public class StarMadeLauncher extends JFrame {
 	private JPanel serverPanel;
 	private JPanel playPanelButtons;
 	private LauncherNewsPanel newsPanel;
+	private JSONObject launchSettings;
 
 	public StarMadeLauncher() {
 		super("StarMade Launcher");
@@ -175,6 +173,8 @@ public class StarMadeLauncher extends JFrame {
 		setMinimumSize(new Dimension(800, 550));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+		launchSettings = getLaunchSettings();
 		createMainPanel();
 		dispose();
 
@@ -428,7 +428,6 @@ public class StarMadeLauncher extends JFrame {
 		launchSettings.setContentAreaFilled(false);
 		bottomPanel.add(launchSettings);
 		launchSettings.addActionListener(e -> {
-			//Create dialog with memory slider
 			JDialog dialog = new JDialog();
 			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			dialog.setModal(true);
@@ -518,10 +517,9 @@ public class StarMadeLauncher extends JFrame {
 			buttonPanel.add(cancelButton);
 
 			saveButton.addActionListener(e1 -> {
-				JSONObject l = new JSONObject();
-				l.put("memory", slider.getValue());
-				l.put("launchArgs", launchArgs.getText());
-				saveLaunchSettings(l);
+				this.launchSettings.put("memory", slider.getValue());
+				this.launchSettings.put("launchArgs", launchArgs.getText());
+				saveLaunchSettings();
 				dialog.dispose();
 			});
 			cancelButton.addActionListener(e1 -> dialog.dispose());
@@ -535,6 +533,87 @@ public class StarMadeLauncher extends JFrame {
 		installSettings.setOpaque(false);
 		installSettings.setContentAreaFilled(false);
 		bottomPanel.add(installSettings);
+		installSettings.addActionListener(e -> {
+			JDialog dialog = new JDialog();
+			dialog.setModal(true);
+			dialog.setResizable(false);
+			dialog.setTitle("Installation Settings");
+			dialog.setSize(450, 150);
+			dialog.setLocationRelativeTo(null);
+			dialog.setLayout(new BorderLayout());
+			dialog.setAlwaysOnTop(true);
+			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+			JPanel dialogPanel = new JPanel();
+			dialogPanel.setDoubleBuffered(true);
+			dialogPanel.setOpaque(false);
+			dialog.add(dialogPanel, BorderLayout.CENTER);
+
+			JPanel installLabelPanel = new JPanel();
+			installLabelPanel.setDoubleBuffered(true);
+			installLabelPanel.setOpaque(false);
+			installLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+			dialogPanel.add(installLabelPanel);
+
+			JLabel installLabel = new JLabel("Install Directory: ");
+			installLabel.setDoubleBuffered(true);
+			installLabel.setOpaque(false);
+			installLabel.setFont(new Font("Roboto", Font.BOLD, 12));
+			installLabelPanel.add(installLabel);
+
+			JTextField installLabelPath = new JTextField(installDir);
+			installLabelPath.setDoubleBuffered(true);
+			installLabelPath.setOpaque(false);
+			installLabelPath.setFont(new Font("Roboto", Font.PLAIN, 12));
+			installLabelPath.setMinimumSize(new Dimension(200, 20));
+			installLabelPath.setPreferredSize(new Dimension(200, 20));
+			installLabelPath.setMaximumSize(new Dimension(200, 20));
+			installLabelPanel.add(installLabelPath);
+
+			JButton installButton = new JButton("Change");
+			installButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
+			installButton.setDoubleBuffered(true);
+			installButton.setOpaque(false);
+			installButton.setContentAreaFilled(false);
+			installButton.setBorderPainted(false);
+			installButton.setFont(new Font("Roboto", Font.BOLD, 12));
+			dialogPanel.add(installButton);
+			installButton.addActionListener(e1 -> {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int result = fileChooser.showOpenDialog(dialog);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					if(!file.isDirectory()) file = file.getParentFile();
+					installDir = file.getAbsolutePath();
+					installLabel.setText("Install Directory: " + installDir);
+				}
+			});
+
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setDoubleBuffered(true);
+			buttonPanel.setOpaque(false);
+			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+			JButton saveButton = new JButton("Save");
+			saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
+			saveButton.setDoubleBuffered(true);
+			buttonPanel.add(saveButton);
+
+			JButton cancelButton = new JButton("Cancel");
+			cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
+			cancelButton.setDoubleBuffered(true);
+			buttonPanel.add(cancelButton);
+
+			saveButton.addActionListener(e1 -> {
+				this.launchSettings.put("installDir", installDir);
+				saveLaunchSettings();
+				dialog.dispose();
+			});
+			cancelButton.addActionListener(e1 -> dialog.dispose());
+			dialog.setVisible(true);
+		});
 
 		serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
@@ -577,13 +656,13 @@ public class StarMadeLauncher extends JFrame {
 		//createNewsPanel();
 	}
 
-	private void saveLaunchSettings(JSONObject object) {
+	private void saveLaunchSettings() {
 		try {
 			File file = new File("launch-settings.json");
 			if(file.exists()) file.delete();
 			file.createNewFile();
 			FileWriter writer = new FileWriter("launch-settings.json", StandardCharsets.UTF_8);
-			writer.write(object.toString());
+			writer.write(launchSettings.toString());
 			writer.flush();
 			writer.close();
 		} catch(IOException exception) {
@@ -605,6 +684,7 @@ public class StarMadeLauncher extends JFrame {
 				JSONObject object = new JSONObject();
 				object.put("memory", 2048);
 				object.put("launchArgs", "");
+				object.put("installDir", installDir);
 				FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
 				writer.write(object.toString());
 				writer.flush();
