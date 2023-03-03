@@ -7,6 +7,7 @@
     <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/launch-settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/launch-settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -152,7 +153,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1677864438828</updated>
-      <workItem from="1677864440314" duration="9424000" />
+      <workItem from="1677864440314" duration="10983000" />
     </task>
     <servers />
   </component>

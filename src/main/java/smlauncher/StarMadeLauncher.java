@@ -16,6 +16,9 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -439,10 +442,10 @@ public class StarMadeLauncher extends JFrame {
 		launchSettings.addActionListener(e -> {
 			//Create dialog with memory slider
 			JDialog dialog = new JDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			dialog.setModal(true);
 			dialog.setResizable(false);
-			dialog.setTitle("Memory Settings");
+			dialog.setTitle("Launch Settings");
 			dialog.setSize(500, 350);
 			dialog.setLocationRelativeTo(null);
 			dialog.setLayout(new BorderLayout());
@@ -454,7 +457,19 @@ public class StarMadeLauncher extends JFrame {
 			dialogPanel.setLayout(new BorderLayout());
 			dialog.add(dialogPanel);
 
-			JSlider slider = new JSlider(JSlider.HORIZONTAL, 1024, getSystemMemory(), getLaunchSettings().getInt("memory"));
+			JPanel northPanel = new JPanel();
+			northPanel.setDoubleBuffered(true);
+			northPanel.setOpaque(false);
+			northPanel.setLayout(new BorderLayout());
+			dialogPanel.add(northPanel, BorderLayout.NORTH);
+
+			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 1024, getSystemMemory(), Objects.requireNonNull(getLaunchSettings()).getInt("memory"));
+			JLabel sliderLabel = new JLabel("Memory: " + slider.getValue() + " MB");
+			sliderLabel.setDoubleBuffered(true);
+			sliderLabel.setOpaque(false);
+			sliderLabel.setFont(new Font("Roboto", Font.BOLD, 12));
+			sliderLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			northPanel.add(sliderLabel, BorderLayout.NORTH);
 			slider.setDoubleBuffered(true);
 			slider.setOpaque(false);
 			slider.setMajorTickSpacing(1024);
@@ -463,7 +478,14 @@ public class StarMadeLauncher extends JFrame {
 			slider.setPaintLabels(true);
 			slider.setSnapToTicks(true);
 			slider.setLabelTable(slider.createStandardLabels(1024));
-			dialogPanel.add(slider, BorderLayout.NORTH);
+			northPanel.add(slider, BorderLayout.CENTER);
+			slider.addChangeListener(e1 -> sliderLabel.setText("Memory: " + slider.getValue() + " MB"));
+
+			JPanel centerPanel = new JPanel();
+			centerPanel.setDoubleBuffered(true);
+			centerPanel.setOpaque(false);
+			centerPanel.setLayout(new BorderLayout());
+			dialogPanel.add(centerPanel, BorderLayout.CENTER);
 
 			JTextArea launchArgs = new JTextArea();
 			launchArgs.setDoubleBuffered(true);
@@ -472,7 +494,14 @@ public class StarMadeLauncher extends JFrame {
 			launchArgs.setLineWrap(true);
 			launchArgs.setWrapStyleWord(true);
 			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			dialogPanel.add(launchArgs, BorderLayout.CENTER);
+			centerPanel.add(launchArgs, BorderLayout.CENTER);
+
+			JLabel launchArgsLabel = new JLabel("Launch Arguments");
+			launchArgsLabel.setDoubleBuffered(true);
+			launchArgsLabel.setOpaque(false);
+			launchArgsLabel.setFont(new Font("Roboto", Font.BOLD, 12));
+			launchArgsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			centerPanel.add(launchArgsLabel, BorderLayout.NORTH);
 
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setDoubleBuffered(true);
@@ -483,23 +512,18 @@ public class StarMadeLauncher extends JFrame {
 			JButton saveButton = new JButton("Save");
 			saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			saveButton.setDoubleBuffered(true);
-			saveButton.setOpaque(false);
-			saveButton.setContentAreaFilled(false);
-			saveButton.setBorderPainted(false);
 			buttonPanel.add(saveButton);
 
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			cancelButton.setDoubleBuffered(true);
-			cancelButton.setOpaque(false);
-			cancelButton.setContentAreaFilled(false);
-			cancelButton.setBorderPainted(false);
 			buttonPanel.add(cancelButton);
 
 			saveButton.addActionListener(e1 -> {
-				getLaunchSettings().put("memory", slider.getValue());
-				getLaunchSettings().put("launchArgs", launchArgs.getText());
-				saveLaunchSettings();
+				JSONObject l = new JSONObject();
+				l.put("memory", slider.getValue());
+				l.put("launchArgs", launchArgs.getText());
+				saveLaunchSettings(l);
 				dialog.dispose();
 			});
 			cancelButton.addActionListener(e1 -> dialog.dispose());
@@ -556,10 +580,13 @@ public class StarMadeLauncher extends JFrame {
 		//createNewsPanel();
 	}
 
-	private void saveLaunchSettings() {
+	private void saveLaunchSettings(JSONObject object) {
 		try {
+			File file = new File("launch-settings.json");
+			if(file.exists()) file.delete();
+			file.createNewFile();
 			FileWriter writer = new FileWriter("launch-settings.json", StandardCharsets.UTF_8);
-			writer.write(getLaunchSettings().toString());
+			writer.write(object.toString());
 			writer.flush();
 			writer.close();
 		} catch(IOException exception) {
@@ -570,7 +597,13 @@ public class StarMadeLauncher extends JFrame {
 
 	private JSONObject getLaunchSettings() {
 		File file = new File("launch-settings.json");
-		if(!file.exists()) {
+		try {
+			FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
+			String data = IOUtils.toString(reader);
+			JSONObject object = new JSONObject(data);
+			reader.close();
+			return object;
+		} catch(Exception exception) {
 			try {
 				file.createNewFile();
 				JSONObject object = new JSONObject();
@@ -581,27 +614,23 @@ public class StarMadeLauncher extends JFrame {
 				writer.flush();
 				writer.close();
 				return object;
-			} catch(IOException exception) {
-				exception.printStackTrace();
+			} catch(IOException e) {
+				e.printStackTrace();
 				flagForRepair();
 			}
-		}
-
-		try {
-			FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
-			String data = IOUtils.toString(reader);
-			JSONObject object = new JSONObject(data);
-			reader.close();
-			return object;
-		} catch(IOException exception) {
-			exception.printStackTrace();
-			flagForRepair();
 			return null;
 		}
 	}
 
 	private int getSystemMemory() {
-		return (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
+		try {
+			OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+			Method method = operatingSystemMXBean.getClass().getDeclaredMethod("getTotalPhysicalMemorySize");
+			method.setAccessible(true);
+			return (int) (Long.parseLong(method.invoke(operatingSystemMXBean).toString()) / 1024 / 1024);
+		} catch(Exception exception) {
+			return (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
+		}
 	}
 
 	private void createPlayPanel(JPanel footerPanel) {
@@ -657,7 +686,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanel.add(playPanelButtons, BorderLayout.EAST);
 
 		if(getLatestVersion(getLastUsedBranch()) != GAME_VERSION && !devMode) {
-			JButton updateButton = new JButton(getIcon("update_btn.png"));
+			JButton updateButton = new JButton(getIcon("update_btn.png", 280, 85));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
 			updateButton.setContentAreaFilled(false);
@@ -668,17 +697,17 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					updateButton.setIcon(getIcon("update_roll.png"));
+					updateButton.setIcon(getIcon("update_roll.png", 280, 85));
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					updateButton.setIcon(getIcon("update_btn.png"));
+					updateButton.setIcon(getIcon("update_btn.png", 280, 85));
 				}
 			});
 			playPanelButtons.add(updateButton);
 		} else {
-			JButton playButton = new JButton(getIcon("launch_btn.png")); //Todo: Reduce button glow so this doesn't look weird
+			JButton playButton = new JButton(getIcon("launch_btn.png", 280, 85)); //Todo: Reduce button glow so this doesn't look weird
 			playButton.setDoubleBuffered(true);
 			playButton.setOpaque(false);
 			playButton.setContentAreaFilled(false);
@@ -702,12 +731,12 @@ public class StarMadeLauncher extends JFrame {
 			playButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					playButton.setIcon(getIcon("launch_roll.png"));
+					playButton.setIcon(getIcon("launch_roll.png", 280, 85));
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					playButton.setIcon(getIcon("launch_btn.png"));
+					playButton.setIcon(getIcon("launch_btn.png", 280, 85));
 				}
 			});
 			playPanelButtons.add(playButton);
@@ -720,7 +749,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private String getUserArgs() {
-		return getLaunchSettings().getString("launchArgs").trim() + " -Xms2048g -Xmx" + getLaunchSettings().getInt("memory") + "g";
+		return getLaunchSettings().getString("launchArgs").trim() + " -Xms1024m -Xmx" + getLaunchSettings().getInt("memory") + "m";
 	}
 
 	public void runStarMade() { //Todo: Support Linux and Mac
@@ -746,8 +775,8 @@ public class StarMadeLauncher extends JFrame {
 		if(choice == 0) backupMode = UpdaterThread.BACKUP_MODE_DATABASE;
 		else if(choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
 
-		ImageIcon updateButtonEmpty = getIcon("update_load_empty.png");
-		ImageIcon updateButtonFilled = getIcon("update_load_full.png");
+		ImageIcon updateButtonEmpty = getIcon("update_load_empty.png", 280, 85);
+		ImageIcon updateButtonFilled = getIcon("update_load_full.png", 280, 85);
 		updateButton.setIcon(updateButtonEmpty);
 
 		//Start update process and update progress bar
@@ -769,14 +798,14 @@ public class StarMadeLauncher extends JFrame {
 
 			@Override
 			public void onFinished() {
-				updateButton.setIcon(getIcon("update_btn.png"));
+				updateButton.setIcon(getIcon("update_btn.png", 280, 85));
 				updateButton.repaint();
 			}
 
 			@Override
 			public void onError(Exception exception) {
 				exception.printStackTrace();
-				updateButton.setIcon(getIcon("update_btn.png"));
+				updateButton.setIcon(getIcon("update_btn.png", 280, 85));
 				flagForRepair();
 			}
 		}).start();
