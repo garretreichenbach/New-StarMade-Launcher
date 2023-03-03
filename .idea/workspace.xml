@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.4/checksums/checksums.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.4/dependencies-accessors/dependencies-accessors.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.4/dependencies-accessors/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.4/fileChanges/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.4/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/vcs-1/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/UpdaterThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/news/LauncherNewsPanel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/news/LauncherNewsPost.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/news/LauncherNewsRetriever.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/news/NewsEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/CheckSumFailedException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/ChecksumFile.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/ChecksumFileEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/DataUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/DownloadCallback.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/ErrorDialog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/Eula.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/FileDowloadCallback.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/FileDownloadUpdate.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/FileEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/FileUpdateTotal.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/FileUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/FolderZipper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/HtmlDisplayer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/IndexFileEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/OldVersionException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/OperatingSystem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/SerializationInterface.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/StarMadeBackupTool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/StarMadeCredentials.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/Updater.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/Version.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/VersionContainer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/VersionNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/XMLSerializationInterface.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/ZipGUICallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="New-StarMade-Launcher" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="New-StarMade-Launcher" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="New-StarMade-Launcher" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="application" type="c8890929:TasksNode$1" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2MVtB2zG90ATVR8dZ7reh6F20XN" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/garre/OneDrive - Arizona State University/Documents/GitHub/New-StarMade-Launcher/src/main/java/smlauncher/util",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\garre\OneDrive - Arizona State University\Documents\GitHub\New-StarMade-Launcher\src\main\java\smlauncher\util" />
+      <recent name="C:\Users\garre\OneDrive - Arizona State University\Documents\GitHub\New-StarMade-Launcher\src\main\java\smlauncher" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="smlauncher.util" />
+      <recent name="smlauncher" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="lua.app" factoryName="Lua Application">
+      <option name="program" value="lua.exe" />
+      <option name="file" value="" />
+      <option name="workingDir" value="$PROJECT_DIR$/src/main/java" />
+      <option name="debuggerType" value="1" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="" />
+      <created>1677864438828</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1677864438828</updated>
+      <workItem from="1677864440314" duration="4590000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+</project>
