@@ -19,6 +19,7 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.Buffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
@@ -800,12 +801,18 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtons = new JPanel();
 		playPanelButtons.setDoubleBuffered(true);
 		playPanelButtons.setOpaque(false);
-		playPanelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
+		playPanelButtons.setLayout(new BorderLayout());
 		playPanel.remove(playPanelButtons);
 		playPanel.add(playPanelButtons, BorderLayout.EAST);
 
+		JPanel playPanelButtonsSub = new JPanel();
+		playPanelButtonsSub.setDoubleBuffered(true);
+		playPanelButtonsSub.setOpaque(false);
+		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
+
 		if(!lookForGame(installDir)) {
-			JButton updateButton = new JButton(getIcon("update_btn.png", 280, 85));
+			JButton updateButton = new JButton(getIcon("update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
 			updateButton.setContentAreaFilled(false);
@@ -816,19 +823,19 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_roll.png", 280, 85));
+					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_roll.png"));
 					else updateButton.setToolTipText("Updating... [" + (installProgress[0] * 100) + "%]");
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_btn.png", 280, 85));
+					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_btn.png"));
 					else updateButton.setToolTipText("");
 				}
 			});
-			playPanelButtons.add(updateButton);
+			playPanelButtonsSub.add(updateButton);
 		} else {
-			JButton playButton = new JButton(getIcon("launch_btn.png", 280, 85)); //Todo: Reduce button glow so this doesn't look weird
+			JButton playButton = new JButton(getIcon("launch_btn.png")); //Todo: Reduce button glow so this doesn't look weird
 			playButton.setDoubleBuffered(true);
 			playButton.setOpaque(false);
 			playButton.setContentAreaFilled(false);
@@ -864,15 +871,15 @@ public class StarMadeLauncher extends JFrame {
 			playButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					playButton.setIcon(getIcon("launch_roll.png", 280, 85));
+					playButton.setIcon(getIcon("launch_roll.png"));
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					playButton.setIcon(getIcon("launch_btn.png", 280, 85));
+					playButton.setIcon(getIcon("launch_btn.png"));
 				}
 			});
-			playPanelButtons.add(playButton);
+			playPanelButtonsSub.add(playButton);
 		}
 
 		playPanel.revalidate();
@@ -944,8 +951,8 @@ public class StarMadeLauncher extends JFrame {
 		if(choice == 0) backupMode = UpdaterThread.BACKUP_MODE_DATABASE;
 		else if(choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
 
-		ImageIcon updateButtonEmpty = getIcon("update_load_empty.png", 280, 85);
-		ImageIcon updateButtonFilled = getIcon("update_load_full.png", 280, 85);
+		ImageIcon updateButtonEmpty = getIcon("update_load_empty.png");
+		ImageIcon updateButtonFilled = getIcon("update_load_full.png");
 		updateButton.setIcon(updateButtonEmpty);
 
 		//Start update process and update progress bar
@@ -976,7 +983,7 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public void onError(Exception exception) {
 				exception.printStackTrace();
-				updateButton.setIcon(getIcon("update_btn.png", 280, 85));
+				updateButton.setIcon(getIcon("update_btn.png"));
 			}
 		}).start();
 	}
@@ -1039,6 +1046,22 @@ public class StarMadeLauncher extends JFrame {
 	private ImageIcon getIcon(String s, int width, int height) {
 		try {
 			return new ImageIcon(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s))).getScaledInstance(width, height, Image.SCALE_SMOOTH));
+		} catch(IOException exception) {
+			throw new RuntimeException(exception);
+		}
+	}
+
+	private ImageIcon getIcon(String s, int width, int height, boolean allowTransparency) {
+		try {
+			if(!allowTransparency) return new ImageIcon(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s))).getScaledInstance(width, height, Image.SCALE_SMOOTH));
+			else {
+				BufferedImage image = ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s)));
+				BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+				Graphics2D g = scaledImage.createGraphics();
+				g.drawImage(image, 0, 0, width, height, null);
+				g.dispose();
+				return new ImageIcon(scaledImage);
+			}
 		} catch(IOException exception) {
 			throw new RuntimeException(exception);
 		}
