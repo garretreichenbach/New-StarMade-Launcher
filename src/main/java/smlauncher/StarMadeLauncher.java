@@ -569,6 +569,15 @@ public class StarMadeLauncher extends JFrame {
 			installLabelPath.setPreferredSize(new Dimension(200, 20));
 			installLabelPath.setMaximumSize(new Dimension(200, 20));
 			installLabelPanel.add(installLabelPath);
+			installLabelPath.addActionListener(e1 -> {
+				String path = installLabelPath.getText();
+				if(path == null || path.isEmpty()) return;
+				File file = new File(path);
+				if(!file.exists()) return;
+				if(!file.isDirectory()) file = file.getParentFile();
+				installDir = file.getAbsolutePath();
+				installLabelPath.setText(installDir);
+			});
 
 			JButton installButton = new JButton("Change");
 			installButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
@@ -586,7 +595,7 @@ public class StarMadeLauncher extends JFrame {
 					File file = fileChooser.getSelectedFile();
 					if(!file.isDirectory()) file = file.getParentFile();
 					installDir = file.getAbsolutePath();
-					installLabel.setText("Install Directory: " + installDir);
+					installLabelPath.setText(installDir);
 				}
 			});
 
