@@ -19,10 +19,16 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Main class for the StarMade Launcher.
@@ -32,19 +38,20 @@ import java.util.Objects;
 public class StarMadeLauncher extends JFrame {
 
 	public static final int LAUNCHER_VERSION = 3;
+	private static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
+	private static final String JAVA_11_URL = "https://dl.dropboxusercontent.com/s/pqplrlwo9qxv9vs/jre11.zip?dl=0";
 	public static IndexFileEntry GAME_VERSION;
 
 	public static final Color selectedColor = Color.decode("#438094");
 	public static final Color deselectedColor = Color.decode("#325561");
 	public static boolean useSteam;
 	private static boolean selectVersion;
-	private static boolean devMode;
 	private static int backup = Updater.BACK_DB;
-	public static String installDir = "./StarMade/";
+	public static String installDir = "./StarMade";
 	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
+	private final float[] installProgress = new float[1];
 
 	public static void main(String[] args) {
-		//FlatDarculaLaf.setup();
 		boolean headless = false;
 		if(args == null || args.length == 0) startup();
 		else {
@@ -54,7 +61,6 @@ public class StarMadeLauncher extends JFrame {
 					selectVersion = true;
 					if(arg.contains("-dev")) buildBranch = Updater.VersionFile.DEV;
 					else if(arg.contains("-pre")) buildBranch = Updater.VersionFile.PRE;
-					else if(arg.contains("-archive")) buildBranch = Updater.VersionFile.ARCHIVE;
 					else buildBranch = Updater.VersionFile.RELEASE;
 				} else if("-no_gui".equals(arg) || "-nogui".equals(arg)) {
 					if(GraphicsEnvironment.isHeadless()) {
@@ -62,7 +68,7 @@ public class StarMadeLauncher extends JFrame {
 						System.out.println("Please use the '-nogui' parameter to run the launcher in text mode!");
 						return;
 					} else headless = true;
-				} else if("-devmode".equals(arg)) devMode = true;
+				}
 				if(headless) {
 					switch(arg) {
 						case "-h":
@@ -117,18 +123,19 @@ public class StarMadeLauncher extends JFrame {
 	public final ArrayList<IndexFileEntry> releaseVersions = new ArrayList<>();
 	public final ArrayList<IndexFileEntry> devVersions = new ArrayList<>();
 	public final ArrayList<IndexFileEntry> preReleaseVersions = new ArrayList<>();
-	public final ArrayList<IndexFileEntry> archiveVersions = new ArrayList<>();
 	public int lastUsedBranch;
 	private UpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
 	private JPanel mainPanel;
 	private JPanel centerPanel;
+	private JPanel footerPanel;
 	private JPanel versionPanel;
+	private JPanel playPanel;
 	private JPanel serverPanel;
 	private JPanel playPanelButtons;
 	private LauncherNewsPanel newsPanel;
-	private JSONObject launchSettings;
+	private final JSONObject launchSettings;
 
 	public StarMadeLauncher() {
 		super("StarMade Launcher");
@@ -158,9 +165,6 @@ public class StarMadeLauncher extends JFrame {
 				case "PRE":
 					lastUsedBranch = 2;
 					break;
-				case "ARCHIVE":
-					lastUsedBranch = 3;
-					break;
 			}
 		}
 		try {
@@ -184,6 +188,20 @@ public class StarMadeLauncher extends JFrame {
 		setResizable(false);
 		getRootPane().setDoubleBuffered(true);
 		setVisible(true);
+	}
+
+	private IndexFileEntry getCurrentVersion() {
+		try {
+			File versionFile = new File(installDir, "version.txt");
+			if(!versionFile.exists()) return null;
+			String version = Files.readString(versionFile.toPath());
+			for(IndexFileEntry entry : releaseVersions) if(version.contains(entry.build) && version.contains(entry.path)) return entry;
+			for(IndexFileEntry entry : devVersions) if(version.contains(entry.build) && version.contains(entry.path)) return entry;
+			for(IndexFileEntry entry : preReleaseVersions) if(version.contains(entry.build) && version.contains(entry.path)) return entry;
+		} catch(IOException exception) {
+			exception.printStackTrace();
+		}
+		return null;
 	}
 
 	private void createMainPanel() {
@@ -363,7 +381,7 @@ public class StarMadeLauncher extends JFrame {
 		logo.setIcon(getIcon("logo.png"));
 		leftInset.add(logo);
 
-		JPanel footerPanel = new JPanel();
+		footerPanel = new JPanel();
 		footerPanel.setDoubleBuffered(true);
 		footerPanel.setOpaque(false);
 		footerPanel.setLayout(new StackLayout());
@@ -632,7 +650,6 @@ public class StarMadeLauncher extends JFrame {
 			serverPanel.setVisible(false);
 			versionPanel.setVisible(true);
 			createPlayPanel(footerPanel);
-			footerPanel.repaint();
 		});
 
 		dedicatedServerButton.addActionListener(e -> {
@@ -642,7 +659,6 @@ public class StarMadeLauncher extends JFrame {
 			versionPanel.removeAll();
 			serverPanel.setVisible(true);
 			createServerPanel(footerPanel);
-			footerPanel.repaint();
 		});
 
 		centerPanel = new JPanel();
@@ -686,6 +702,7 @@ public class StarMadeLauncher extends JFrame {
 			String data = IOUtils.toString(reader);
 			JSONObject object = new JSONObject(data);
 			reader.close();
+			installDir = object.getString("installDir");
 			return object;
 		} catch(Exception exception) {
 			try {
@@ -694,6 +711,8 @@ public class StarMadeLauncher extends JFrame {
 				object.put("memory", 2048);
 				object.put("launchArgs", "");
 				object.put("installDir", installDir);
+				if(GAME_VERSION != null) object.put("lastUsedVersion", GAME_VERSION.build);
+				else object.put("lastUsedVersion", "NONE");
 				FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
 				writer.write(object.toString());
 				writer.flush();
@@ -712,7 +731,12 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createPlayPanel(JPanel footerPanel) {
-		JPanel playPanel = new JPanel();
+		if(playPanel != null) {
+			playPanel.removeAll();
+			playPanel.revalidate();
+			playPanel.repaint();
+		}
+		playPanel = new JPanel();
 		playPanel.setDoubleBuffered(true);
 		playPanel.setOpaque(false);
 		playPanel.setLayout(new BorderLayout());
@@ -742,21 +766,37 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		//branchDropdown.addItem("Archive");
 		branchDropdown.addActionListener(e -> {
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
+			recreateButtons(playPanel);
 		});
 		branchDropdown.setSelectedIndex(lastUsedBranch);
 		versionDropdown.removeAllItems();
 		updateVersions(versionDropdown, branchDropdown);
+		versionDropdown.addActionListener(e -> {
+			recreateButtons(playPanel);
+		});
+		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
+		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
+			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
+				versionDropdown.setSelectedIndex(i);
+				break;
+			}
+		}
 
 		versionSubPanel.add(branchDropdown);
 		versionSubPanel.add(versionDropdown);
 		recreateButtons(playPanel);
+		footerPanel.revalidate();
+		footerPanel.repaint();
 	}
 
 	private void recreateButtons(JPanel playPanel) {
+		if(playPanelButtons != null) {
+			playPanelButtons.removeAll();
+			playPanel.remove(playPanelButtons);
+		}
 		playPanelButtons = new JPanel();
 		playPanelButtons.setDoubleBuffered(true);
 		playPanelButtons.setOpaque(false);
@@ -764,7 +804,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanel.remove(playPanelButtons);
 		playPanel.add(playPanelButtons, BorderLayout.EAST);
 
-		if(getLatestVersion(getLastUsedBranch()) != GAME_VERSION && !devMode) {
+		if(!lookForGame(installDir)) {
 			JButton updateButton = new JButton(getIcon("update_btn.png", 280, 85));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
@@ -776,12 +816,14 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					updateButton.setIcon(getIcon("update_roll.png", 280, 85));
+					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_roll.png", 280, 85));
+					else updateButton.setToolTipText("Updating... [" + (installProgress[0] * 100) + "%]");
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					updateButton.setIcon(getIcon("update_btn.png", 280, 85));
+					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_btn.png", 280, 85));
+					else updateButton.setToolTipText("");
 				}
 			});
 			playPanelButtons.add(updateButton);
@@ -794,15 +836,28 @@ public class StarMadeLauncher extends JFrame {
 			playButton.addActionListener(e -> {
 				dispose();
 				if(!checkJavaVersion()) {
-					JDialog dialog = new JDialog(this, "Java not found", true);
-					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-					dialog.setResizable(false);
-					dialog.setLayout(new BorderLayout());
-					dialog.setSize(400, 200);
-					dialog.setLocationRelativeTo(null);
-					dialog.setVisible(true);
-					return;
+					//Create new Dialog to ask if user wants to install java
+					int result = JOptionPane.showConfirmDialog(null, "Java 8 or 11 is required to run StarMade, would you like to install it now?", "Java Required", JOptionPane.YES_NO_OPTION);
+					if(result != JOptionPane.YES_OPTION) return;
+					//Download java
+					try {
+						if(GAME_VERSION.build.startsWith("0.2")) {
+							downloadJava(JAVA_8_URL, "./jre8.zip");
+							ZipFile zipFile = new ZipFile("./jre8.zip");
+							unzip(zipFile, new File("./"));
+						} else {
+							downloadJava(JAVA_11_URL, "./jre11.zip");
+							ZipFile zipFile = new ZipFile("./jre11.zip");
+							unzip(zipFile, new File("./"));
+						}
+					} catch(IOException exception) {
+						exception.printStackTrace();
+						(new ErrorDialog("Error", "Failed to download java, manual installation required", exception)).setVisible(true);
+						return;
+					}
 				}
+				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
+				saveLaunchSettings();
 				runStarMade();
 				System.exit(0);
 			});
@@ -819,11 +874,47 @@ public class StarMadeLauncher extends JFrame {
 			});
 			playPanelButtons.add(playButton);
 		}
+
+		playPanel.revalidate();
+		playPanel.repaint();
+	}
+
+	private void downloadJava(String url, String destination) throws IOException {
+		URL website = new URL(url);
+		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+		FileOutputStream fos = new FileOutputStream(destination);
+		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+		fos.close();
+	}
+
+	private void unzip(ZipFile zipFile, File file) {
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		while(entries.hasMoreElements()) {
+			ZipEntry entry = entries.nextElement();
+			File entryDestination = new File(file, entry.getName());
+			entryDestination.getParentFile().mkdirs();
+			if(entry.isDirectory()) continue;
+			try {
+				InputStream in = zipFile.getInputStream(entry);
+				OutputStream out = new FileOutputStream(entryDestination);
+				byte[] buffer = new byte[1024];
+				int len;
+				while((len = in.read(buffer)) > 0) {
+					out.write(buffer, 0, len);
+				}
+				in.close();
+				out.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private boolean checkJavaVersion() {
-		if(GAME_VERSION.build.startsWith("0.2")) return new File("./jre8/java.exe").exists();
-		else return new File("./jre11/java.exe").exists();
+		File jre8 = new File("./jre8/bin/java.exe");
+		File jre11 = new File("./jre11/bin/java.exe");
+		if(GAME_VERSION.build.startsWith("0.2")) return jre8.exists();
+		else return jre11.exists();
 	}
 
 	private String getUserArgs() {
@@ -832,7 +923,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public void runStarMade() { //Todo: Support Linux and Mac
 		boolean useJava8 = (GAME_VERSION.build.startsWith("0.2")); //Use Java 11 on version 0.300 and above
-		String bundledJavaPath = new File((useJava8) ? "./jre8/java.exe" : "./jre11/java.exe").getPath();
+		String bundledJavaPath = new File((useJava8) ? "./jre8/bin/java.exe" : "./jre11/bin/java.exe").getPath();
 		ProcessBuilder proc = new ProcessBuilder(bundledJavaPath + " " + getUserArgs() +  " -jar StarMade.jar -force");
 		try {
 			proc.start();
@@ -858,9 +949,10 @@ public class StarMadeLauncher extends JFrame {
 		updateButton.setIcon(updateButtonEmpty);
 
 		//Start update process and update progress bar
-		(updaterThread = new UpdaterThread(getLatestVersion(getLastUsedBranch()), backupMode, new File("./")) {
+		(updaterThread = new UpdaterThread(getLatestVersion(getLastUsedBranch()), backupMode, new File(installDir)) {
 			@Override
 			public void onProgress(float progress) {
+				installProgress[0] = progress;
 				int width = updateButtonEmpty.getIconWidth();
 				int height = updateButtonEmpty.getIconHeight();
 				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -876,8 +968,9 @@ public class StarMadeLauncher extends JFrame {
 
 			@Override
 			public void onFinished() {
-				updateButton.setIcon(getIcon("update_btn.png", 280, 85));
-				updateButton.repaint();
+				GAME_VERSION = getCurrentVersion();
+				saveLaunchSettings();
+				recreateButtons(playPanel);
 			}
 
 			@Override
@@ -894,8 +987,6 @@ public class StarMadeLauncher extends JFrame {
 				return Updater.VersionFile.DEV;
 			case 2:
 				return Updater.VersionFile.PRE;
-			case 3:
-				return Updater.VersionFile.ARCHIVE;
 			default:
 				return Updater.VersionFile.RELEASE;
 		}
@@ -910,17 +1001,12 @@ public class StarMadeLauncher extends JFrame {
 		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Dev")) {
 			for(IndexFileEntry version : devVersions) {
 				if(version.build.startsWith("2017")) continue;
-				if(version.equals(devVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)");
+				if(version.equals(devVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)"); //Todo: Sub versions
 				else versionDropdown.addItem(version.build);
 			}
 		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Pre-Release")) {
 			for(IndexFileEntry version : preReleaseVersions) {
 				if(version.equals(preReleaseVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)");
-				else versionDropdown.addItem(version.build);
-			}
-		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Archive")) {
-			for(IndexFileEntry version : archiveVersions) {
-				if(version.equals(archiveVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)");
 				else versionDropdown.addItem(version.build);
 			}
 		}
@@ -970,33 +1056,9 @@ public class StarMadeLauncher extends JFrame {
 				return devVersions.get(0);
 			case PRE:
 				return preReleaseVersions.get(0);
-			case ARCHIVE:
-				return archiveVersions.get(0);
 			default:
 				return null;
 		}
-	}
-
-	private IndexFileEntry getCurrentVersion() {
-		File versionFile = new File("version.txt");
-		if(versionFile.exists()) {
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(versionFile, StandardCharsets.UTF_8));
-				String path = reader.readLine();
-				String version = reader.readLine();
-				String build = reader.readLine();
-				reader.close();
-				return new IndexFileEntry(build, path, version, getLastUsedBranch());
-			} catch(IOException exception) {
-				exception.printStackTrace();
-				(new ErrorDialog("Error", "IO Error", exception)).setVisible(true);
-			}
-		}
-		return null;
-	}
-
-	private void repairLauncher() {
-		//Todo: Repair launcher
 	}
 
 	private void loadVersionList() throws IOException {
@@ -1004,7 +1066,6 @@ public class StarMadeLauncher extends JFrame {
 		releaseVersions.clear();
 		devVersions.clear();
 		preReleaseVersions.clear();
-		archiveVersions.clear();
 		for(Updater.VersionFile branch : Updater.VersionFile.values()) {
 			url = new URL(branch.location);
 			URLConnection openConnection = url.openConnection();
@@ -1036,11 +1097,6 @@ public class StarMadeLauncher extends JFrame {
 						preReleaseVersions.sort(Collections.reverseOrder());
 						System.err.println("loaded files (sorted) " + preReleaseVersions);
 						break;
-					case ARCHIVE:
-						archiveVersions.add(new IndexFileEntry(build, path, version, branch));
-						archiveVersions.sort(Collections.reverseOrder());
-						System.err.println("loaded files (sorted) " + archiveVersions);
-						break;
 				}
 			}
 			in.close();
@@ -1062,7 +1118,6 @@ public class StarMadeLauncher extends JFrame {
 		System.out.println("-no_gui dont start gui (needed for linux dedicated servers)");
 		System.out.println("-no_backup dont create backup (default backup is server database only)");
 		System.out.println("-backup_all create backup of everything (default backup is server database only)");
-		System.out.println("-archive use archive branch (default is release)");
 		System.out.println("-pre use pre branch (default is release)");
 		System.out.println("-dev use dev branch (default is release)");
 	}

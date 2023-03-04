@@ -3,3 +3,10 @@
 /build/
 /StarMade Launcher.jar
 /launch-settings.json
+/jre8/
+/jre11/
+/StarMade/
+version.txt
+MANIFEST.MF
+/jre8.zip
+/jre11.zip

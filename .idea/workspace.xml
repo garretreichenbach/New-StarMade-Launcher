@@ -7,8 +7,11 @@
     <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/launch-settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/launch-settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/UpdaterThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/UpdaterThread.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,7 +147,8 @@
       <option name="presentableId" value="Default" />
       <updated>1677864438828</updated>
       <workItem from="1677864440314" duration="15937000" />
-      <workItem from="1677893628825" duration="408000" />
+      <workItem from="1677893628825" duration="440000" />
+      <workItem from="1677896621521" duration="7459000" />
     </task>
     <servers />
   </component>

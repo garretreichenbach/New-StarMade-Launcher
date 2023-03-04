@@ -40,12 +40,11 @@ public class UpdaterThread extends Thread {
 			ChecksumFile checksums = Updater.getChecksums(buildDir);
 			if(!installDir.exists()) installDir.mkdirs();
 			float finalSize = checksums.checksums.size();
-			float[] progress = {0};
 			checksums.download(false, buildDir, installDir, installDir.getPath(), new FileDowloadCallback() {
 				@Override
 				public void update(FileDownloadUpdate u) {
-					progress[0] ++; //Todo: This doesn't seem to work quite right.
-					onProgress(progress[0] / finalSize);
+					onProgress(u.index / finalSize);
+					if(u.index == finalSize) onFinished();
 				}
 
 				@Override
@@ -53,7 +52,7 @@ public class UpdaterThread extends Thread {
 
 				}
 			});
-			onFinished();
+			//onFinished();
 		} catch(IOException exception) {
 			exception.printStackTrace();
 			onError(exception);
