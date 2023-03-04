@@ -742,12 +742,13 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		branchDropdown.addItem("Archive");
+		//branchDropdown.addItem("Archive");
 		branchDropdown.addActionListener(e -> {
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
 		});
 		branchDropdown.setSelectedIndex(lastUsedBranch);
+		versionDropdown.removeAllItems();
 		updateVersions(versionDropdown, branchDropdown);
 
 		versionSubPanel.add(branchDropdown);
