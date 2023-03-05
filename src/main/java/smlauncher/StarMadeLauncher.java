@@ -1043,34 +1043,6 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private ImageIcon getIcon(String s, int width, int height) {
-		try {
-			return new ImageIcon(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s))).getScaledInstance(width, height, Image.SCALE_SMOOTH));
-		} catch(IOException exception) {
-			throw new RuntimeException(exception);
-		}
-	}
-
-	private ImageIcon getIcon(String s, int width, int height, boolean allowTransparency) {
-		try {
-			if(!allowTransparency) return new ImageIcon(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s))).getScaledInstance(width, height, Image.SCALE_SMOOTH));
-			else {
-				BufferedImage image = ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s)));
-				BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-				Graphics2D g = scaledImage.createGraphics();
-				g.drawImage(image, 0, 0, width, height, null);
-				g.dispose();
-				return new ImageIcon(scaledImage);
-			}
-		} catch(IOException exception) {
-			throw new RuntimeException(exception);
-		}
-	}
-
-	private boolean isInstallValid() {
-		return lookForGame(installDir);
-	}
-
 	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
 		switch(branch) {
 			case RELEASE:
