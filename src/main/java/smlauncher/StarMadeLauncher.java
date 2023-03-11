@@ -865,7 +865,7 @@ public class StarMadeLauncher extends JFrame {
 				}
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				saveLaunchSettings();
-				runStarMade();
+				runStarMade(false);
 				System.exit(0);
 			});
 			playButton.addMouseListener(new MouseAdapter() {
@@ -928,13 +928,21 @@ public class StarMadeLauncher extends JFrame {
 		return Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").trim() + " -Xms1024m -Xmx" + getLaunchSettings().getInt("memory") + "m";
 	}
 
-	public void runStarMade() { //Todo: Support Linux and Mac
+	public void runStarMade(boolean server) { //Todo: Support Linux and Mac
 		boolean useJava8 = (GAME_VERSION.build.startsWith("0.2")); //Use Java 11 on version 0.300 and above
 		String bundledJavaPath = new File((useJava8) ? "./jre8/bin/java.exe" : "./jre11/bin/java.exe").getPath();
-		ProcessBuilder proc = new ProcessBuilder(bundledJavaPath + " " + getUserArgs() +  " -jar StarMade.jar -force");
+		ProcessBuilder proc = new ProcessBuilder(bundledJavaPath);
+		proc.directory(new File(installDir));
+		proc.command().add("-jar");
+		proc.command().add("StarMade.jar");
+		proc.command().add(getUserArgs().trim());
+		if(server) proc.command().add("-server");
+		else proc.command().add("-force");
 		try {
+			proc.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+			proc.redirectError(ProcessBuilder.Redirect.INHERIT);
 			proc.start();
-		} catch(IOException exception) {
+		} catch(Exception exception) {
 			throw new RuntimeException(exception);
 		}
 	}
