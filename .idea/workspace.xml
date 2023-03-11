@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/launch-settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/launch-settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
-    </list>
+    <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -152,7 +147,7 @@
       <workItem from="1677962092394" duration="293000" />
       <workItem from="1677985204435" duration="716000" />
       <workItem from="1678044464042" duration="168000" />
-      <workItem from="1678563547135" duration="1557000" />
+      <workItem from="1678563547135" duration="1855000" />
     </task>
     <servers />
   </component>
