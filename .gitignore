@@ -4,9 +4,11 @@
 /StarMade Launcher.jar
 /launch-settings.json
 /jre8/
-/jre11/
+/jre18/
 /StarMade/
 version.txt
 MANIFEST.MF
 /jre8.zip
-/jre11.zip
+/jre18.zip
+.idea/workspace.xml
+.idea/misc.xml
