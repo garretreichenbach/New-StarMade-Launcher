@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.4/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +100,28 @@
       <recent name="smlauncher" />
     </key>
   </component>
-  <component name="RunManager" selected="JAR Application.StarMade Launcher.jar">
+  <component name="RunManager" selected="Gradle.New-StarMade-Launcher [jar]">
+    <configuration name="New-StarMade-Launcher [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
     <configuration name="New-StarMade-Launcher [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -131,13 +151,15 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Gradle.New-StarMade-Launcher [clean]" />
       <item itemvalue="Gradle.New-StarMade-Launcher [jar]" />
       <item itemvalue="JAR Application.StarMade Launcher.jar" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JAR Application.StarMade Launcher.jar" />
         <item itemvalue="Gradle.New-StarMade-Launcher [jar]" />
+        <item itemvalue="Gradle.New-StarMade-Launcher [clean]" />
+        <item itemvalue="JAR Application.StarMade Launcher.jar" />
       </list>
     </recent_temporary>
   </component>
@@ -156,7 +178,7 @@
       <workItem from="1677985204435" duration="716000" />
       <workItem from="1678044464042" duration="168000" />
       <workItem from="1678563547135" duration="2052000" />
-      <workItem from="1678655665799" duration="383000" />
+      <workItem from="1678655665799" duration="539000" />
     </task>
     <servers />
   </component>
