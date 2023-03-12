@@ -10,3 +10,5 @@ version.txt
 MANIFEST.MF
 /jre8.zip
 /jre18.zip
+.idea/workspace.xml
+.idea/misc.xml

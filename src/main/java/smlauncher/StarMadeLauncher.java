@@ -19,6 +19,7 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.Buffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +40,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public static final int LAUNCHER_VERSION = 3;
 	private static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
-	private static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
+	private static final String JAVA_11_URL = "https://dl.dropboxusercontent.com/s/pqplrlwo9qxv9vs/jre11.zip?dl=0";
 	public static IndexFileEntry GAME_VERSION;
 
 	public static final Color selectedColor = Color.decode("#438094");
@@ -843,7 +844,7 @@ public class StarMadeLauncher extends JFrame {
 				dispose();
 				if(!checkJavaVersion()) {
 					//Create new Dialog to ask if user wants to install java
-					int result = JOptionPane.showConfirmDialog(null, "Java 8 or 18 is required to run StarMade, would you like to install it now?", "Java Required", JOptionPane.YES_NO_OPTION);
+					int result = JOptionPane.showConfirmDialog(null, "Java 8 or 11 is required to run StarMade, would you like to install it now?", "Java Required", JOptionPane.YES_NO_OPTION);
 					if(result != JOptionPane.YES_OPTION) return;
 					//Download java
 					try {
@@ -852,8 +853,8 @@ public class StarMadeLauncher extends JFrame {
 							ZipFile zipFile = new ZipFile("./jre8.zip");
 							unzip(zipFile, new File("./"));
 						} else {
-							downloadJava(JAVA_18_URL, "./jre18.zip");
-							ZipFile zipFile = new ZipFile("./jre18.zip");
+							downloadJava(JAVA_11_URL, "./jre11.zip");
+							ZipFile zipFile = new ZipFile("./jre11.zip");
 							unzip(zipFile, new File("./"));
 						}
 					} catch(IOException exception) {
@@ -918,9 +919,9 @@ public class StarMadeLauncher extends JFrame {
 
 	private boolean checkJavaVersion() {
 		File jre8 = new File("./jre8/bin/java.exe");
-		File jre18 = new File("./jre18/bin/java.exe");
+		File jre11 = new File("./jre11/bin/java.exe");
 		if(GAME_VERSION.build.startsWith("0.2")) return jre8.exists();
-		else return jre18.exists();
+		else return jre11.exists();
 	}
 
 	private String getUserArgs() {
@@ -928,8 +929,8 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	public void runStarMade(boolean server) { //Todo: Support Linux and Mac
-		boolean useJava8 = (GAME_VERSION.build.startsWith("0.2")); //Use Java 18 on version 0.300 and above
-		String bundledJavaPath = new File((useJava8) ? "./jre8/bin/java.exe" : "./jre18/bin/java.exe").getPath();
+		boolean useJava8 = (GAME_VERSION.build.startsWith("0.2")); //Use Java 11 on version 0.300 and above
+		String bundledJavaPath = new File((useJava8) ? "./jre8/bin/java.exe" : "./jre11/bin/java.exe").getPath();
 		ProcessBuilder proc = new ProcessBuilder(bundledJavaPath);
 		proc.directory(new File(installDir));
 		proc.command().add("-jar");
