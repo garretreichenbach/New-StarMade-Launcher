@@ -40,7 +40,7 @@ public class StarMadeLauncher extends JFrame {
 	public static final int LAUNCHER_VERSION = 3;
 	private static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
 	private static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
-	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED\n" + "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED\n" + "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED\n" + "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED\n" + "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED\n" + "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED\n" + "--add-opens=java.base/java.lang=ALL-UNNAMED\n" + "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED\n" + "--add-opens=java.base/java.io=ALL-UNNAMED\n" + "--add-opens=java.base/java.util=ALL-UNNAMED";
+	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED";
 	public static IndexFileEntry GAME_VERSION;
 
 	public static final Color selectedColor = Color.decode("#438094");
