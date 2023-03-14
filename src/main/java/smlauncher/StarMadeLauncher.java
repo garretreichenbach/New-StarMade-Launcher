@@ -40,6 +40,7 @@ public class StarMadeLauncher extends JFrame {
 	public static final int LAUNCHER_VERSION = 3;
 	private static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
 	private static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
+	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED\n" + "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED\n" + "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED\n" + "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED\n" + "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED\n" + "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED\n" + "--add-opens=java.base/java.lang=ALL-UNNAMED\n" + "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED\n" + "--add-opens=java.base/java.io=ALL-UNNAMED\n" + "--add-opens=java.base/java.util=ALL-UNNAMED";
 	public static IndexFileEntry GAME_VERSION;
 
 	public static final Color selectedColor = Color.decode("#438094");
@@ -711,8 +712,14 @@ public class StarMadeLauncher extends JFrame {
 				object.put("memory", 2048);
 				object.put("launchArgs", "");
 				object.put("installDir", installDir);
-				if(GAME_VERSION != null) object.put("lastUsedVersion", GAME_VERSION.build);
-				else object.put("lastUsedVersion", "NONE");
+				if(GAME_VERSION != null) {
+					object.put("lastUsedVersion", GAME_VERSION.build);
+					if(GAME_VERSION.build.startsWith("0.2")) object.put("jvm_args", "--illegal-access=permit");
+					else object.put("jvm_args", J18ARGS);
+				} else {
+					object.put("lastUsedVersion", "NONE");
+					object.put("jvm_args", "");
+				}
 				FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
 				writer.write(object.toString());
 				writer.flush();
@@ -848,10 +855,12 @@ public class StarMadeLauncher extends JFrame {
 					//Download java
 					try {
 						if(GAME_VERSION.build.startsWith("0.2")) {
+							launchSettings.put("jvm_args", "--illegal-access=permit");
 							downloadJava(JAVA_8_URL, "./jre8.zip");
 							ZipFile zipFile = new ZipFile("./jre8.zip");
 							unzip(zipFile, new File("./"));
 						} else {
+							launchSettings.put("jvm_args", J18ARGS);
 							downloadJava(JAVA_18_URL, "./jre18.zip");
 							ZipFile zipFile = new ZipFile("./jre18.zip");
 							unzip(zipFile, new File("./"));
@@ -924,7 +933,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private String getUserArgs() {
-		return Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").trim() + " -Xms1024m -Xmx" + getLaunchSettings().getInt("memory") + "m";
+		return Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").trim() + " " + getLaunchSettings().getString("jvm_args").trim() + " -Xms1024m -Xmx" + getLaunchSettings().getInt("memory") + "m";
 	}
 
 	public void runStarMade(boolean server) { //Todo: Support Linux and Mac
