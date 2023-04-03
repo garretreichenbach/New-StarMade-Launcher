@@ -45,6 +45,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public static final Color selectedColor = Color.decode("#438094");
 	public static final Color deselectedColor = Color.decode("#325561");
+	public static boolean debugMode;
 	public static boolean useSteam;
 	private static boolean selectVersion;
 	private static int backup = Updater.BACK_DB;
@@ -69,7 +70,7 @@ public class StarMadeLauncher extends JFrame {
 						System.out.println("Please use the '-nogui' parameter to run the launcher in text mode!");
 						return;
 					} else headless = true;
-				}
+				} else if("-debug".equals(arg)) debugMode = true;
 				if(headless) {
 					switch(arg) {
 						case "-h":
@@ -817,7 +818,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
 
-		if(!lookForGame(installDir)) {
+		if((!lookForGame(installDir) || GAME_VERSION != getLatestVersion(buildBranch)) && !debugMode) {
 			JButton updateButton = new JButton(getIcon("update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
