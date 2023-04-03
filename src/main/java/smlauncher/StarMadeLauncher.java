@@ -714,7 +714,7 @@ public class StarMadeLauncher extends JFrame {
 				object.put("installDir", installDir);
 				if(GAME_VERSION != null) {
 					object.put("lastUsedVersion", GAME_VERSION.build);
-					if(GAME_VERSION.build.startsWith("0.2")) object.put("jvm_args", "--illegal-access=permit");
+					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) object.put("jvm_args", "--illegal-access=permit");
 					else object.put("jvm_args", J18ARGS);
 				} else {
 					object.put("lastUsedVersion", "NONE");
@@ -854,7 +854,7 @@ public class StarMadeLauncher extends JFrame {
 					if(result != JOptionPane.YES_OPTION) return;
 					//Download java
 					try {
-						if(GAME_VERSION.build.startsWith("0.2")) {
+						if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) {
 							launchSettings.put("jvm_args", "--illegal-access=permit");
 							downloadJava(JAVA_8_URL, "./jre8.zip");
 							ZipFile zipFile = new ZipFile("./jre8.zip");
@@ -928,7 +928,7 @@ public class StarMadeLauncher extends JFrame {
 	private boolean checkJavaVersion() {
 		File jre8 = new File("./jre8/bin/java.exe");
 		File jre18 = new File("./jre18/bin/java.exe");
-		if(GAME_VERSION.build.startsWith("0.2")) return jre8.exists();
+		if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) return jre8.exists();
 		else return jre18.exists();
 	}
 
@@ -937,7 +937,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	public void runStarMade(boolean server) { //Todo: Support Linux and Mac
-		boolean useJava8 = (GAME_VERSION.build.startsWith("0.2")); //Use Java 18 on version 0.300 and above
+		boolean useJava8 = (GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")); //Use Java 18 on version 0.300 and above
 		String bundledJavaPath = new File((useJava8) ? "./jre8/bin/java.exe" : "./jre18/bin/java.exe").getPath();
 		ProcessBuilder proc = new ProcessBuilder(bundledJavaPath);
 		proc.directory(new File(installDir));
