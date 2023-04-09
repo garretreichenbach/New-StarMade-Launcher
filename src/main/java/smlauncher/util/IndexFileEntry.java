@@ -19,11 +19,12 @@ public class IndexFileEntry implements Comparable<IndexFileEntry> {
 		return build.compareToIgnoreCase(arg0.build);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
-	public String toString() {
+	public String toString(){
+		return build;
+	}
+
+	public String toStringFull() {
 		return build + " v" + version + " (" + v.name() + ")";
 	}
 

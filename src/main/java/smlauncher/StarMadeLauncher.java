@@ -671,35 +671,35 @@ public class StarMadeLauncher extends JFrame {
 		updateButton.setIcon(updateButtonEmpty);
 
 		//Start update process and update progress bar
-		(updaterThread = new UpdaterThread(getLatestVersion(getLastUsedBranch()), backupMode, new File("./")) {
-			@Override
-			public void onProgress(float progress) {
-				int width = updateButtonEmpty.getIconWidth();
-				int height = updateButtonEmpty.getIconHeight();
-				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = image.createGraphics();
-				g.drawImage(updateButtonEmpty.getImage(), 0, 0, null);
-				//Create sub image of filled image
-				int filledWidth = (int) (width * progress);
-				g.drawImage(updateButtonFilled.getImage(), 0, 0, filledWidth, updateButtonFilled.getIconHeight(), 0, 0, filledWidth, updateButtonFilled.getIconHeight(), null);
-				g.dispose();
-				updateButton.setIcon(new ImageIcon(image));
-				updateButton.repaint();
-			}
-
-			@Override
-			public void onFinished() {
-				updateButton.setIcon(getIcon("update_btn.png"));
-				updateButton.repaint();
-			}
-
-			@Override
-			public void onError(Exception exception) {
-				exception.printStackTrace();
-				updateButton.setIcon(getIcon("update_btn.png"));
-				flagForRepair();
-			}
-		}).start();
+//		(updaterThread = new UpdaterThread(getLatestVersion(getLastUsedBranch()), backupMode, new File("./")) {
+//			@Override
+//			public void onProgress(float progress) {
+//				int width = updateButtonEmpty.getIconWidth();
+//				int height = updateButtonEmpty.getIconHeight();
+//				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//				Graphics2D g = image.createGraphics();
+//				g.drawImage(updateButtonEmpty.getImage(), 0, 0, null);
+//				//Create sub image of filled image
+//				int filledWidth = (int) (width * progress);
+//				g.drawImage(updateButtonFilled.getImage(), 0, 0, filledWidth, updateButtonFilled.getIconHeight(), 0, 0, filledWidth, updateButtonFilled.getIconHeight(), null);
+//				g.dispose();
+//				updateButton.setIcon(new ImageIcon(image));
+//				updateButton.repaint();
+//			}
+//
+//			@Override
+//			public void onFinished() {
+//				updateButton.setIcon(getIcon("update_btn.png"));
+//				updateButton.repaint();
+//			}
+//
+//			@Override
+//			public void onError(Exception exception) {
+//				exception.printStackTrace();
+//				updateButton.setIcon(getIcon("update_btn.png"));
+//				flagForRepair();
+//			}
+//		}).start();
 	}
 
 	private Updater.VersionFile getLastUsedBranch() {

@@ -1,6 +1,7 @@
 package smlauncher;
 
 
+import smlauncher.contents.LaunchPanel;
 import smlauncher.util.*;
 
 import java.io.File;
@@ -36,16 +37,20 @@ public class UpdaterThread extends Thread {
 			boolean dbOnly = backupMode == BACKUP_MODE_DATABASE;
 			if(backupMode != BACKUP_MODE_NONE && installDir.exists()) (new StarMadeBackupTool()).backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
 
-			String buildDir = FILES_URL + "/build/starmade-build_" + entry.path;
+			String buildDir = FILES_URL + "build/starmade-build_" + entry.path;
 			ChecksumFile checksums = Updater.getChecksums(buildDir);
 			if(!installDir.exists()) installDir.mkdirs();
-			float finalSize = checksums.checksums.size();
-			float[] progress = {0};
 			checksums.download(false, buildDir, installDir, installDir.getPath(), new FileDowloadCallback() {
 				@Override
 				public void update(FileDownloadUpdate u) {
-					progress[0] ++; //Todo: This doesn't seem to work quite right.
-					onProgress(progress[0] / finalSize);
+					float totalPct = u.index/ ((float) u.total);
+					LaunchPanel.totalBar.setValue((int) (1000*totalPct));
+					LaunchPanel.totalBar.setString((int)(u.downloadSpeed/1024) + " Kbps");
+
+					System.out.println(u);
+					float indPct = u.downloaded/ ((float) u.size);
+					LaunchPanel.indBar.setValue((int) (1000*indPct));
+					LaunchPanel.indBar.setString(u.fileName);
 				}
 
 				@Override
@@ -53,18 +58,11 @@ public class UpdaterThread extends Thread {
 
 				}
 			});
-			onFinished();
+			System.out.println("Done lol");
 		} catch(IOException exception) {
 			exception.printStackTrace();
-			onError(exception);
 		} catch(NoSuchAlgorithmException exception) {
 			throw new RuntimeException(exception);
 		}
 	}
-
-	public void onProgress(float progress) {}
-
-	public void onFinished() {}
-
-	public void onError(Exception exception) {}
 }
