@@ -29,6 +29,7 @@ public class CoolButton extends JPanel implements MouseListener {
         this.setVisible(true);
         this.setLocation(x, y);
         this.setSize(w, h);
+        setOpaque(false);
 
         panel.add(this);
 

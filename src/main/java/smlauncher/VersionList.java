@@ -1,5 +1,6 @@
 package smlauncher;
 
+import smlauncher.contents.LaunchPanel;
 import smlauncher.util.IndexFileEntry;
 import smlauncher.util.Updater;
 
@@ -12,6 +13,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 public class VersionList {
     public static String installationDir = "./sm/";
@@ -30,7 +32,7 @@ public class VersionList {
         else if (choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
 
         //Start update process and update progress bar
-        UpdaterThread updaterThread = new UpdaterThread(releaseVersions.get(0), backupMode, new File(installationDir));
+        UpdaterThread updaterThread = new UpdaterThread((IndexFileEntry) LaunchPanel.versionDropdown.getSelectedItem(), backupMode, new File(installationDir));
         updaterThread.start();
     }
 
@@ -64,6 +66,7 @@ public class VersionList {
                     case DEV:
                         devVersions.add(new IndexFileEntry(build, path, version, branch));
                         devVersions.sort(Collections.reverseOrder());
+                        devVersions.removeIf(next -> next.toString().startsWith("2017")); // 2017 broke
                         System.err.println("loaded files (sorted) " + devVersions);
                         break;
                     case PRE:

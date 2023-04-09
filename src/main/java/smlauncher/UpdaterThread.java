@@ -38,6 +38,9 @@ public class UpdaterThread extends Thread {
 			if(backupMode != BACKUP_MODE_NONE && installDir.exists()) (new StarMadeBackupTool()).backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
 
 			String buildDir = FILES_URL + "build/starmade-build_" + entry.path;
+			if (entry.v == Updater.VersionFile.DEV){
+				buildDir = FILES_URL + "build/dev/starmade-build_" + entry.path;
+			}
 			ChecksumFile checksums = Updater.getChecksums(buildDir);
 			if(!installDir.exists()) installDir.mkdirs();
 			checksums.download(false, buildDir, installDir, installDir.getPath(), new FileDowloadCallback() {
@@ -58,7 +61,9 @@ public class UpdaterThread extends Thread {
 
 				}
 			});
-			System.out.println("Done lol");
+			LaunchPanel.resetBars();
+			// Update installed version TODO
+			System.out.println("Done");
 		} catch(IOException exception) {
 			exception.printStackTrace();
 		} catch(NoSuchAlgorithmException exception) {

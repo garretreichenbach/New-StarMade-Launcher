@@ -38,11 +38,17 @@ public class LaunchPanel extends JPanel implements MouseListener {
         setLocation(x, y);
         setSize(w, h);
 
+
+
         //Version dropdown
-        JComboBox<IndexFileEntry> versionDropdown = new JComboBox<>();
+        versionDropdown = new JComboBox<>();
         versionDropdown.setOpaque(false);
         versionDropdown.setLocation(15, 65);
         versionDropdown.setSize(150, 30);
+
+
+
+        versionDropdown.setBorder(BorderFactory.createEmptyBorder());
 
         //Branch dropdown
         JComboBox<String> branchDropdown = new JComboBox<>();
@@ -57,8 +63,16 @@ public class LaunchPanel extends JPanel implements MouseListener {
             updateVersions(versionDropdown, branchDropdown);
         });
         IndexFileEntry installedVersion = InstalledUtils.getInstalledVersion();
-        branchDropdown.setSelectedIndex(0);
         updateVersions(versionDropdown, branchDropdown);
+        if( installedVersion == null){
+            versionDropdown.setSelectedIndex(0);
+            branchDropdown.setSelectedIndex(0);
+        }else{
+            branchDropdown.setSelectedItem(installedVersion.version);
+//            versionDropdown.setSelectedItem(installedVersion); // Use last selected version
+            versionDropdown.setSelectedIndex(0); // Use latest
+        }
+
         branchDropdown.setLocation(15, 15);
         branchDropdown.setSize(150, 30);
 
@@ -66,31 +80,58 @@ public class LaunchPanel extends JPanel implements MouseListener {
         add(branchDropdown);
 
         JButton launchButton = new JButton("Update");
-        launchButton.setLocation(w - 120 - 15, h / 2 - 15);
+        launchButton.setLocation(w - 120 - 15, h / 3 - 15);
         launchButton.setSize(120, 30);
         launchButton.addActionListener(e -> {
             VersionList.updateGame();
         });
+        JButton playButton = new JButton("Play");
+        playButton.setLocation(w - 120 - 15, h * 2 / 3 - 15);
+        playButton.setSize(120, 30);
+        playButton.addActionListener(e -> {
+//            VersionList.updateGame();
+        });
 
         add(launchButton);
+        add(playButton);
 
         totalBar = new JProgressBar(0, 1000);
         totalBar.setBounds(200, 27, 500, 30);
-        totalBar.setString("download bar");
+        totalBar.setString("");
         totalBar.setStringPainted(true);
+        totalBar.setBorderPainted(false);
         add(totalBar);
 
         indBar = new JProgressBar(0, 1000);
         indBar.setBounds(200, 57, 500, 25);
-        indBar.setString("individual prog bar");
+        indBar.setString("");
         indBar.setStringPainted(true);
+        indBar.setBorderPainted(false);
         add(indBar);
+
+        Font font = new Font("Roboto", Font.BOLD, 14);
+        for (Component component : getComponents()) {
+            component.setFont(font);
+            component.setBackground(new Color(40, 40, 40));
+            component.setForeground(new Color(255, 255, 255));
+            component.setFocusable(false);
+        }
+        Color barColor = new Color(0, 1, 87);
+        indBar.setForeground(barColor);
+        totalBar.setForeground(barColor);
 
         panel.add(this);
     }
-
+    public static JComboBox<IndexFileEntry> versionDropdown;
     public static JProgressBar totalBar;
     public static JProgressBar indBar;
+
+    public static void resetBars(){
+        totalBar.setValue(0);
+        totalBar.setString("Done");
+        indBar.setValue(0);
+        indBar.setString("");
+    }
 
     private void updateVersions(JComboBox<IndexFileEntry> versionDropdown, JComboBox<String> branchDropdown) {
         Object selected = branchDropdown.getSelectedItem();
