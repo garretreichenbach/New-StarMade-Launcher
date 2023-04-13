@@ -28,10 +28,10 @@ public class Images {
             try {
                 image = ImageIO.read(GoodLauncher.class.getResourceAsStream("/" + str.toLowerCase(Locale.ENGLISH) + ".png"));
 
-                if(str.startsWith("button") || str.startsWith("bar")){
-                    ImageProducer filteredImgProd = new FilteredImageSource(image.getSource(), filter);
-                    image = Toolkit.getDefaultToolkit().createImage(filteredImgProd);
-                }
+//                if(str.startsWith("button") || str.startsWith("bar")){
+//                    ImageProducer filteredImgProd = new FilteredImageSource(image.getSource(), filter);
+//                    image = Toolkit.getDefaultToolkit().createImage(filteredImgProd);
+//                }
 
                 map.put(str, image);
                 return image;

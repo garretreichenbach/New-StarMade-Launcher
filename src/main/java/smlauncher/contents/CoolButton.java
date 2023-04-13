@@ -39,28 +39,36 @@ public class CoolButton extends JPanel implements MouseListener {
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        if(active){
-            g.drawImage(Images.get(img + "A"), 0, 0, null);
-        }else{
-            g.drawImage(Images.get(img), 0, 0, null);
+
+        String currentImage = img;
+        if(held){
+            currentImage += "S";
+        }else if(active){
+            currentImage += "A";
         }
-        g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 24));
+
+        g.drawImage(Images.get(currentImage), 0, 0, null);
+
+        Font font = new Font("Roboto", Font.BOLD, 20);
+        g.setFont(font);
         g.setColor(Color.WHITE);
         drawCenteredString(g, name, new Rectangle(0, 0, getWidth(), getHeight()), g.getFont());
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-
     }
+    boolean held = false;
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        held = true;
+        repaint();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        held = false;
+        repaint();
     }
 
     @Override
