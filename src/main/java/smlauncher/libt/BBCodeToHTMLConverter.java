@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 public class BBCodeToHTMLConverter {
     public static ArrayList<String> convert(String bbcode) {
         ArrayList<String> output = new ArrayList<>();
-        System.out.println("Input:\n" + bbcode);
         for (String line : getLines(bbcode)) {
             // Regular stuff
             line = line.replace("[", "<").replace("]", ">");
@@ -21,6 +20,7 @@ public class BBCodeToHTMLConverter {
             line = line.replace("h3>", "h2>");
 
             output.add(line);
+            System.out.println(line);
         }
         return output;
     }
@@ -36,7 +36,12 @@ public class BBCodeToHTMLConverter {
             String s;
             if (index == -1) {
                 // No line found
-                s = "<font color=\"" + color + "\">" + line;
+                s = "<font face=\"Verdana\" color=\"" + color + "\">" + line;
+                if(line.length() >= 3){
+                    if(line.startsWith("[b]") || !line.startsWith("<")){
+                        s = "<br>" + s + "<br>";
+                    }
+                }
             } else {
                 s = insertString(line, "<font color=\"" + color + "\">", index);
             }

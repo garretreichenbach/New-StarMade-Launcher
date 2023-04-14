@@ -20,14 +20,11 @@ public class MainPanel extends JPanel {
         LaunchPanel bgPanel = new LaunchPanel(this, x, 391, "bar");
 
         NewsPane np = new NewsPane(this);
-
         JScrollPane scrollPane = new JScrollPane(np);
-        Image bg = Images.get("npane");
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setBounds(NewsPane.X, NewsPane.Y, bg.getWidth(null), bg.getHeight(null));
+        scrollPane.setBounds(NewsPane.X, NewsPane.Y, NewsPane.W, NewsPane.H);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setBackground(Color.black);
-        scrollPane.setForeground(Color.blue);
+        scrollPane.setVisible(true);
         add(scrollPane);
     }
 

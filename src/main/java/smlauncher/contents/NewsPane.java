@@ -13,34 +13,41 @@ import java.util.ArrayList;
 public class NewsPane extends JEditorPane {
     public static int X = 226;
     public static int Y = 45;
+    public static int W = 675;
+    public static int H = 295;
     public NewsPane(MainPanel mainPanel) {
         mainPanel.add(this);
-        Image bg = Images.get("npane");
-        setBounds(226, 45, bg.getWidth(null), bg.getHeight(null));
+        setBounds(X,Y,W,H);
         setBackground(new Color(0, 0, 0, 0));
         setForeground(Color.white);
         setOpaque(false);
+        setEditable(false);
         setContentType("text/html");
 
-        StringBuilder contents = new StringBuilder();
-        contents.append("<hr>");
-//        for (SteamNewsAPI.NewsPost post : SteamNewsAPI.getPosts()) {
-        SteamNewsAPI.NewsPost post = SteamNewsAPI.getPosts().get(1);
-        System.out.println(post.getUrl());
-        ArrayList<String> lines = BBCodeToHTMLConverter.convert(post.getContents());
-        lines = BBCodeToHTMLConverter.insertColors(lines, "#ffffff");
+        StringBuilder sb = new StringBuilder();
+        for (SteamNewsAPI.NewsPost post : SteamNewsAPI.getPosts()) {
+            ArrayList<String> lines = BBCodeToHTMLConverter.convert(post.getContents());
 
-        for (String line : lines) {
-            contents.append(line);
+            lines.add(0, "<h3>sus!!!!</h3>");
+            lines = BBCodeToHTMLConverter.insertColors(lines, "#eeeeee");
+            lines.add("<hr>");
+
+            for (String line : lines) {
+                sb.append(line);
+            }
         }
-        setText(contents.toString());
+        setText(sb.toString());
 
 
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        g.drawImage(Images.get("npane"), 0, 0, null);
+        Color inner = new Color(18, 18, 18);
+
+        g.setColor(inner);
+        g.fillRect(0,0, W, getHeight());
+
         super.paintComponent(g);
     }
 }
