@@ -8,8 +8,9 @@ import java.io.IOException;
 public class GoodLauncher {
     public static int W = 960;
     public static int H = 570;
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         VersionList.loadVersionList();
+
         JFrame frame = new JFrame("Dead Game Launcher 3.0");
         frame.setLayout(null);
         frame.setVisible(true);

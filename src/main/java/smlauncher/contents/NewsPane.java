@@ -1,13 +1,13 @@
 package smlauncher.contents;
 
-import smlauncher.Images;
 import smlauncher.libt.BBCodeToHTMLConverter;
 import smlauncher.libt.SteamNewsAPI;
 
 import javax.swing.*;
-import javax.swing.text.EditorKit;
 import java.awt.*;
-import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 public class NewsPane extends JEditorPane {
@@ -28,7 +28,8 @@ public class NewsPane extends JEditorPane {
         for (SteamNewsAPI.NewsPost post : SteamNewsAPI.getPosts()) {
             ArrayList<String> lines = BBCodeToHTMLConverter.convert(post.getContents());
 
-            lines.add(0, "<h3>sus!!!!</h3>");
+            LocalDate ldt = Instant.ofEpochMilli(post.getDate()*1000L).atZone(ZoneId.systemDefault()).toLocalDate();
+            lines.add("<p><a href=\""+post.getUrl()+"\">Posted on " + ldt.toString() + " by " + post.getAuthor() + "</a></p>");
             lines = BBCodeToHTMLConverter.insertColors(lines, "#eeeeee");
             lines.add("<hr>");
 
@@ -40,12 +41,12 @@ public class NewsPane extends JEditorPane {
 
 
     }
-
+    public static final Color paneColor = new Color(18, 18, 18);
     @Override
     protected void paintComponent(Graphics g) {
-        Color inner = new Color(18, 18, 18);
 
-        g.setColor(inner);
+
+        g.setColor(paneColor);
         g.fillRect(0,0, W, getHeight());
 
         super.paintComponent(g);

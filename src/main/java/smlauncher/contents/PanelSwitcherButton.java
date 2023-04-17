@@ -6,9 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
-public class CoolButton extends JPanel implements MouseListener {
+public class PanelSwitcherButton extends JPanel implements MouseListener {
     private boolean active = false;
     private final int x;
     private final int y;
@@ -16,8 +15,11 @@ public class CoolButton extends JPanel implements MouseListener {
     private final int h;
     private final String img;
     private String name;
-
-    public CoolButton(JPanel panel, int x, int y, int w, int h, String img, String name){
+    public static int idSelect = 0;
+    int id;
+    public PanelSwitcherButton(JPanel panel, int x, int y, int w, int h, String img, String name){
+        id = idSelect;
+        idSelect++;
         this.name = name;
         addMouseListener(this);
         this.x = x;
@@ -62,6 +64,7 @@ public class CoolButton extends JPanel implements MouseListener {
     @Override
     public void mousePressed(MouseEvent e) {
         held = true;
+        MainPanel.inst.switchActivePane(id);
         repaint();
     }
 
@@ -91,7 +94,7 @@ public class CoolButton extends JPanel implements MouseListener {
      * @param text The String to draw.
      * @param rect The Rectangle to center the text in.
      */
-    public void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
+    public static void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
         // Get the FontMetrics
         FontMetrics metrics = g.getFontMetrics(font);
         // Determine the X coordinate for the text
