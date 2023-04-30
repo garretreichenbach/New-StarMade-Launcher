@@ -1,19 +1,17 @@
 package smlauncher;
 
 import smlauncher.contents.LaunchPanel;
+import smlauncher.contents.MainPanel;
 import smlauncher.util.IndexFileEntry;
 import smlauncher.util.Updater;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 
 public class VersionList {
     public static String installationDir = "./sm/";
@@ -34,6 +32,8 @@ public class VersionList {
         //Start update process and update progress bar
         UpdaterThread updaterThread = new UpdaterThread((IndexFileEntry) LaunchPanel.versionDropdown.getSelectedItem(), backupMode, new File(installationDir));
         updaterThread.start();
+        MainPanel.inst.launchPanel.launchButton.setEnabled(false);
+        MainPanel.inst.launchPanel.playButton.setEnabled(false);
     }
 
     public static void loadVersionList() throws IOException {

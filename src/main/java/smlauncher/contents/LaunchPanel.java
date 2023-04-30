@@ -1,6 +1,5 @@
 package smlauncher.contents;
 
-import smlauncher.GoodLauncher;
 import smlauncher.Images;
 import smlauncher.InstalledUtils;
 import smlauncher.VersionList;
@@ -10,8 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.ImageFilter;
-import java.awt.image.RGBImageFilter;
 import java.util.Objects;
 
 public class LaunchPanel extends JPanel implements MouseListener {
@@ -21,6 +18,9 @@ public class LaunchPanel extends JPanel implements MouseListener {
     private final int w;
     private final int h;
     private final String img;
+
+    public JButton launchButton;
+    public JButton playButton;
 
     public LaunchPanel(JPanel panel, int x, int y, String img) {
         this.x = x;
@@ -39,13 +39,11 @@ public class LaunchPanel extends JPanel implements MouseListener {
         setSize(w, h);
 
 
-
         //Version dropdown
         versionDropdown = new JComboBox<>();
         versionDropdown.setOpaque(false);
         versionDropdown.setLocation(15, 65);
         versionDropdown.setSize(150, 30);
-
 
 
         versionDropdown.setBorder(BorderFactory.createEmptyBorder());
@@ -56,7 +54,7 @@ public class LaunchPanel extends JPanel implements MouseListener {
         branchDropdown.setOpaque(false);
         branchDropdown.addItem("Release");
         branchDropdown.addItem("Dev");
-        branchDropdown.addItem("Pre-Release");
+        branchDropdown.addItem("Universe Dev");
         branchDropdown.addItem("Archive");
         branchDropdown.addActionListener(e -> {
             versionDropdown.removeAllItems();
@@ -64,10 +62,10 @@ public class LaunchPanel extends JPanel implements MouseListener {
         });
         IndexFileEntry installedVersion = InstalledUtils.getInstalledVersion();
         updateVersions(versionDropdown, branchDropdown);
-        if( installedVersion == null){
+        if (installedVersion == null) {
             versionDropdown.setSelectedIndex(0);
             branchDropdown.setSelectedIndex(0);
-        }else{
+        } else {
             branchDropdown.setSelectedItem(installedVersion.version);
 //            versionDropdown.setSelectedItem(installedVersion); // Use last selected version
             versionDropdown.setSelectedIndex(0); // Use latest
@@ -79,13 +77,13 @@ public class LaunchPanel extends JPanel implements MouseListener {
         add(versionDropdown);
         add(branchDropdown);
 
-        JButton launchButton = new JButton("Update");
+        launchButton = new JButton("Update");
         launchButton.setLocation(w - 120 - 15, h / 3 - 15);
         launchButton.setSize(120, 30);
         launchButton.addActionListener(e -> {
             VersionList.updateGame();
         });
-        JButton playButton = new JButton("Play");
+        playButton = new JButton("Play");
         playButton.setLocation(w - 120 - 15, h * 2 / 3 - 15);
         playButton.setSize(120, 30);
         playButton.addActionListener(e -> {
@@ -122,11 +120,12 @@ public class LaunchPanel extends JPanel implements MouseListener {
 
         panel.add(this);
     }
+
     public static JComboBox<IndexFileEntry> versionDropdown;
     public static JProgressBar totalBar;
     public static JProgressBar indBar;
 
-    public static void resetBars(){
+    public static void resetBars() {
         totalBar.setValue(0);
         totalBar.setString("Done");
         indBar.setValue(0);
@@ -139,7 +138,7 @@ public class LaunchPanel extends JPanel implements MouseListener {
             VersionList.releaseVersions.forEach(versionDropdown::addItem);
         } else if (Objects.equals(selected, "Dev")) {
             VersionList.devVersions.forEach(versionDropdown::addItem);
-        } else if (Objects.equals(selected, "Pre-Release")) {
+        } else if (Objects.equals(selected, "Universe Dev")) {
             VersionList.preReleaseVersions.forEach(versionDropdown::addItem);
         } else if (Objects.equals(selected, "Archive")) {
             VersionList.archiveVersions.forEach(versionDropdown::addItem);

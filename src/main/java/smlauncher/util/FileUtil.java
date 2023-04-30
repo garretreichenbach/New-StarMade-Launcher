@@ -5,13 +5,11 @@ import org.apache.commons.io.output.StringBuilderWriter;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.Selector;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 public class FileUtil {
@@ -73,7 +71,7 @@ public class FileUtil {
 	}
 
 	public static URL convertToURLEscapingIllegalCharacters(String string) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
-		String decodedURL = URLDecoder.decode(string, StandardCharsets.UTF_8);
+		String decodedURL = URLDecoder.decode(string);
 		URL url = new URL(decodedURL);
 		URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 		return uri.toURL();
@@ -930,7 +928,7 @@ public class FileUtil {
 
 		FileReader s = null;
 		try {
-			s = new FileReader(file, StandardCharsets.UTF_8);
+			s = new FileReader(file);
 			BufferedReader r = new BufferedReader(s);
 			StringBuffer sb = new StringBuffer();
 

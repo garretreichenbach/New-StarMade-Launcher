@@ -8,9 +8,12 @@ import java.awt.*;
 public class MainPanel extends JPanel {
 
     public static MainPanel inst;
-    NewsPane np;
-    JScrollPane scrollPane;
-    JPanel linksPanel;
+    public NewsPane np;
+    public JScrollPane scrollPane;
+    public JPanel linksPanel;
+    OptionsPanel optionsPanel;
+
+    public LaunchPanel launchPanel;
 
     public MainPanel(){
         inst = this;
@@ -22,9 +25,9 @@ public class MainPanel extends JPanel {
         PanelSwitcherButton news = new PanelSwitcherButton(this, x, ix, 150, 40, "button", "NEWS");
         PanelSwitcherButton options = new PanelSwitcherButton(this, x, ix + i, 150, 40, "button", "OPTIONS");
         PanelSwitcherButton links = new PanelSwitcherButton(this, x, ix + (i *2), 150, 40, "button", "LINKS");
-        PanelSwitcherButton info = new PanelSwitcherButton(this, x, ix + (i * 3), 150, 40, "button", "INFO");
+//        PanelSwitcherButton info = new PanelSwitcherButton(this, x, ix + (i * 3), 150, 40, "button", "INFO");
 
-        LaunchPanel bgPanel = new LaunchPanel(this, x, 391, "bar");
+        launchPanel = new LaunchPanel(this, x, 391, "bar");
 
          np = new NewsPane(this);
 
@@ -39,6 +42,8 @@ public class MainPanel extends JPanel {
 
         linksPanel = new LinksPanel();
         add(linksPanel);
+        optionsPanel = new OptionsPanel();
+        add(optionsPanel);
 
 
         switchActivePane(0);
@@ -48,11 +53,12 @@ public class MainPanel extends JPanel {
         np.setVisible(false);
         scrollPane.setVisible(false);
         linksPanel.setVisible(false);
+        optionsPanel.setVisible(false);
         if(id == 0){
             np.setVisible(true);
             scrollPane.setVisible(true);
         }else if(id == 1){
-            linksPanel.setVisible(true);
+            optionsPanel.setVisible(true);
         }else if(id == 2){
             linksPanel.setVisible(true);
         }else if(id == 3){
