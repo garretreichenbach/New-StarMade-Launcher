@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/launch-settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/launch-settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/UpdaterThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/UpdaterThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/util/Updater.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/util/Updater.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,7 +185,7 @@
       <workItem from="1693863900865" duration="498000" />
       <workItem from="1693864425514" duration="755000" />
       <workItem from="1693937916695" duration="4485000" />
-      <workItem from="1693952584097" duration="1645000" />
+      <workItem from="1693952584097" duration="2049000" />
     </task>
     <servers />
   </component>

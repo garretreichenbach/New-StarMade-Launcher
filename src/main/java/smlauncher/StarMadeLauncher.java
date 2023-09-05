@@ -796,11 +796,13 @@ public class StarMadeLauncher extends JFrame {
 							downloadJava(JAVA_8_URL, "./jre8.zip");
 							ZipFile zipFile = new ZipFile("./jre8.zip");
 							unzip(zipFile, new File("./"));
+							new File("./jre8.zip").deleteOnExit();
 						} else {
 							launchSettings.put("jvm_args", J18ARGS);
 							downloadJava(JAVA_18_URL, "./jre18.zip");
 							ZipFile zipFile = new ZipFile("./jre18.zip");
 							unzip(zipFile, new File("./"));
+							new File("./jre18.zip").deleteOnExit();
 						}
 					} catch(IOException exception) {
 						exception.printStackTrace();
