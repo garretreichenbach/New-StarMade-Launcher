@@ -10,7 +10,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -133,7 +135,7 @@ public class StarMadeLauncher extends JFrame {
 		super("StarMade Launcher");
 		FlatDarkLaf.setup();
 		try {
-			URL resource = StarMadeLauncher.class.getResource("/icon.png");
+			URL resource = StarMadeLauncher.class.getResource("/sprites/icon.png");
 			if(resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
 		} catch(Exception exception) {
 			exception.printStackTrace();
@@ -154,7 +156,7 @@ public class StarMadeLauncher extends JFrame {
 			}
 		}
 		try {
-			setIconImage(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/icon.png"))));
+			setIconImage(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/sprites/icon.png"))));
 		} catch(IOException exception) {
 			exception.printStackTrace();
 		}
@@ -201,19 +203,19 @@ public class StarMadeLauncher extends JFrame {
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 		JLabel topLabel = new JLabel();
 		topLabel.setDoubleBuffered(true);
-		topLabel.setIcon(getIcon("header_top.png"));
+		topLabel.setIcon(getIcon("sprites/header_top.png"));
 		topPanel.add(topLabel);
 		JPanel topPanelButtons = new JPanel();
 		topPanelButtons.setDoubleBuffered(true);
 		topPanelButtons.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		topPanelButtons.setOpaque(false);
-		JButton closeButton = new JButton(null, getIcon("close_icon.png")); //Todo: Replace these cus they look like shit
+		JButton closeButton = new JButton(null, getIcon("sprites/close_icon.png")); //Todo: Replace these cus they look like shit
 		closeButton.setDoubleBuffered(true);
 		closeButton.setOpaque(false);
 		closeButton.setContentAreaFilled(false);
 		closeButton.setBorderPainted(false);
 		closeButton.addActionListener(e -> System.exit(0));
-		JButton minimizeButton = new JButton(null, getIcon("minimize_icon.png"));
+		JButton minimizeButton = new JButton(null, getIcon("sprites/minimize_icon.png"));
 		minimizeButton.setDoubleBuffered(true);
 		minimizeButton.setOpaque(false);
 		minimizeButton.setContentAreaFilled(false);
@@ -252,7 +254,7 @@ public class StarMadeLauncher extends JFrame {
 		JLabel leftLabel = new JLabel();
 		leftLabel.setDoubleBuffered(true);
 		try {
-			Image image = ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/left_panel.png")));
+			Image image = ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/sprites/left_panel.png")));
 			//Resize the image to the left panel
 			image = image.getScaledInstance(150, 500, Image.SCALE_SMOOTH);
 			leftLabel.setIcon(new ImageIcon(image));
@@ -347,7 +349,7 @@ public class StarMadeLauncher extends JFrame {
 		JLabel logo = new JLabel();
 		logo.setDoubleBuffered(true);
 		logo.setOpaque(false);
-		logo.setIcon(getIcon("logo.png"));
+		logo.setIcon(getIcon("sprites/logo.png"));
 		leftInset.add(logo);
 		footerPanel = new JPanel();
 		footerPanel.setDoubleBuffered(true);
@@ -356,7 +358,7 @@ public class StarMadeLauncher extends JFrame {
 		mainPanel.add(footerPanel, BorderLayout.SOUTH);
 		JLabel footerLabel = new JLabel();
 		footerLabel.setDoubleBuffered(true);
-		footerLabel.setIcon(getIcon("footer_normalplay_bg.jpg"));
+		footerLabel.setIcon(getIcon("sprites/footer_normalplay_bg.jpg"));
 		footerPanel.add(footerLabel);
 		JPanel topRightPanel = new JPanel();
 		topRightPanel.setDoubleBuffered(true);
@@ -366,7 +368,7 @@ public class StarMadeLauncher extends JFrame {
 		JLabel logoLabel = new JLabel();
 		logoLabel.setDoubleBuffered(true);
 		logoLabel.setOpaque(false);
-		logoLabel.setIcon(getIcon("launcher_schine_logo.png"));
+		logoLabel.setIcon(getIcon("sprites/launcher_schine_logo.png"));
 		topRightPanel.add(logoLabel, BorderLayout.EAST);
 		JButton normalPlayButton = new JButton("Play");
 		normalPlayButton.setFont(new Font("Roboto", Font.BOLD, 12));
@@ -399,7 +401,7 @@ public class StarMadeLauncher extends JFrame {
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		footerPanel.add(bottomPanel, BorderLayout.SOUTH);
 		JButton launchSettings = new JButton("Launch Settings");
-		launchSettings.setIcon(getIcon("memory_options_gear.png"));
+		launchSettings.setIcon(getIcon("sprites/memory_options_gear.png"));
 		launchSettings.setFont(new Font("Roboto", Font.BOLD, 12));
 		launchSettings.setDoubleBuffered(true);
 		launchSettings.setOpaque(false);
@@ -502,7 +504,7 @@ public class StarMadeLauncher extends JFrame {
 			dialog.setVisible(true);
 		});
 		JButton installSettings = new JButton("Installation Settings");
-		installSettings.setIcon(getIcon("launch_options_gear.png"));
+		installSettings.setIcon(getIcon("sprites/launch_options_gear.png"));
 		installSettings.setFont(new Font("Roboto", Font.BOLD, 12));
 		installSettings.setDoubleBuffered(true);
 		installSettings.setOpaque(false);
@@ -592,13 +594,13 @@ public class StarMadeLauncher extends JFrame {
 		serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
 		normalPlayButton.addActionListener(e -> {
-			footerLabel.setIcon(getIcon("footer_normalplay_bg.jpg"));
+			footerLabel.setIcon(getIcon("sprites/footer_normalplay_bg.jpg"));
 			serverPanel.setVisible(false);
 			versionPanel.setVisible(true);
 			createPlayPanel(footerPanel);
 		});
 		dedicatedServerButton.addActionListener(e -> {
-			footerLabel.setIcon(getIcon("footer_dedicated_bg.jpg"));
+			footerLabel.setIcon(getIcon("sprites/footer_dedicated_bg.jpg"));
 			versionPanel.setVisible(false);
 			playPanelButtons.removeAll();
 			versionPanel.removeAll();
@@ -613,7 +615,7 @@ public class StarMadeLauncher extends JFrame {
 		JLabel background = new JLabel();
 		background.setDoubleBuffered(true);
 		try {
-			Image image = ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/left_panel.png")));
+			Image image = ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/sprites/left_panel.png")));
 			//Resize the image to the left panel
 			image = image.getScaledInstance(800, 500, Image.SCALE_SMOOTH);
 			background.setIcon(new ImageIcon(image));
@@ -755,7 +757,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
 		if(!lookForGame(installDir) || GAME_VERSION == null || !Objects.equals(GAME_VERSION.build, selectedVersion)) {
-			JButton updateButton = new JButton(getIcon("update_btn.png"));
+			JButton updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
 			updateButton.setContentAreaFilled(false);
@@ -766,19 +768,19 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_roll.png"));
+					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("sprites/update_roll.png"));
 					else updateButton.setToolTipText("Updating... [" + (int) (installProgress[0] * 100) + ".0%]");
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_btn.png"));
+					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("sprites/update_btn.png"));
 					else updateButton.setToolTipText("");
 				}
 			});
 			playPanelButtonsSub.add(updateButton);
 		} else {
-			JButton playButton = new JButton(getIcon("launch_btn.png")); //Todo: Reduce button glow so this doesn't look weird
+			JButton playButton = new JButton(getIcon("sprites/launch_btn.png")); //Todo: Reduce button glow so this doesn't look weird
 			playButton.setDoubleBuffered(true);
 			playButton.setOpaque(false);
 			playButton.setContentAreaFilled(false);
@@ -818,12 +820,12 @@ public class StarMadeLauncher extends JFrame {
 			playButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					playButton.setIcon(getIcon("launch_roll.png"));
+					playButton.setIcon(getIcon("sprites/launch_roll.png"));
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					playButton.setIcon(getIcon("launch_btn.png"));
+					playButton.setIcon(getIcon("sprites/launch_btn.png"));
 				}
 			});
 			playPanelButtonsSub.add(playButton);
@@ -852,9 +854,7 @@ public class StarMadeLauncher extends JFrame {
 				OutputStream out = new FileOutputStream(entryDestination);
 				byte[] buffer = new byte[1024];
 				int len;
-				while((len = in.read(buffer)) > 0) {
-					out.write(buffer, 0, len);
-				}
+				while((len = in.read(buffer)) > 0) out.write(buffer, 0, len);
 				in.close();
 				out.close();
 			} catch(IOException e) {
@@ -904,8 +904,8 @@ public class StarMadeLauncher extends JFrame {
 		int backupMode = UpdaterThread.BACKUP_MODE_NONE;
 		if(choice == 0) backupMode = UpdaterThread.BACKUP_MODE_DATABASE;
 		else if(choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
-		ImageIcon updateButtonEmpty = getIcon("update_load_empty.png");
-		ImageIcon updateButtonFilled = getIcon("update_load_full.png");
+		ImageIcon updateButtonEmpty = getIcon("sprites/update_load_empty.png");
+		ImageIcon updateButtonFilled = getIcon("sprites/update_load_full.png");
 		updateButton.setIcon(updateButtonEmpty);
 		//Start update process and update progress bar
 		(updaterThread = new UpdaterThread(getLatestVersion(getLastUsedBranch()), backupMode, new File(installDir)) {
@@ -936,7 +936,7 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public void onError(Exception exception) {
 				exception.printStackTrace();
-				updateButton.setIcon(getIcon("update_btn.png"));
+				updateButton.setIcon(getIcon("sprites/update_btn.png"));
 			}
 		}).start();
 	}
