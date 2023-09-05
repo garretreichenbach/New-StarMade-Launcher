@@ -10,9 +10,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -36,16 +34,16 @@ import java.util.zip.ZipFile;
  * @author TheDerpGamer (TheDerpGamer#0027)
  */
 public class StarMadeLauncher extends JFrame {
-
-	public static final int LAUNCHER_VERSION = 3;
+	public static final String LAUNCHER_VERSION = "3.0.0"; //We've had two other launchers before this, so this works
 	private static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
 	private static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
 	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED";
 	public static IndexFileEntry GAME_VERSION;
-
+	private static String selectedVersion;
 	public static final Color selectedColor = Color.decode("#438094");
 	public static final Color deselectedColor = Color.decode("#325561");
-	public static boolean debugMode;
+	public static final Color backgroundColor = Color.decode("#0f0f13");
+	public static final Color foregroundColor = Color.decode("#121526");
 	public static boolean useSteam;
 	private static boolean selectVersion;
 	private static int backup = Updater.BACK_DB;
@@ -70,25 +68,17 @@ public class StarMadeLauncher extends JFrame {
 						System.out.println("Please use the '-nogui' parameter to run the launcher in text mode!");
 						return;
 					} else headless = true;
-				} else if("-debug".equals(arg)) debugMode = true;
+				}
 				if(headless) {
 					switch(arg) {
-						case "-h":
-						case "-help":
+						case "-h", "-help" -> {
 							displayHelp();
 							return;
-						case "-steam":
-							useSteam = true;
-							break;
-						case "-backup":
-							backup = Updater.BACK_ALL;
-							break;
-						case "-backup_all":
-							backup = Updater.BACK_ALL;
-							break;
-						case "-no_backup":
-							backup = Updater.BACK_NONE;
-							break;
+						}
+						case "-steam" -> useSteam = true;
+						case "-backup" -> backup = Updater.BACK_ALL;
+						case "-backup_all" -> backup = Updater.BACK_ALL;
+						case "-no_backup" -> backup = Updater.BACK_NONE;
 					}
 					Updater.withoutGUI((args.length > 1 && "-force".equals(args[1])), installDir, buildBranch, backup, selectVersion);
 				} else startup();
@@ -158,15 +148,9 @@ public class StarMadeLauncher extends JFrame {
 		if(GAME_VERSION == null || GAME_VERSION.build == null) lastUsedBranch = 0;
 		else {
 			switch(GAME_VERSION.build) {
-				case "RELEASE":
-					lastUsedBranch = 0;
-					break;
-				case "DEV":
-					lastUsedBranch = 1;
-					break;
-				case "PRE":
-					lastUsedBranch = 2;
-					break;
+				case "RELEASE" -> lastUsedBranch = 0;
+				case "DEV" -> lastUsedBranch = 1;
+				case "PRE" -> lastUsedBranch = 2;
 			}
 		}
 		try {
@@ -179,14 +163,11 @@ public class StarMadeLauncher extends JFrame {
 		setMinimumSize(new Dimension(800, 550));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
 		launchSettings = getLaunchSettings();
 		createMainPanel();
 		dispose();
-
 		setUndecorated(true);
 		setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
-
 		setResizable(false);
 		getRootPane().setDoubleBuffered(true);
 		setVisible(true);
@@ -197,9 +178,10 @@ public class StarMadeLauncher extends JFrame {
 			File versionFile = new File(installDir, "version.txt");
 			if(!versionFile.exists()) return null;
 			String version = Files.readString(versionFile.toPath());
-			for(IndexFileEntry entry : releaseVersions) if(version.contains(entry.build) && version.contains(entry.path)) return entry;
-			for(IndexFileEntry entry : devVersions) if(version.contains(entry.build) && version.contains(entry.path)) return entry;
-			for(IndexFileEntry entry : preReleaseVersions) if(version.contains(entry.build) && version.contains(entry.path)) return entry;
+			version = version.substring(0, version.indexOf('#'));
+			for(IndexFileEntry entry : releaseVersions) if(version.equals(entry.build)) return entry;
+			for(IndexFileEntry entry : devVersions) if(version.equals(entry.build)) return entry;
+			for(IndexFileEntry entry : preReleaseVersions) if(version.equals(entry.build)) return entry;
 		} catch(IOException exception) {
 			exception.printStackTrace();
 		}
@@ -212,42 +194,35 @@ public class StarMadeLauncher extends JFrame {
 		mainPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 		setContentPane(mainPanel);
 		mainPanel.setLayout(new BorderLayout(0, 0));
-
 		JPanel topPanel = new JPanel();
 		topPanel.setDoubleBuffered(true);
 		topPanel.setOpaque(false);
 		topPanel.setLayout(new StackLayout());
 		mainPanel.add(topPanel, BorderLayout.NORTH);
-
 		JLabel topLabel = new JLabel();
 		topLabel.setDoubleBuffered(true);
 		topLabel.setIcon(getIcon("header_top.png"));
 		topPanel.add(topLabel);
-
 		JPanel topPanelButtons = new JPanel();
 		topPanelButtons.setDoubleBuffered(true);
 		topPanelButtons.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		topPanelButtons.setOpaque(false);
-
 		JButton closeButton = new JButton(null, getIcon("close_icon.png")); //Todo: Replace these cus they look like shit
 		closeButton.setDoubleBuffered(true);
 		closeButton.setOpaque(false);
 		closeButton.setContentAreaFilled(false);
 		closeButton.setBorderPainted(false);
 		closeButton.addActionListener(e -> System.exit(0));
-
 		JButton minimizeButton = new JButton(null, getIcon("minimize_icon.png"));
 		minimizeButton.setDoubleBuffered(true);
 		minimizeButton.setOpaque(false);
 		minimizeButton.setContentAreaFilled(false);
 		minimizeButton.setBorderPainted(false);
 		minimizeButton.addActionListener(e -> setState(Frame.ICONIFIED));
-
 		topPanelButtons.add(minimizeButton);
 		topPanelButtons.add(closeButton);
 		topLabel.add(topPanelButtons);
 		topPanelButtons.setBounds(0, 0, 800, 30);
-
 		//Use top panel to drag the window
 		topPanel.addMouseListener(new MouseAdapter() {
 			@Override
@@ -269,13 +244,11 @@ public class StarMadeLauncher extends JFrame {
 				super.mouseDragged(e);
 			}
 		});
-
 		JPanel leftPanel = new JPanel();
 		leftPanel.setDoubleBuffered(true);
 		leftPanel.setOpaque(false);
 		leftPanel.setLayout(new StackLayout());
 		mainPanel.add(leftPanel, BorderLayout.WEST);
-
 		JLabel leftLabel = new JLabel();
 		leftLabel.setDoubleBuffered(true);
 		try {
@@ -288,13 +261,11 @@ public class StarMadeLauncher extends JFrame {
 		}
 		//Stretch the image to the left panel
 		leftPanel.add(leftLabel, StackLayout.BOTTOM);
-
 		JPanel topLeftPanel = new JPanel();
 		topLeftPanel.setDoubleBuffered(true);
 		topLeftPanel.setOpaque(false);
 		topLeftPanel.setLayout(new BorderLayout());
 		leftPanel.add(topLeftPanel, StackLayout.TOP);
-
 		//Add list
 		JList<JLabel> list = new JList<>();
 		list.setDoubleBuffered(true);
@@ -347,12 +318,10 @@ public class StarMadeLauncher extends JFrame {
 		});
 		list.setFixedCellHeight(48);
 		DefaultListModel<JLabel> listModel = new DefaultListModel<>();
-
 		listModel.addElement(new JLabel("NEWS"));
 		listModel.addElement(new JLabel("FORUMS"));
 		listModel.addElement(new JLabel("CONTENT"));
 		listModel.addElement(new JLabel("COMMUNITY"));
-
 		for(int i = 0; i < listModel.size(); i++) {
 			JLabel label = listModel.get(i);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -364,7 +333,6 @@ public class StarMadeLauncher extends JFrame {
 		}
 		list.setModel(listModel);
 		topLeftPanel.add(list);
-
 		JPanel topLeftLogoPanel = new JPanel();
 		topLeftLogoPanel.setDoubleBuffered(true);
 		topLeftLogoPanel.setOpaque(false);
@@ -375,51 +343,43 @@ public class StarMadeLauncher extends JFrame {
 		leftInset.setDoubleBuffered(true);
 		leftInset.setOpaque(false);
 		topLeftLogoPanel.add(leftInset, BorderLayout.CENTER);
-
 		//Add logo at top left
 		JLabel logo = new JLabel();
 		logo.setDoubleBuffered(true);
 		logo.setOpaque(false);
 		logo.setIcon(getIcon("logo.png"));
 		leftInset.add(logo);
-
 		footerPanel = new JPanel();
 		footerPanel.setDoubleBuffered(true);
 		footerPanel.setOpaque(false);
 		footerPanel.setLayout(new StackLayout());
 		mainPanel.add(footerPanel, BorderLayout.SOUTH);
-
 		JLabel footerLabel = new JLabel();
 		footerLabel.setDoubleBuffered(true);
 		footerLabel.setIcon(getIcon("footer_normalplay_bg.jpg"));
 		footerPanel.add(footerLabel);
-
 		JPanel topRightPanel = new JPanel();
 		topRightPanel.setDoubleBuffered(true);
 		topRightPanel.setOpaque(false);
 		topRightPanel.setLayout(new BorderLayout());
 		topPanel.add(topRightPanel, BorderLayout.EAST);
-
 		JLabel logoLabel = new JLabel();
 		logoLabel.setDoubleBuffered(true);
 		logoLabel.setOpaque(false);
 		logoLabel.setIcon(getIcon("launcher_schine_logo.png"));
 		topRightPanel.add(logoLabel, BorderLayout.EAST);
-
 		JButton normalPlayButton = new JButton("Play");
 		normalPlayButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		normalPlayButton.setDoubleBuffered(true);
 		normalPlayButton.setOpaque(false);
 		normalPlayButton.setContentAreaFilled(false);
 		normalPlayButton.setBorderPainted(false);
-
 		JButton dedicatedServerButton = new JButton("Dedicated Server");
 		dedicatedServerButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		dedicatedServerButton.setDoubleBuffered(true);
 		dedicatedServerButton.setOpaque(false);
 		dedicatedServerButton.setContentAreaFilled(false);
 		dedicatedServerButton.setBorderPainted(false);
-
 		JPanel footerPanelButtons = new JPanel();
 		footerPanelButtons.setDoubleBuffered(true);
 		footerPanelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -430,16 +390,14 @@ public class StarMadeLauncher extends JFrame {
 		footerPanelButtons.add(dedicatedServerButton);
 		footerLabel.add(footerPanelButtons);
 		footerPanelButtons.setBounds(0, 0, 800, 30);
-
+		selectedVersion = getCurrentVersion().build;
 		createPlayPanel(footerPanel);
 		createServerPanel(footerPanel);
-
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setDoubleBuffered(true);
 		bottomPanel.setOpaque(false);
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		footerPanel.add(bottomPanel, BorderLayout.SOUTH);
-
 		JButton launchSettings = new JButton("Launch Settings");
 		launchSettings.setIcon(getIcon("memory_options_gear.png"));
 		launchSettings.setFont(new Font("Roboto", Font.BOLD, 12));
@@ -457,19 +415,22 @@ public class StarMadeLauncher extends JFrame {
 			dialog.setLocationRelativeTo(null);
 			dialog.setLayout(new BorderLayout());
 			dialog.setAlwaysOnTop(true);
-
+			dialog.setBackground(backgroundColor);
+			dialog.setForeground(foregroundColor);
 			JPanel dialogPanel = new JPanel();
 			dialogPanel.setDoubleBuffered(true);
 			dialogPanel.setOpaque(false);
+			dialogPanel.setBackground(backgroundColor);
+			dialogPanel.setForeground(foregroundColor);
 			dialogPanel.setLayout(new BorderLayout());
 			dialog.add(dialogPanel);
-
 			JPanel northPanel = new JPanel();
 			northPanel.setDoubleBuffered(true);
 			northPanel.setOpaque(false);
 			northPanel.setLayout(new BorderLayout());
+			northPanel.setBackground(backgroundColor);
+			northPanel.setForeground(foregroundColor);
 			dialogPanel.add(northPanel, BorderLayout.NORTH);
-
 			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 1024, getSystemMemory(), Objects.requireNonNull(getLaunchSettings()).getInt("memory"));
 			JLabel sliderLabel = new JLabel("Memory: " + slider.getValue() + " MB");
 			sliderLabel.setDoubleBuffered(true);
@@ -479,7 +440,7 @@ public class StarMadeLauncher extends JFrame {
 			northPanel.add(sliderLabel, BorderLayout.NORTH);
 			slider.setDoubleBuffered(true);
 			slider.setOpaque(false);
-			if(getSystemMemory() > 16384) { //Make sure the slider is not too squished for those with really epic gamer pc's
+			if(getSystemMemory() > 16384) { //Make sure the slider is not too squished for people that have a really epic gamer pc
 				slider.setMajorTickSpacing(2048);
 				slider.setMajorTickSpacing(1024);
 				slider.setLabelTable(slider.createStandardLabels(4096));
@@ -497,13 +458,13 @@ public class StarMadeLauncher extends JFrame {
 			slider.setSnapToTicks(true);
 			northPanel.add(slider, BorderLayout.CENTER);
 			slider.addChangeListener(e1 -> sliderLabel.setText("Memory: " + slider.getValue() + " MB"));
-
 			JPanel centerPanel = new JPanel();
 			centerPanel.setDoubleBuffered(true);
 			centerPanel.setOpaque(false);
 			centerPanel.setLayout(new BorderLayout());
+			centerPanel.setBackground(backgroundColor);
+			centerPanel.setForeground(foregroundColor);
 			dialogPanel.add(centerPanel, BorderLayout.CENTER);
-
 			JTextArea launchArgs = new JTextArea();
 			launchArgs.setDoubleBuffered(true);
 			launchArgs.setOpaque(false);
@@ -512,30 +473,25 @@ public class StarMadeLauncher extends JFrame {
 			launchArgs.setWrapStyleWord(true);
 			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			centerPanel.add(launchArgs, BorderLayout.CENTER);
-
 			JLabel launchArgsLabel = new JLabel("Launch Arguments");
 			launchArgsLabel.setDoubleBuffered(true);
 			launchArgsLabel.setOpaque(false);
 			launchArgsLabel.setFont(new Font("Roboto", Font.BOLD, 12));
 			launchArgsLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			centerPanel.add(launchArgsLabel, BorderLayout.NORTH);
-
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setDoubleBuffered(true);
 			buttonPanel.setOpaque(false);
 			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			dialogPanel.add(buttonPanel, BorderLayout.SOUTH);
-
 			JButton saveButton = new JButton("Save");
 			saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			saveButton.setDoubleBuffered(true);
 			buttonPanel.add(saveButton);
-
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			cancelButton.setDoubleBuffered(true);
 			buttonPanel.add(cancelButton);
-
 			saveButton.addActionListener(e1 -> {
 				this.launchSettings.put("memory", slider.getValue());
 				this.launchSettings.put("launchArgs", launchArgs.getText());
@@ -545,7 +501,6 @@ public class StarMadeLauncher extends JFrame {
 			cancelButton.addActionListener(e1 -> dialog.dispose());
 			dialog.setVisible(true);
 		});
-
 		JButton installSettings = new JButton("Installation Settings");
 		installSettings.setIcon(getIcon("launch_options_gear.png"));
 		installSettings.setFont(new Font("Roboto", Font.BOLD, 12));
@@ -563,24 +518,20 @@ public class StarMadeLauncher extends JFrame {
 			dialog.setLayout(new BorderLayout());
 			dialog.setAlwaysOnTop(true);
 			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
 			JPanel dialogPanel = new JPanel();
 			dialogPanel.setDoubleBuffered(true);
 			dialogPanel.setOpaque(false);
 			dialog.add(dialogPanel, BorderLayout.CENTER);
-
 			JPanel installLabelPanel = new JPanel();
 			installLabelPanel.setDoubleBuffered(true);
 			installLabelPanel.setOpaque(false);
 			installLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 			dialogPanel.add(installLabelPanel);
-
 			JLabel installLabel = new JLabel("Install Directory: ");
 			installLabel.setDoubleBuffered(true);
 			installLabel.setOpaque(false);
 			installLabel.setFont(new Font("Roboto", Font.BOLD, 12));
 			installLabelPanel.add(installLabel);
-
 			JTextField installLabelPath = new JTextField(installDir);
 			installLabelPath.setDoubleBuffered(true);
 			installLabelPath.setOpaque(false);
@@ -598,7 +549,6 @@ public class StarMadeLauncher extends JFrame {
 				installDir = file.getAbsolutePath();
 				installLabelPath.setText(installDir);
 			});
-
 			JButton installButton = new JButton("Change");
 			installButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
 			installButton.setDoubleBuffered(true);
@@ -618,23 +568,19 @@ public class StarMadeLauncher extends JFrame {
 					installLabelPath.setText(installDir);
 				}
 			});
-
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setDoubleBuffered(true);
 			buttonPanel.setOpaque(false);
 			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			dialog.add(buttonPanel, BorderLayout.SOUTH);
-
 			JButton saveButton = new JButton("Save");
 			saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			saveButton.setDoubleBuffered(true);
 			buttonPanel.add(saveButton);
-
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			cancelButton.setDoubleBuffered(true);
 			buttonPanel.add(cancelButton);
-
 			saveButton.addActionListener(e1 -> {
 				this.launchSettings.put("installDir", installDir);
 				saveLaunchSettings();
@@ -643,17 +589,14 @@ public class StarMadeLauncher extends JFrame {
 			cancelButton.addActionListener(e1 -> dialog.dispose());
 			dialog.setVisible(true);
 		});
-
 		serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
-
 		normalPlayButton.addActionListener(e -> {
 			footerLabel.setIcon(getIcon("footer_normalplay_bg.jpg"));
 			serverPanel.setVisible(false);
 			versionPanel.setVisible(true);
 			createPlayPanel(footerPanel);
 		});
-
 		dedicatedServerButton.addActionListener(e -> {
 			footerLabel.setIcon(getIcon("footer_dedicated_bg.jpg"));
 			versionPanel.setVisible(false);
@@ -662,13 +605,11 @@ public class StarMadeLauncher extends JFrame {
 			serverPanel.setVisible(true);
 			createServerPanel(footerPanel);
 		});
-
 		centerPanel = new JPanel();
 		centerPanel.setDoubleBuffered(true);
 		centerPanel.setOpaque(false);
 		centerPanel.setLayout(new BorderLayout());
 		mainPanel.add(centerPanel, BorderLayout.CENTER);
-
 		JLabel background = new JLabel();
 		background.setDoubleBuffered(true);
 		try {
@@ -735,7 +676,7 @@ public class StarMadeLauncher extends JFrame {
 
 	private int getSystemMemory() {
 		com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-		return (int) (os.getTotalPhysicalMemorySize() / 1024 / 1024);
+		return (int) (os.getTotalMemorySize() / 1024 / 1024);
 	}
 
 	private void createPlayPanel(JPanel footerPanel) {
@@ -749,24 +690,20 @@ public class StarMadeLauncher extends JFrame {
 		playPanel.setOpaque(false);
 		playPanel.setLayout(new BorderLayout());
 		footerPanel.add(playPanel);
-
 		versionPanel = new JPanel();
 		versionPanel.setDoubleBuffered(true);
 		versionPanel.setOpaque(false);
 		versionPanel.setLayout(new BorderLayout());
 		footerPanel.add(versionPanel, BorderLayout.WEST);
-
 		JPanel versionSubPanel = new JPanel();
 		versionSubPanel.setDoubleBuffered(true);
 		versionSubPanel.setOpaque(false);
 		versionSubPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		versionPanel.add(versionSubPanel, BorderLayout.SOUTH);
-
 		//Version dropdown
 		JComboBox<String> versionDropdown = new JComboBox<>();
 		versionDropdown.setDoubleBuffered(true);
 		versionDropdown.setOpaque(false);
-
 		//Branch dropdown
 		JComboBox<String> branchDropdown = new JComboBox<>();
 		branchDropdown.setDoubleBuffered(true);
@@ -774,7 +711,7 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		branchDropdown.addActionListener(e -> {
+		branchDropdown.addItemListener(e -> {
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
 			recreateButtons(playPanel);
@@ -782,7 +719,9 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.setSelectedIndex(lastUsedBranch);
 		versionDropdown.removeAllItems();
 		updateVersions(versionDropdown, branchDropdown);
-		versionDropdown.addActionListener(e -> {
+		versionDropdown.addItemListener(e -> {
+			if(versionDropdown.getSelectedIndex() == -1) return;
+			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
 			recreateButtons(playPanel);
 		});
 		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
@@ -792,7 +731,6 @@ public class StarMadeLauncher extends JFrame {
 				break;
 			}
 		}
-
 		versionSubPanel.add(branchDropdown);
 		versionSubPanel.add(versionDropdown);
 		recreateButtons(playPanel);
@@ -811,14 +749,12 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtons.setLayout(new BorderLayout());
 		playPanel.remove(playPanelButtons);
 		playPanel.add(playPanelButtons, BorderLayout.EAST);
-
 		JPanel playPanelButtonsSub = new JPanel();
 		playPanelButtonsSub.setDoubleBuffered(true);
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-
-		if((!lookForGame(installDir) || GAME_VERSION != getLatestVersion(buildBranch)) && !debugMode) {
+		if(!lookForGame(installDir) || GAME_VERSION == null || !Objects.equals(GAME_VERSION.build, selectedVersion)) {
 			JButton updateButton = new JButton(getIcon("update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
@@ -831,7 +767,7 @@ public class StarMadeLauncher extends JFrame {
 				@Override
 				public void mouseEntered(MouseEvent e) {
 					if(updaterThread == null || !updaterThread.isAlive()) updateButton.setIcon(getIcon("update_roll.png"));
-					else updateButton.setToolTipText("Updating... [" + (installProgress[0] * 100) + "%]");
+					else updateButton.setToolTipText("Updating... [" + (int) (installProgress[0] * 100) + ".0%]");
 				}
 
 				@Override
@@ -890,7 +826,6 @@ public class StarMadeLauncher extends JFrame {
 			});
 			playPanelButtonsSub.add(playButton);
 		}
-
 		playPanel.revalidate();
 		playPanel.repaint();
 	}
@@ -967,11 +902,9 @@ public class StarMadeLauncher extends JFrame {
 		int backupMode = UpdaterThread.BACKUP_MODE_NONE;
 		if(choice == 0) backupMode = UpdaterThread.BACKUP_MODE_DATABASE;
 		else if(choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
-
 		ImageIcon updateButtonEmpty = getIcon("update_load_empty.png");
 		ImageIcon updateButtonFilled = getIcon("update_load_full.png");
 		updateButton.setIcon(updateButtonEmpty);
-
 		//Start update process and update progress bar
 		(updaterThread = new UpdaterThread(getLatestVersion(getLastUsedBranch()), backupMode, new File(installDir)) {
 			@Override
@@ -993,6 +926,7 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public void onFinished() {
 				GAME_VERSION = getCurrentVersion();
+				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				saveLaunchSettings();
 				recreateButtons(playPanel);
 			}
@@ -1025,7 +959,7 @@ public class StarMadeLauncher extends JFrame {
 		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Dev")) {
 			for(IndexFileEntry version : devVersions) {
 				if(version.build.startsWith("2017")) continue;
-				if(version.equals(devVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)"); //Todo: Sub versions
+				if(version.equals(devVersions.get(2))) versionDropdown.addItem(version.build + " (Latest)");
 				else versionDropdown.addItem(version.build);
 			}
 		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Pre-Release")) {
@@ -1037,19 +971,15 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createNewsPanel() {
-
 	}
 
 	private void createForumsPanel() {
-
 	}
 
 	private void createContentPanel() {
-
 	}
 
 	private void createCommunityPanel() {
-
 	}
 
 	private ImageIcon getIcon(String s) {
@@ -1084,7 +1014,6 @@ public class StarMadeLauncher extends JFrame {
 			openConnection.setConnectTimeout(10000);
 			openConnection.setReadTimeout(10000);
 			openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + LAUNCHER_VERSION);
-
 			BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 			String str;
 			while((str = in.readLine()) != null) {

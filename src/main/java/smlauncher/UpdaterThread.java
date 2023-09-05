@@ -44,7 +44,7 @@ public class UpdaterThread extends Thread {
 				@Override
 				public void update(FileDownloadUpdate u) {
 					onProgress(u.index / finalSize);
-					if(u.index == finalSize) onFinished();
+					if(u.index >= u.total - 1) onFinished();
 				}
 
 				@Override

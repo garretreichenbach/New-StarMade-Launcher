@@ -79,7 +79,7 @@ public class Updater extends Observable {
 		u.startUpdateNew(installDir, u.versions.get(k), false, backUp);
 	}
 
-	public static int getRemoteLauncherVersion() throws IOException {
+	public static String getRemoteLauncherVersion() throws IOException {
 		URL urlVersion = new URL(LAUNCHER_VERSION_SITE);
 		URLConnection openConnection = urlVersion.openConnection();
 		openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + StarMadeLauncher.LAUNCHER_VERSION);
@@ -89,7 +89,7 @@ public class Updater extends Observable {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 		String version = in.readLine();
 		in.close();
-		return Integer.parseInt(version);
+		return version;
 	}
 
 	public static int askBackup(JFrame f) {
@@ -149,9 +149,8 @@ public class Updater extends Observable {
 		loading = true;
 		try {
 			versions.clear();
-			int version = getRemoteLauncherVersion();
-
-			if(version > StarMadeLauncher.LAUNCHER_VERSION) throw new OldVersionException("You have an old Launcher Version.\n" + "Please download the latest Launcher Version at http://www.star-made.org/\n('retry' will let you ignore this message [not recommended!])");
+			String version = getRemoteLauncherVersion();
+			if(!Objects.equals(version, StarMadeLauncher.LAUNCHER_VERSION)) throw new OldVersionException("You have an old Launcher Version.\n" + "Please download the latest Launcher Version at http://www.star-made.org/\n('retry' will let you ignore this message [not recommended!])");
 		} catch(MalformedURLException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "Malformed URL", e)).setVisible(true);
