@@ -5,12 +5,46 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba62a1e9-0beb-45dc-beb3-802be560594b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - back.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - cancel.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - enter.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - error 1.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - error 2.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - highlight 1.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - highlight 2.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - highlight 3.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - pause.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - swoosh scroll large.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sounds/0022_menu_ui - swoosh scroll small.ogg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/news/LauncherNewsPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/smlauncher/news/LauncherNewsPanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/news/LauncherNewsPost.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/news/LauncherNewsRetriever.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/smlauncher/news/NewsEntry.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/close_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/close_icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/empty_star.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/empty_star.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/featured_content_frame.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/featured_content_frame.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/footer_dedicated_bg.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/footer_dedicated_bg.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/footer_normalplay_bg.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/footer_normalplay_bg.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/full_star.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/full_star.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/header_top.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/header_top.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/launch_btn.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/launch_btn.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/launch_options_gear.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/launch_options_gear.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/launch_roll.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/launch_roll.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/launch_settings_option_gear.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/launch_settings_option_gear.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/launch_tooltip_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/launch_tooltip_icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/launcher_schine_logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/launcher_schine_logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/left_panel.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/left_panel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/memory_options_gear.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/memory_options_gear.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/minimize_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/minimize_icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/nav_options_gear_btn.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/nav_options_gear_btn.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/popup_notification_header_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/popup_notification_header_icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/popup_settings_header_close.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/popup_settings_header_close.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/popup_settings_header_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/popup_settings_header_icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/tooltip_popup_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/tooltip_popup_icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/update_btn.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/update_btn.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/update_load_empty.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/update_load_empty.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/update_load_full.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/update_load_full.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/update_roll.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sprites/update_roll.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,28 +101,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/garre/OneDrive - Arizona State University/Documents/GitHub/New-StarMade-Launcher/src/main/resources/sounds&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/garre/OneDrive - Arizona State University/Documents/GitHub/New-StarMade-Launcher/src/main/resources/sounds",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\garre\OneDrive - Arizona State University\Documents\GitHub\New-StarMade-Launcher\src\main\resources\sounds" />
@@ -193,8 +227,7 @@
       <workItem from="1693863900865" duration="498000" />
       <workItem from="1693864425514" duration="755000" />
       <workItem from="1693937916695" duration="4485000" />
-      <workItem from="1693952584097" duration="3834000" />
-      <workItem from="1694011906986" duration="1694000" />
+      <workItem from="1693952584097" duration="3744000" />
     </task>
     <servers />
   </component>
@@ -214,5 +247,16 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/smlauncher/StarMadeLauncher.java</url>
+          <line>793</line>
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

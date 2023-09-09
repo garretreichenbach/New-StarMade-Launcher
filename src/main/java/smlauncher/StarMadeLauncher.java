@@ -623,7 +623,7 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
-		createNewsPanel();
+		//createNewsPanel();
 	}
 
 	private void saveLaunchSettings() {
@@ -973,11 +973,9 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createNewsPanel() {
-		newsPanel = new LauncherNewsPanel(centerPanel);
 	}
 
 	private void createForumsPanel() {
-		
 	}
 
 	private void createContentPanel() {
