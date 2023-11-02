@@ -4,7 +4,8 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.news.LauncherNewsPanel;
-import smlauncher.util.*;
+import smlauncher.starmade.*;
+import smlauncher.util.Palette;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -42,10 +43,6 @@ public class StarMadeLauncher extends JFrame {
 	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED";
 	public static IndexFileEntry GAME_VERSION;
 	private static String selectedVersion;
-	public static final Color selectedColor = Color.decode("#438094");
-	public static final Color deselectedColor = Color.decode("#325561");
-	public static final Color backgroundColor = Color.decode("#0f0f13");
-	public static final Color foregroundColor = Color.decode("#121526");
 	public static boolean useSteam;
 	private static boolean selectVersion;
 	private static int backup = Updater.BACK_DB;
@@ -167,6 +164,7 @@ public class StarMadeLauncher extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		launchSettings = getLaunchSettings();
 		createMainPanel();
+		createNewsPanel();
 		dispose();
 		setUndecorated(true);
 		setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
@@ -277,11 +275,11 @@ public class StarMadeLauncher extends JFrame {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setCellRenderer((list1, value, index, isSelected, cellHasFocus) -> {
 			if(isSelected) {
-				value.setForeground(selectedColor);
-				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, selectedColor));
+				value.setForeground(Palette.selectedColor);
+				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.selectedColor));
 			} else {
-				value.setForeground(deselectedColor);
-				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, deselectedColor));
+				value.setForeground(Palette.deselectedColor);
+				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.deselectedColor));
 			}
 			return value;
 		});
@@ -328,8 +326,8 @@ public class StarMadeLauncher extends JFrame {
 			JLabel label = listModel.get(i);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setFont(new Font("Roboto", Font.BOLD, 18));
-			label.setForeground(selectedColor);
-			label.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, selectedColor));
+			label.setForeground(Palette.selectedColor);
+			label.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.selectedColor));
 			label.setDoubleBuffered(true);
 			label.setOpaque(false);
 		}
@@ -376,12 +374,14 @@ public class StarMadeLauncher extends JFrame {
 		normalPlayButton.setOpaque(false);
 		normalPlayButton.setContentAreaFilled(false);
 		normalPlayButton.setBorderPainted(false);
+		normalPlayButton.setForeground(Palette.textColor);
 		JButton dedicatedServerButton = new JButton("Dedicated Server");
 		dedicatedServerButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		dedicatedServerButton.setDoubleBuffered(true);
 		dedicatedServerButton.setOpaque(false);
 		dedicatedServerButton.setContentAreaFilled(false);
 		dedicatedServerButton.setBorderPainted(false);
+		dedicatedServerButton.setForeground(Palette.textColor);
 		JPanel footerPanelButtons = new JPanel();
 		footerPanelButtons.setDoubleBuffered(true);
 		footerPanelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -392,7 +392,7 @@ public class StarMadeLauncher extends JFrame {
 		footerPanelButtons.add(dedicatedServerButton);
 		footerLabel.add(footerPanelButtons);
 		footerPanelButtons.setBounds(0, 0, 800, 30);
-		selectedVersion = getCurrentVersion().build;
+		selectedVersion = Objects.requireNonNull(getCurrentVersion()).build;
 		createPlayPanel(footerPanel);
 		createServerPanel(footerPanel);
 		JPanel bottomPanel = new JPanel();
@@ -406,7 +406,19 @@ public class StarMadeLauncher extends JFrame {
 		launchSettings.setDoubleBuffered(true);
 		launchSettings.setOpaque(false);
 		launchSettings.setContentAreaFilled(false);
+		launchSettings.setForeground(Palette.textColor);
 		bottomPanel.add(launchSettings);
+		launchSettings.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				launchSettings.setForeground(Palette.selectedColor);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				launchSettings.setForeground(Palette.textColor);
+			}
+		});
 		launchSettings.addActionListener(e -> {
 			JDialog dialog = new JDialog();
 			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -417,21 +429,21 @@ public class StarMadeLauncher extends JFrame {
 			dialog.setLocationRelativeTo(null);
 			dialog.setLayout(new BorderLayout());
 			dialog.setAlwaysOnTop(true);
-			dialog.setBackground(backgroundColor);
-			dialog.setForeground(foregroundColor);
+			dialog.setBackground(Palette.backgroundColor);
+			dialog.setForeground(Palette.foregroundColor);
 			JPanel dialogPanel = new JPanel();
 			dialogPanel.setDoubleBuffered(true);
 			dialogPanel.setOpaque(false);
-			dialogPanel.setBackground(backgroundColor);
-			dialogPanel.setForeground(foregroundColor);
+			dialogPanel.setBackground(Palette.backgroundColor);
+			dialogPanel.setForeground(Palette.foregroundColor);
 			dialogPanel.setLayout(new BorderLayout());
 			dialog.add(dialogPanel);
 			JPanel northPanel = new JPanel();
 			northPanel.setDoubleBuffered(true);
 			northPanel.setOpaque(false);
 			northPanel.setLayout(new BorderLayout());
-			northPanel.setBackground(backgroundColor);
-			northPanel.setForeground(foregroundColor);
+			northPanel.setBackground(Palette.backgroundColor);
+			northPanel.setForeground(Palette.foregroundColor);
 			dialogPanel.add(northPanel, BorderLayout.NORTH);
 			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 1024, getSystemMemory(), Objects.requireNonNull(getLaunchSettings()).getInt("memory"));
 			JLabel sliderLabel = new JLabel("Memory: " + slider.getValue() + " MB");
@@ -464,8 +476,8 @@ public class StarMadeLauncher extends JFrame {
 			centerPanel.setDoubleBuffered(true);
 			centerPanel.setOpaque(false);
 			centerPanel.setLayout(new BorderLayout());
-			centerPanel.setBackground(backgroundColor);
-			centerPanel.setForeground(foregroundColor);
+			centerPanel.setBackground(Palette.backgroundColor);
+			centerPanel.setForeground(Palette.foregroundColor);
 			dialogPanel.add(centerPanel, BorderLayout.CENTER);
 			JTextArea launchArgs = new JTextArea();
 			launchArgs.setDoubleBuffered(true);
@@ -509,7 +521,19 @@ public class StarMadeLauncher extends JFrame {
 		installSettings.setDoubleBuffered(true);
 		installSettings.setOpaque(false);
 		installSettings.setContentAreaFilled(false);
+		installSettings.setForeground(Palette.textColor);
 		bottomPanel.add(installSettings);
+		installSettings.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				installSettings.setForeground(Palette.selectedColor);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				installSettings.setForeground(Palette.textColor);
+			}
+		});
 		installSettings.addActionListener(e -> {
 			JDialog dialog = new JDialog();
 			dialog.setModal(true);
@@ -593,11 +617,33 @@ public class StarMadeLauncher extends JFrame {
 		});
 		serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
+		normalPlayButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				setForeground(Palette.selectedColor);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				setForeground(Palette.textColor);
+			}
+		});
 		normalPlayButton.addActionListener(e -> {
 			footerLabel.setIcon(getIcon("sprites/footer_normalplay_bg.jpg"));
 			serverPanel.setVisible(false);
 			versionPanel.setVisible(true);
 			createPlayPanel(footerPanel);
+		});
+		dedicatedServerButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				setForeground(Palette.selectedColor);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				setForeground(Palette.textColor);
+			}
 		});
 		dedicatedServerButton.addActionListener(e -> {
 			footerLabel.setIcon(getIcon("sprites/footer_dedicated_bg.jpg"));
@@ -623,7 +669,6 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
-		//createNewsPanel();
 	}
 
 	private void saveLaunchSettings() {
@@ -973,6 +1018,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createNewsPanel() {
+//		newsPanel = new LauncherNewsPanel(centerPanel);
 	}
 
 	private void createForumsPanel() {

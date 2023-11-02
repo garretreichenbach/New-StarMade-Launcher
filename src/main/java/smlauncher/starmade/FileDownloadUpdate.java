@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 public class FileDownloadUpdate {
 	public long downloaded;

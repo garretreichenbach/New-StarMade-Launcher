@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.jasypt.util.text.BasicTextEncryptor;

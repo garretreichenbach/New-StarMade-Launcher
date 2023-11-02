@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="394ac086-2e97-4fbd-a697-af46491e897e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/html.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../java/smlauncher/util/Palette.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../java/smlauncher/util/SetupUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../../build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/StarMadeLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/StarMadeLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/UpdaterThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/UpdaterThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/news/LauncherNewsPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/news/LauncherNewsPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/news/NewsEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/news/NewsEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/CheckSumFailedException.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/CheckSumFailedException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/ChecksumFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/ChecksumFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/ChecksumFileEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/ChecksumFileEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/DataUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/DataUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/DownloadCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/DownloadCallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/ErrorDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/ErrorDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/Eula.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/Eula.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/FileDowloadCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/FileDowloadCallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/FileDownloadUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/FileDownloadUpdate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/FileEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/FileEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/FileUpdateTotal.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/FileUpdateTotal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/FileUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/FileUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/FolderZipper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/FolderZipper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/HtmlDisplayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/HtmlDisplayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/IndexFileEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/IndexFileEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/OldVersionException.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/OldVersionException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/OperatingSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/OperatingSystem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/SerializationInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/SerializationInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/StackLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/StackLayout.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/StarMadeBackupTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/StarMadeBackupTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/StarMadeCredentials.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/StarMadeCredentials.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/Updater.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/Updater.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/Version.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/VersionContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/VersionContainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/VersionNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/VersionNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/XMLSerializationInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/XMLSerializationInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java/smlauncher/util/ZipGUICallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/smlauncher/starmade/ZipGUICallback.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2XJSCYqCIbKZhEa83tm554bsQ2v" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/garre/OneDrive - Arizona State University/Documents/GitHub/New-StarMade-Launcher/src/main/html&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="394ac086-2e97-4fbd-a697-af46491e897e" name="Changes" comment="" />
+      <created>1698345563209</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1698345563209</updated>
+      <workItem from="1698345564202" duration="6000" />
+      <workItem from="1698345579729" duration="25000" />
+      <workItem from="1698345621386" duration="564000" />
+      <workItem from="1698962261899" duration="4000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 public interface FileDowloadCallback {
 	void update(FileDownloadUpdate u);

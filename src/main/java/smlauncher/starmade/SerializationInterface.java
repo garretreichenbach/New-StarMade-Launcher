@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;

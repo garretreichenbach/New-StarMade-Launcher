@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 public interface DownloadCallback {
 	void downloaded(long size, long diff);

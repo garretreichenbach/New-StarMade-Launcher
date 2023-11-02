@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 public class Eula {
 	public String text;

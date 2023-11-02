@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;

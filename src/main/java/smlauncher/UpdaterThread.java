@@ -1,13 +1,13 @@
 package smlauncher;
 
 
-import smlauncher.util.*;
+import smlauncher.starmade.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import static smlauncher.util.Updater.FILES_URL;
+import static smlauncher.starmade.Updater.FILES_URL;
 
 /**
  * Thread for updating the game.

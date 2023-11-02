@@ -1,4 +1,4 @@
-package smlauncher.util;
+package smlauncher.starmade;
 
 import java.io.File;
 import java.io.FileFilter;
