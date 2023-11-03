@@ -3,7 +3,6 @@ package smlauncher.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.nio.charset.StandardCharsets;
 
 public class VersionContainer {
 	private static final String versionFile = "version.txt";
@@ -33,7 +32,7 @@ public class VersionContainer {
 			VERSION = new Version(0, 0, 0);
 			build = "undefined";
 			if(f.exists()) {
-				BufferedReader b = new BufferedReader(new FileReader(f, StandardCharsets.UTF_8));
+				BufferedReader b = new BufferedReader(new FileReader(f));
 
 				VERSION = Version.parseFrom(b.readLine());
 				build = "latest";
@@ -42,7 +41,7 @@ public class VersionContainer {
 			} else {
 				f = new File(installDir + versionFile);
 				if(f.exists()) {
-					BufferedReader b = new BufferedReader(new FileReader(f, StandardCharsets.UTF_8));
+					BufferedReader b = new BufferedReader(new FileReader(f));
 					String[] st = b.readLine().split("#");
 					VERSION = Version.parseFrom(st[0].trim());
 					build = st[1].trim();

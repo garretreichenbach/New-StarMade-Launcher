@@ -4,16 +4,14 @@ import smlauncher.util.IndexFileEntry;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class InstalledUtils {
     public static IndexFileEntry getInstalledVersion(){
         try {
-            Scanner fileReader = new Scanner(new File(VersionList.installationDir + "/version.txt"), StandardCharsets.UTF_8);
+            Scanner fileReader = new Scanner(new File(VersionList.installationDir + "/version.txt"));
             String v = fileReader.nextLine();
             fileReader.close();
             ArrayList<IndexFileEntry> allEntries = new ArrayList<>();

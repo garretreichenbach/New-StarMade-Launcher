@@ -3,7 +3,6 @@ package smlauncher;
 import com.formdev.flatlaf.FlatDarkLaf;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
-import smlauncher.news.LauncherNewsPanel;
 import smlauncher.util.*;
 
 import javax.imageio.ImageIO;
@@ -14,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -128,7 +126,7 @@ public class StarMadeLauncher extends JFrame {
 	private JPanel versionPanel;
 	private JPanel serverPanel;
 	private JPanel playPanelButtons;
-	private LauncherNewsPanel newsPanel;
+//	private LauncherNewsPanel newsPanel;
 
 	public StarMadeLauncher() {
 		super("StarMade Launcher");
@@ -490,7 +488,7 @@ public class StarMadeLauncher extends JFrame {
 
 	private void saveLaunchSettings() {
 		try {
-			FileWriter writer = new FileWriter("launch-settings.json", StandardCharsets.UTF_8);
+			FileWriter writer = new FileWriter("launch-settings.json");
 			writer.write(getLaunchSettings().toString());
 			writer.flush();
 			writer.close();
@@ -507,7 +505,7 @@ public class StarMadeLauncher extends JFrame {
 				file.createNewFile();
 				JSONObject object = new JSONObject();
 				object.put("memory", 2048);
-				FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
+				FileWriter writer = new FileWriter(file);
 				writer.write(object.toString());
 				writer.flush();
 				writer.close();
@@ -519,7 +517,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 
 		try {
-			FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
+			FileReader reader = new FileReader(file);
 			String data = IOUtils.toString(reader);
 			JSONObject object = new JSONObject(data);
 			reader.close();
@@ -804,7 +802,7 @@ public class StarMadeLauncher extends JFrame {
 		File versionFile = new File("version.txt");
 		if(versionFile.exists()) {
 			try {
-				BufferedReader reader = new BufferedReader(new FileReader(versionFile, StandardCharsets.UTF_8));
+				BufferedReader reader = new BufferedReader(new FileReader(versionFile));
 				String path = reader.readLine();
 				String version = reader.readLine();
 				String build = reader.readLine();
