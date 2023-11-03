@@ -56,6 +56,7 @@ public class SteamNewsAPI {
 			np.title = obj.getString("title");
 			np.url = obj.getString("url");
 			np.contents = obj.getString("contents");
+			np.contents = np.contents.replaceAll("(.{1,80})(\\s+|$)", "$1\n");
 			np.date = obj.getInt("date");
 			return np;
 		}

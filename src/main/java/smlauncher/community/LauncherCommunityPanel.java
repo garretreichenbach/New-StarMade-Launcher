@@ -1,5 +1,6 @@
 package smlauncher.community;
 
+import smlauncher.StarMadeLauncher;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
@@ -37,7 +38,15 @@ public class LauncherCommunityPanel extends JPanel {
 		mainDiscordPanel.setOpaque(true);
 		mainDiscordPanel.setLayout(new BoxLayout(mainDiscordPanel, BoxLayout.X_AXIS));
 
-		JButton mainDiscordButton = new JButton("StarMade Discord");
+		JButton mainDiscordButton = new JButton("StarMade Discord") {
+			@Override
+			protected void paintComponent(Graphics g) {
+				if(getModel().isArmed()) g.setColor(Palette.selectedColor);
+				else g.setColor(Palette.deselectedColor);
+				g.fillRoundRect(0, 0, getSize().width - 1, getSize().height - 1, 40, 40);
+				super.paintComponent(g);
+			}
+		};
 		mainDiscordButton.addActionListener(e -> {
 			if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 				try {
@@ -47,11 +56,22 @@ public class LauncherCommunityPanel extends JPanel {
 				}
 			}
 		});
-		mainDiscordButton.setIcon(new ImageIcon("resources/icon.png"));
+		mainDiscordButton.setIcon(StarMadeLauncher.getIcon("sprites/icon.png", 32, 32));
+		mainDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, mainDiscordButton.getMinimumSize().height));
 		mainDiscordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		mainDiscordButton.setBackground(Palette.buttonColor);
 		mainDiscordPanel.add(mainDiscordButton);
+		mainDiscordPanel.add(Box.createRigidArea(new Dimension(4, 0)));
 
-		JButton starLoaderDiscordButton = new JButton("StarLoader Discord");
+		JButton starLoaderDiscordButton = new JButton("StarLoader Discord") {
+			@Override
+			protected void paintComponent(Graphics g) {
+				if(getModel().isArmed()) g.setColor(Palette.selectedColor);
+				else g.setColor(Palette.deselectedColor);
+				g.fillRoundRect(0, 0, getSize().width - 1, getSize().height - 1, 20, 20);
+				super.paintComponent(g);
+			}
+		};
 		starLoaderDiscordButton.addActionListener(e -> {
 			if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 				try {
@@ -61,17 +81,24 @@ public class LauncherCommunityPanel extends JPanel {
 				}
 			}
 		});
-		starLoaderDiscordButton.setIcon(new ImageIcon("resources/starloader.png"));
+		starLoaderDiscordButton.setIcon(StarMadeLauncher.getIcon("sprites/starloader.png", 32, 32));
+		starLoaderDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, starLoaderDiscordButton.getMinimumSize().height));
 		starLoaderDiscordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		starLoaderDiscordButton.setBackground(Palette.buttonColor);
 		mainDiscordPanel.add(starLoaderDiscordButton);
 		add(mainDiscordPanel);
 
 		//Community server list
+		add(Box.createRigidArea(new Dimension(0, 10)));
 		JPanel communityServerPanel = new JPanel(true);
 		communityServerPanel.setBackground(Palette.paneColor);
 		communityServerPanel.setOpaque(true);
 		communityServerPanel.setLayout(new BoxLayout(communityServerPanel, BoxLayout.Y_AXIS));
-		//Fetch community server list
 		CommunityServerList communityServerList = new CommunityServerList(COMMUNITY_SERVER_JSON_URL);
+		communityServerList.setBackground(Palette.paneColor);
+		communityServerList.setOpaque(true);
+		communityServerList.setAlignmentX(Component.CENTER_ALIGNMENT);
+		communityServerPanel.add(communityServerList);
+		add(communityServerPanel);
 	}
 }

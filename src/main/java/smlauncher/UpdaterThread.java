@@ -23,6 +23,7 @@ public class UpdaterThread extends Thread {
 	private final IndexFileEntry entry;
 	private final int backupMode;
 	private final File installDir;
+	public boolean updating;
 
 	public UpdaterThread(IndexFileEntry entry, int backupMode, File installDir) {
 		this.entry = entry;
@@ -33,6 +34,7 @@ public class UpdaterThread extends Thread {
 	@Override
 	public void run() {
 		try {
+			updating = true;
 			boolean dbOnly = backupMode == BACKUP_MODE_DATABASE;
 			if(backupMode != BACKUP_MODE_NONE && installDir.exists()) (new StarMadeBackupTool()).backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
 
@@ -44,7 +46,10 @@ public class UpdaterThread extends Thread {
 				@Override
 				public void update(FileDownloadUpdate u) {
 					onProgress(u.index / finalSize);
-					if(u.index >= u.total - 1) onFinished();
+					if(u.index >= u.total - 1) {
+						updating = false;
+						onFinished();
+					}
 				}
 
 				@Override

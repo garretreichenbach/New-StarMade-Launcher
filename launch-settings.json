@@ -1,1 +1,1 @@
-{"lastUsedVersion":"0.203.156","memory":8192,"launchArgs":"","installDir":"./StarMade","jvm_args":""}
+{"lastUsedVersion":"0.203.156","memory":4096,"launchArgs":"","installDir":"./StarMade","jvm_args":"--illegal-access=permit"}

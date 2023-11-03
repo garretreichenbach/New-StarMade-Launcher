@@ -14,4 +14,5 @@ public class Palette {
 	public static final Color backgroundColor = Color.decode("#0f0f13");
 	public static final Color foregroundColor = Color.decode("#121526");
 	public static final Color paneColor = Color.decode("#19191F");
+	public static final Color buttonColor = Color.decode("#1E1E24");
 }
