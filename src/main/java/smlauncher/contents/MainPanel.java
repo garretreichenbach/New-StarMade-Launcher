@@ -11,6 +11,7 @@ public class MainPanel extends JPanel {
     NewsPane np;
     JScrollPane scrollPane;
     JPanel linksPanel;
+    JPanel optionsPanel;
 
     public MainPanel(){
         inst = this;
@@ -40,6 +41,9 @@ public class MainPanel extends JPanel {
         linksPanel = new LinksPanel();
         add(linksPanel);
 
+        optionsPanel = new OptionsPanel();
+        add(optionsPanel);
+
 
         switchActivePane(0);
     }
@@ -48,11 +52,12 @@ public class MainPanel extends JPanel {
         np.setVisible(false);
         scrollPane.setVisible(false);
         linksPanel.setVisible(false);
+        optionsPanel.setVisible(false);
         if(id == 0){
             np.setVisible(true);
             scrollPane.setVisible(true);
         }else if(id == 1){
-            linksPanel.setVisible(true);
+            optionsPanel.setVisible(true);
         }else if(id == 2){
             linksPanel.setVisible(true);
         }else if(id == 3){

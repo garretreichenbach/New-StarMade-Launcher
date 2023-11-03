@@ -7,7 +7,7 @@ public class LinksPanel extends JPanel {
     public LinksPanel() {
         setBounds(NewsPane.X, NewsPane.Y, NewsPane.W, NewsPane.H);
         setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        setBackground(Color.BLACK);
+        setBackground(new Color(0,0,0,10));
         new UrlOpenButton(this, 150, 30, "https://starmadedock.net/", "Forums");
         new UrlOpenButton(this, 150, 30, "https://discord.com/invite/SXbkYpU", "Discord Server");
         new UrlOpenButton(this, 150, 30, "https://www.twitch.tv/starmade", "Twitch (inactive)");
