@@ -3,6 +3,9 @@ package smlauncher;
 import com.formdev.flatlaf.FlatDarkLaf;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+import smlauncher.community.LauncherCommunityPanel;
+import smlauncher.content.LauncherContentPanel;
+import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
 import smlauncher.util.Palette;
@@ -37,7 +40,7 @@ import java.util.zip.ZipFile;
  * @author TheDerpGamer (TheDerpGamer#0027)
  */
 public class StarMadeLauncher extends JFrame {
-	public static final String LAUNCHER_VERSION = "3.0.0"; //We've had two other launchers before this, so this works
+	public static final String LAUNCHER_VERSION = "3.0.0"; //We've had two other launchers before this
 	private static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
 	private static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
 	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED";
@@ -118,6 +121,8 @@ public class StarMadeLauncher extends JFrame {
 	private UpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
+	private final JSONObject launchSettings;
+	private JButton updateButton;
 	private JPanel mainPanel;
 	private JPanel centerPanel;
 	private JPanel footerPanel;
@@ -125,8 +130,11 @@ public class StarMadeLauncher extends JFrame {
 	private JPanel playPanel;
 	private JPanel serverPanel;
 	private JPanel playPanelButtons;
+	private JScrollPane centerScrollPane;
 	private LauncherNewsPanel newsPanel;
-	private final JSONObject launchSettings;
+	private LauncherForumsPanel forumsPanel;
+	private LauncherContentPanel contentPanel;
+	private LauncherCommunityPanel communityPanel;
 
 	public StarMadeLauncher() {
 		super("StarMade Launcher");
@@ -392,7 +400,8 @@ public class StarMadeLauncher extends JFrame {
 		footerPanelButtons.add(dedicatedServerButton);
 		footerLabel.add(footerPanelButtons);
 		footerPanelButtons.setBounds(0, 0, 800, 30);
-		selectedVersion = Objects.requireNonNull(getCurrentVersion()).build;
+		if(getCurrentVersion() == null) selectedVersion = null;
+		else selectedVersion = getCurrentVersion().build;
 		createPlayPanel(footerPanel);
 		createServerPanel(footerPanel);
 		JPanel bottomPanel = new JPanel();
@@ -594,6 +603,17 @@ public class StarMadeLauncher extends JFrame {
 					installLabelPath.setText(installDir);
 				}
 			});
+			JButton repairButton = new JButton("Repair");
+			repairButton.setIcon(UIManager.getIcon("FileView.checkIcon"));
+			repairButton.setDoubleBuffered(true);
+			repairButton.setOpaque(false);
+			repairButton.setFont(new Font("Roboto", Font.BOLD, 12));
+			dialogPanel.add(repairButton);
+			repairButton.addActionListener(e1 -> {
+				if(updaterThread == null || !updaterThread.isAlive()) updateGame(updateButton);
+				dialog.dispose();
+			});
+
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setDoubleBuffered(true);
 			buttonPanel.setOpaque(false);
@@ -698,7 +718,7 @@ public class StarMadeLauncher extends JFrame {
 			try {
 				file.createNewFile();
 				JSONObject object = new JSONObject();
-				object.put("memory", 2048);
+				object.put("memory", 4096);
 				object.put("launchArgs", "");
 				object.put("installDir", installDir);
 				if(GAME_VERSION != null) {
@@ -802,7 +822,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
 		if(!lookForGame(installDir) || GAME_VERSION == null || !Objects.equals(GAME_VERSION.build, selectedVersion)) {
-			JButton updateButton = new JButton(getIcon("sprites/update_btn.png"));
+			updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
 			updateButton.setContentAreaFilled(false);
@@ -975,7 +995,9 @@ public class StarMadeLauncher extends JFrame {
 				GAME_VERSION = getCurrentVersion();
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				saveLaunchSettings();
-				recreateButtons(playPanel);
+				mainPanel.removeAll();
+				createMainPanel();
+//				recreateButtons(playPanel);
 			}
 
 			@Override
@@ -987,14 +1009,11 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private Updater.VersionFile getLastUsedBranch() {
-		switch(lastUsedBranch) {
-			case 1:
-				return Updater.VersionFile.DEV;
-			case 2:
-				return Updater.VersionFile.PRE;
-			default:
-				return Updater.VersionFile.RELEASE;
-		}
+		return switch(lastUsedBranch) {
+			case 1 -> Updater.VersionFile.DEV;
+			case 2 -> Updater.VersionFile.PRE;
+			default -> Updater.VersionFile.RELEASE;
+		};
 	}
 
 	private void updateVersions(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown) {
@@ -1017,17 +1036,40 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
+	private void createScroller(JPanel currentPanel) {
+		if(centerScrollPane == null) {
+			centerScrollPane = new JScrollPane(currentPanel);
+			centerScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			centerScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+			JScrollBar vertical = centerScrollPane.getVerticalScrollBar();
+			vertical.setValue(vertical.getMaximum());
+			centerPanel.add(centerScrollPane, BorderLayout.CENTER);
+		}
+		centerScrollPane.setViewportView(currentPanel);
+	}
+
 	private void createNewsPanel() {
-//		newsPanel = new LauncherNewsPanel(centerPanel);
+		if(newsPanel == null) newsPanel = new LauncherNewsPanel();
+		createScroller(newsPanel);
+		newsPanel.updatePanel();
 	}
 
 	private void createForumsPanel() {
+		forumsPanel = new LauncherForumsPanel();
+		createScroller(forumsPanel);
+		forumsPanel.updatePanel();
 	}
 
 	private void createContentPanel() {
+		contentPanel = new LauncherContentPanel();
+		createScroller(contentPanel);
+		contentPanel.updatePanel();
 	}
 
 	private void createCommunityPanel() {
+		communityPanel = new LauncherCommunityPanel();
+		createScroller(communityPanel);
+		communityPanel.updatePanel();
 	}
 
 	private ImageIcon getIcon(String s) {
