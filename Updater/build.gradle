@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id "application"
+    id "com.github.johnrengelman.shadow" version "7.1.0"
+}
+
+group = 'smlauncher.updater'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'commons-io:commons-io:2.11.0'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'smlauncher.updater.Updater'
+    }
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    destinationDirectory.set(file("../src/main/resources/"))
+    setArchivesBaseName("Updater")
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

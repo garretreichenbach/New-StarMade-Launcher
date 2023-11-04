@@ -44,12 +44,15 @@ import java.util.zip.ZipFile;
  */
 public class StarMadeLauncher extends JFrame {
 
-	public static boolean debugMode;
-	public static final String LAUNCHER_VERSION = "3.0.0"; //We've had two other launchers before this
-	private static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
-	private static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
+	public static final String BUG_REPORT_URL = ""; //Todo
+	public static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
+	public static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
+
 	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED";
+	public static final String LAUNCHER_VERSION = "3.0.1"; //We've had two other launchers before this
 	public static IndexFileEntry GAME_VERSION;
+
+	public static boolean debugMode;
 	public static boolean useSteam;
 	public static String installDir = "./StarMade";
 	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
@@ -78,9 +81,9 @@ public class StarMadeLauncher extends JFrame {
 	private LauncherForumsPanel forumsPanel;
 	private LauncherContentPanel contentPanel;
 	private LauncherCommunityPanel communityPanel;
+
 	public StarMadeLauncher() {
 		super("StarMade Launcher");
-		FlatDarkLaf.setup();
 		try {
 			URL resource = StarMadeLauncher.class.getResource("/sprites/icon.png");
 			if(resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
@@ -162,31 +165,83 @@ public class StarMadeLauncher extends JFrame {
 	private static void startup() {
 		EventQueue.invokeLater(() -> {
 			try {
+				FlatDarkLaf.setup();
 				if(LauncherUpdater.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
-					//Todo: Launcher update prompt
-				}
-				StarMadeLauncher frame = new StarMadeLauncher();
-				(new Thread(() -> {
-					//For steam: keep it repainting so the damn overlays go away
-					try {
-						Thread.sleep(1200);
-					} catch(InterruptedException e) {
-						e.printStackTrace();
-					}
-					while(frame.isVisible()) {
-						try {
-							Thread.sleep(500);
-						} catch(InterruptedException exception) {
-							exception.printStackTrace();
-						}
-						EventQueue.invokeLater(frame::repaint);
-					}
-				})).start();
+					JDialog dialog = new JDialog();
+					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+					dialog.setModal(true);
+					dialog.setResizable(false);
+					dialog.setTitle("Launcher Update Available");
+					dialog.setSize(500, 350);
+					dialog.setLocationRelativeTo(null);
+					dialog.setLayout(new BorderLayout());
+					dialog.setAlwaysOnTop(true);
+					dialog.setLayout(new BorderLayout());
+
+					JPanel descPanel = new JPanel();
+					descPanel.setDoubleBuffered(true);
+					descPanel.setOpaque(true);
+					descPanel.setLayout(new BoxLayout(descPanel, BoxLayout.Y_AXIS));
+					dialog.add(descPanel);
+
+					JLabel descLabel = new JLabel("A new launcher update is available, please update to continue.");
+					descLabel.setDoubleBuffered(true);
+					descLabel.setOpaque(true);
+					descLabel.setFont(new Font("Roboto", Font.BOLD, 16));
+					descPanel.add(descLabel);
+
+					JPanel buttonPanel = new JPanel();
+					buttonPanel.setDoubleBuffered(true);
+					buttonPanel.setOpaque(true);
+					buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+					dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+					JButton updateButton = new JButton("Update");
+					updateButton.setDoubleBuffered(true);
+					updateButton.setOpaque(true);
+					updateButton.setFont(new Font("Roboto", Font.BOLD, 12));
+					updateButton.addActionListener(e -> {
+						dialog.dispose();
+						LauncherUpdater.updateLauncher();
+					});
+					buttonPanel.add(updateButton);
+
+					JButton cancelButton = new JButton("Cancel");
+					cancelButton.setDoubleBuffered(true);
+					cancelButton.setOpaque(true);
+					cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
+					cancelButton.addActionListener(e -> {
+						dialog.dispose();
+						startFrame();
+					});
+					buttonPanel.add(cancelButton);
+					dialog.setVisible(true);
+				} else startFrame();
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
 		});
+	}
+
+	private static void startFrame() {
+		StarMadeLauncher frame = new StarMadeLauncher();
+		(new Thread(() -> {
+			//For steam: keep it repainting so the damn overlays go away
+			try {
+				Thread.sleep(1200);
+			} catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+			while(frame.isVisible()) {
+				try {
+					Thread.sleep(500);
+				} catch(InterruptedException exception) {
+					exception.printStackTrace();
+				}
+				EventQueue.invokeLater(frame::repaint);
+			}
+		})).start();
 	}
 
 	public static ImageIcon getIcon(String s) {
@@ -944,7 +999,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-		if(!lookForGame(installDir) || GAME_VERSION == null || !Objects.equals(GAME_VERSION.build, selectedVersion)) {
+		if(!lookForGame(installDir) || GAME_VERSION == null || (!Objects.equals(GAME_VERSION.build, selectedVersion) && !debugMode)) {
 			updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
@@ -1230,6 +1285,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
+		if(debugMode || Objects.requireNonNull(getCurrentVersion()).version.startsWith("0.3")) return getCurrentVersion();
 		return switch(branch) {
 			case RELEASE -> releaseVersions.get(0);
 			case DEV -> devVersions.get(0);

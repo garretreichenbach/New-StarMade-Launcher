@@ -18,13 +18,16 @@ dependencies {
 }
 
 jar {
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./"))
-    setArchivesBaseName("StarMade Launcher")
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    destinationDirectory.set(file("./"))
+    setArchivesBaseName("starmade-launcher")
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    from('resources/Updater.jar') {
+        into 'Updater.jar'
     }
 }
