@@ -19,7 +19,8 @@ public class LauncherUpdater {
 
 	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
 //	private static final String UPDATE_URL = "http://launcher-files-origin.star-made.org/launcherbuildindex";
-	private static final String INDEX_URL = "https://www.dropbox.com/scl/fo/4ogzrqulyzmxj9dhrmot4/h?rlkey=fsbum0npmoko7ddcqli4j4sbf&dl=1"; //Temp dropbox link for testing
+	private static final String UPDATE_URL_BASE = "file:///C:/Users/garre/OneDrive - Arizona State University/Documents/GitHub/New-StarMade-Launcher/launcher-test/3.0.0/"; //Temp link for testing
+	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json"; //Temp link for testing
 
 	public static boolean checkForUpdate() {
 		String currentVersion = StarMadeLauncher.LAUNCHER_VERSION;
@@ -49,13 +50,6 @@ public class LauncherUpdater {
 	public static void updateLauncher() {
 		String latestVersion = getLatestVersion();
 		System.err.println("Updating launcher to version " + latestVersion);
-
-		//The actual updater is a separate jar program that inside the jar file (jar in jar)
-		//This is because the launcher jar file is locked while it is running, so it cannot be updated
-		//The updater jar is extracted to the temp directory and then run
-		//The launcher jar is then deleted and replaced with the new one
-		//The launcher is then restarted
-
 		try {
 			File updaterJar = File.createTempFile("Updater", ".jar");
 			updaterJar.deleteOnExit();
@@ -85,7 +79,7 @@ public class LauncherUpdater {
 	}
 
 	private static String getLatestLauncherURL() {
-//		return UPDATE_URL + "/" + getLatestVersion() + "/starmade-launcher" + getPlatformExtension(); //Todo: Verify this works
+		return UPDATE_URL_BASE + getLatestVersion() + "/starmade-launcher" + getPlatformExtension(); //Temp link for testing
 	}
 
 	private static String getPlatformExtension() {

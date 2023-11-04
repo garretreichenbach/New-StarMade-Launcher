@@ -12,5 +12,7 @@ MANIFEST.MF
 /jre18.zip
 .idea/workspace.xml
 StarMade Launcher.exe
-starmade-launcher.exe
+launcher-test/3.0.0/starmade-launcher.exe
 StarMade Launcher.xml
+/launcher-test/
+starmade-launcher.jar
