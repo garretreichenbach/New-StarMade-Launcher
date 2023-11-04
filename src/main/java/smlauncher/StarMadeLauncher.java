@@ -329,7 +329,10 @@ public class StarMadeLauncher extends JFrame {
 		closeButton.setOpaque(false);
 		closeButton.setContentAreaFilled(false);
 		closeButton.setBorderPainted(false);
-		closeButton.addActionListener(e -> System.exit(0));
+		closeButton.addActionListener(e -> {
+			dispose();
+			System.exit(0);
+		});
 		JButton minimizeButton = new JButton(null, getIcon("sprites/minimize_icon.png"));
 		minimizeButton.setDoubleBuffered(true);
 		minimizeButton.setOpaque(false);

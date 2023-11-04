@@ -1,6 +1,8 @@
 package smlauncher;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import smlauncher.misc.ErrorDialog;
 
 import java.awt.*;
@@ -17,7 +19,7 @@ public class LauncherUpdater {
 
 	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
 //	private static final String UPDATE_URL = "http://launcher-files-origin.star-made.org/launcherbuildindex";
-	private static final String UPDATE_URL = ""; //Temp dropbox link for testing
+	private static final String INDEX_URL = "https://www.dropbox.com/scl/fo/4ogzrqulyzmxj9dhrmot4/h?rlkey=fsbum0npmoko7ddcqli4j4sbf&dl=1"; //Temp dropbox link for testing
 
 	public static boolean checkForUpdate() {
 		String currentVersion = StarMadeLauncher.LAUNCHER_VERSION;
@@ -29,10 +31,12 @@ public class LauncherUpdater {
 
 	private static String getLatestVersion() {
 		try {
-			String allVersions = new String(new URL(UPDATE_URL).openStream().readAllBytes(), StandardCharsets.UTF_8);
-			System.err.println(allVersions);
-			String[] versions = allVersions.split("\n");
-			return versions[versions.length - 1].split("#")[0].trim();
+			String indexJSON = new String(new URL(INDEX_URL).openStream().readAllBytes(), StandardCharsets.UTF_8);
+			System.err.println(indexJSON);
+			JSONObject index = new JSONObject(indexJSON);
+			JSONArray versions = index.getJSONArray("versions");
+			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);
+			return latestVersion.getString("version");
 		} catch(IOException exception) {
 			exception.printStackTrace();
 			return "UNKNOWN";
@@ -81,7 +85,7 @@ public class LauncherUpdater {
 	}
 
 	private static String getLatestLauncherURL() {
-		return UPDATE_URL + "/" + getLatestVersion() + "/starmade-launcher" + getPlatformExtension(); //Todo: Verify this works
+//		return UPDATE_URL + "/" + getLatestVersion() + "/starmade-launcher" + getPlatformExtension(); //Todo: Verify this works
 	}
 
 	private static String getPlatformExtension() {

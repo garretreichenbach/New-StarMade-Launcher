@@ -13,7 +13,7 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\garre\OneDrive - Arizona State University\Documents\GitHub\New-StarMade-Launcher\src\main\resources\sprites\icon.png</icon>
+  <icon>C:\Users\garre\OneDrive - Arizona State University\Documents\GitHub\New-StarMade-Launcher\src\main\resources\starmade.ico</icon>
   <jre>
     <path>%JAVA_HOME%;%PATH%</path>
     <requiresJdk>false</requiresJdk>
