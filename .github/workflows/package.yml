@@ -1,0 +1,75 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  node_job:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 16.x ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Wine
+        run: |
+          sudo dpkg --add-architecture i386
+          wget -nc https://dl.winehq.org/wine-builds/winehq.key
+          sudo apt-key add winehq.key
+          sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
+          sudo apt-get update
+          sudo apt-get install --install-recommends winehq-stable
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: node package.js
+
+  gradle_job:
+    needs: node_job
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 18
+        uses: actions/setup-java@v3
+        with:
+          java-version: '18'
+          distribution: 'temurin'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v1
+        with:
+          arguments: build
+      - name: Export jar for Windows
+        uses: gradle/gradle-build-action@v1
+        with:
+          arguments: win_jar
+      - name: Export jar for Mac
+        uses: gradle/gradle-build-action@v1
+        with:
+          arguments: mac_jar
+      - name: Export jar for Linux
+        uses: gradle/gradle-build-action@v1
+        with:
+          arguments: linux_jar
+
+  package_and_publish:
+    needs: gradle_job
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
+        with:
+          arguments: build
+      - name: Publish to GitHub Packages
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
+        with:
+          arguments: publish
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ secrets.TOKEN }}
