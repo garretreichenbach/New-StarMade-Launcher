@@ -29,18 +29,18 @@ jobs:
         java-version: '18'
         distribution: 'temurin'
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      uses: gradle/gradle-build-action@v1
       with:
         arguments: build
     - name: Export jar for Windows
-      uses: jojo243/android-gradle-action@2.1.3
+      uses: gradle/gradle-build-action@v1
       with:
         arguments: win_jar
     - name: Export jar for Mac
-      uses: jojo243/android-gradle-action@2.1.3
+      uses: gradle/gradle-build-action@v1
       with:
         arguments: mac_jar
     - name: Export jar for Linux
-      uses: jojo243/android-gradle-action@2.1.3
+      uses: gradle/gradle-build-action@v1
       with:
         arguments: linux_jar
