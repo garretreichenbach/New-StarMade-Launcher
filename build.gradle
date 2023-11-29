@@ -37,6 +37,12 @@ publishing {
 }
  */
 
+tasks.register('all_jar', Jar) {
+    dependsOn('win_jar')
+    dependsOn('linux_jar')
+    dependsOn('mac_jar')
+}
+
 tasks.register('win_jar', Jar) {
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
