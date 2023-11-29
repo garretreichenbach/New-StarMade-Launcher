@@ -5,6 +5,7 @@ plugins {
 }
 
 group = 'smlauncher.updater'
+mainClassName = 'smlauncher.StarMadeLauncher'
 
 repositories {
     mavenCentral()
