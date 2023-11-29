@@ -12,7 +12,7 @@ const options = {
 }
 
 const platforms = [
-    { platform: 'darwin', arch: 'x64', icon: options.icon + '.icns' },
+    // { platform: 'darwin', arch: 'x64', icon: options.icon + '.icns' }, Todo: This is not working in GitHub Actions, and I can't run it locally since I'm on Windows
     { platform: 'win32', arch: 'ia32', icon: options.icon + '.ico' },
     { platform: 'linux', arch: 'x64', icon: options.icon + '.png' }
 ]
