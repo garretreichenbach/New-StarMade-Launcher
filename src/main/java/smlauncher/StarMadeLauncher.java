@@ -1,6 +1,7 @@
 package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
@@ -86,7 +87,22 @@ public class StarMadeLauncher extends JFrame {
 		super("StarMade Launcher");
 		try {
 			URL resource = StarMadeLauncher.class.getResource("/sprites/icon.png");
-			if(resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
+			if(resource != null) {
+				setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
+				try {
+					//This is for the JS part of the launcher
+					File assetsFolder = new File("./assets");
+					if(!assetsFolder.exists()) assetsFolder.mkdir();
+					File winIcon = new File(assetsFolder, "starmade.ico");
+					File macIcon = new File(assetsFolder, "starmade.icns");
+					File linuxIcon = new File(assetsFolder, "starmade.png");
+					if(!winIcon.exists()) FileUtils.writeByteArrayToFile(winIcon, IOUtils.toByteArray(Objects.requireNonNull(StarMadeLauncher.class.getResourceAsStream("starmade.ico"))));
+					if(!macIcon.exists()) FileUtils.writeByteArrayToFile(macIcon, IOUtils.toByteArray(Objects.requireNonNull(StarMadeLauncher.class.getResourceAsStream("starmade.icns"))));
+					if(!linuxIcon.exists()) FileUtils.writeByteArrayToFile(linuxIcon, IOUtils.toByteArray(Objects.requireNonNull(StarMadeLauncher.class.getResourceAsStream("starmade.png"))));
+				} catch(Exception exception) {
+					exception.printStackTrace();
+				}
+			}
 		} catch(Exception exception) {
 			exception.printStackTrace();
 		}

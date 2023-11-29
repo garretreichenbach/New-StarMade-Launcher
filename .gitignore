@@ -16,3 +16,5 @@ launcher-test/3.0.0/starmade-launcher.exe
 StarMade Launcher.xml
 /launcher-test/
 starmade-launcher.jar
+/node_modules/
+/release-builds/
