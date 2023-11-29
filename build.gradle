@@ -54,4 +54,21 @@ tasks.register('linux_jar', Jar) {
     }
 }
 
+tasks.register('mac_jar', Jar) {
+    manifest {
+        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
+    }
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    destinationDirectory.set(file("./release-builds/StarMade Launcher-darwin-x64"))
+
+    setArchivesBaseName("starmade-launcher")
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    from(sourceSets.main.output)
+    from('resources/Updater.jar') {
+        into 'Updater.jar'
+    }
+}
+
 //Todo: Mac support
