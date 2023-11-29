@@ -8,8 +8,8 @@
     "package-win": "node_modules/.bin/electron-packager . starmade-launcher --overwrite --asar=true --platform=win32 --arch=ia32  --icon=assets/starmade.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName='StarMade Launcher' --extra-resource=starmade-launcher.jar --extra-resource=assets",
     "package-linux": "node_modules/.bin/electron-packager . starmade-launcher --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/starmade.png --prune=true --out=release-builds --extra-resource=starmade-launcher.jar --extra-resource=assets"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Schine, StarLoader Team",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^1.4.15",
     "electron-packager": "^8.5.2"
