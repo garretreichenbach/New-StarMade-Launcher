@@ -71,7 +71,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v1
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
         with:
           arguments: build
       - name: Publish to GitHub Packages
