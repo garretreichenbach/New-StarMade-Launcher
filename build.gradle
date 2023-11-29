@@ -4,6 +4,9 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
+group 'smlauncher'
+mainClassName = 'smlauncher.StarMadeLauncher'
+
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
@@ -17,17 +20,38 @@ dependencies {
     implementation 'it.unimi.dsi:fastutil:8.5.12'
 }
 
-jar {
+tasks.register('win_jar', Jar) {
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./"))
+    destinationDirectory.set(file("./release-builds/StarMade Launcher-win32-ia32"))
+
     setArchivesBaseName("starmade-launcher")
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    from(sourceSets.main.output)
     from('resources/Updater.jar') {
         into 'Updater.jar'
     }
 }
+
+tasks.register('linux_jar', Jar) {
+    manifest {
+        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
+    }
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    destinationDirectory.set(file("./release-builds/StarMade Launcher-linux-x64"))
+
+    setArchivesBaseName("starmade-launcher")
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    from(sourceSets.main.output)
+    from('resources/Updater.jar') {
+        into 'Updater.jar'
+    }
+}
+
+//Todo: Mac support
