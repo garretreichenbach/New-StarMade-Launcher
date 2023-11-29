@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "application"
     id "com.github.johnrengelman.shadow" version "7.1.0"
+    id 'maven-publish'
 }
 
 group 'smlauncher'
@@ -19,6 +20,22 @@ dependencies {
     implementation 'org.jasypt:jasypt:1.9.3'
     implementation 'it.unimi.dsi:fastutil:8.5.12'
 }
+
+/*
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "StarMade Launcher Repository"
+            url = uri("") //Todo: Add repo url
+        }
+    }
+}
+ */
 
 tasks.register('win_jar', Jar) {
     manifest {
@@ -70,5 +87,3 @@ tasks.register('mac_jar', Jar) {
         into 'Updater.jar'
     }
 }
-
-//Todo: Mac support
