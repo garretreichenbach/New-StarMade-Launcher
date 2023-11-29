@@ -9,3 +9,9 @@ This launcher was created due to the old one being outdated and only being able 
 - The StarLoader Team for making a new launcher
 
 Note: Pretty much every class in `util` was copied over from the main repo.
+
+# Building from source
+1. Clone the Repo (duh)
+2. run `npm install`
+3. run `node package.js`
+4. run `gradlew all_jar` (Not `gradlew jar`!)
