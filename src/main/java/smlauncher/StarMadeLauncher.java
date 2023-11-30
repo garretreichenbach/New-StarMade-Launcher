@@ -726,8 +726,16 @@ public class StarMadeLauncher extends JFrame {
 			repairButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			dialogPanel.add(repairButton);
 			repairButton.addActionListener(e1 -> {
-				if(updaterThread == null || !updaterThread.updating) updateGame(updateButton);
-				dialog.dispose();
+				Updater.VersionFile branch = getLastUsedBranch();
+				if(branch == null) branch = Updater.VersionFile.RELEASE;
+				IndexFileEntry version = getLatestVersion(branch);
+				if(version != null) {
+					if(updaterThread == null || !updaterThread.updating) {
+						dialog.dispose();
+						recreateButtons(playPanel, true);
+						updateGame(updateButton, version);
+					}
+				} else JOptionPane.showMessageDialog(dialog, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
 			});
 
 			JPanel buttonPanel = new JPanel();
@@ -959,7 +967,7 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItemListener(e -> {
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
-			recreateButtons(playPanel);
+			recreateButtons(playPanel, false);
 		});
 		branchDropdown.setSelectedIndex(lastUsedBranch);
 		branchDropdown.putClientProperty("Nimbus.Overrides", defaults);
@@ -970,9 +978,10 @@ public class StarMadeLauncher extends JFrame {
 		versionDropdown.addItemListener(e -> {
 			if(versionDropdown.getSelectedIndex() == -1) return;
 			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
-			recreateButtons(playPanel);
+			recreateButtons(playPanel, false);
 		});
 		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
+		if(lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
 		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
 			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
 				versionDropdown.setSelectedIndex(i);
@@ -981,12 +990,12 @@ public class StarMadeLauncher extends JFrame {
 		}
 		versionSubPanel.add(branchDropdown);
 		versionSubPanel.add(versionDropdown);
-		recreateButtons(playPanel);
+		recreateButtons(playPanel, false);
 		footerPanel.revalidate();
 		footerPanel.repaint();
 	}
 
-	private void recreateButtons(JPanel playPanel) {
+	private void recreateButtons(JPanel playPanel, boolean repair) {
 		if(playPanelButtons != null) {
 			playPanelButtons.removeAll();
 			playPanel.remove(playPanelButtons);
@@ -1002,14 +1011,19 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-		if(!lookForGame(installDir) || GAME_VERSION == null || (!Objects.equals(GAME_VERSION.build, selectedVersion) && !debugMode)) {
+		if(repair || !lookForGame(installDir) || GAME_VERSION == null || (!Objects.equals(GAME_VERSION.build, selectedVersion) && !debugMode)) {
 			updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
 			updateButton.setContentAreaFilled(false);
 			updateButton.setBorderPainted(false);
 			updateButton.addActionListener(e -> {
-				if(updaterThread == null || !updaterThread.updating) updateGame(updateButton);
+				Updater.VersionFile branch = getLastUsedBranch();
+				if(branch == null) branch = Updater.VersionFile.RELEASE;
+				IndexFileEntry version = getLatestVersion(branch);
+				if(version != null) {
+					if(updaterThread == null || !updaterThread.updating) updateGame(updateButton, version);
+				} else JOptionPane.showMessageDialog(null, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
 			});
 			updateButton.addMouseListener(new MouseAdapter() {
 				@Override
@@ -1144,7 +1158,7 @@ public class StarMadeLauncher extends JFrame {
 		//Todo: Create server panel
 	}
 
-	private void updateGame(JButton updateButton) {
+	private void updateGame(JButton updateButton, IndexFileEntry version) {
 		String[] options = {"Backup Database", "Backup Everything", "Don't Backup"};
 		int choice = JOptionPane.showOptionDialog(this, "Would you like to backup your database, everything, or nothing?", "Backup", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		int backupMode = UpdaterThread.BACKUP_MODE_NONE;
@@ -1154,7 +1168,7 @@ public class StarMadeLauncher extends JFrame {
 		ImageIcon updateButtonFilled = getIcon("sprites/update_load_full.png");
 		updateButton.setIcon(updateButtonEmpty);
 		//Start update process and update progress bar
-		(updaterThread = new UpdaterThread(getLatestVersion(getLastUsedBranch()), backupMode, new File(installDir)) {
+		(updaterThread = new UpdaterThread(version, backupMode, new File(installDir)) {
 			@Override
 			public void onProgress(float progress) {
 				installProgress[0] = progress;
@@ -1177,7 +1191,7 @@ public class StarMadeLauncher extends JFrame {
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				selectedVersion = GAME_VERSION.build;
 				saveLaunchSettings();
-				recreateButtons(playPanel);
+				recreateButtons(playPanel, false);
 			}
 
 			@Override
@@ -1288,7 +1302,8 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
-		if(debugMode || Objects.requireNonNull(getCurrentVersion()).version.startsWith("0.3")) return getCurrentVersion();
+		IndexFileEntry currentVersion = getCurrentVersion();
+		if(debugMode || (currentVersion != null && currentVersion.version.startsWith("0.3"))) return getCurrentVersion();
 		return switch(branch) {
 			case RELEASE -> releaseVersions.get(0);
 			case DEV -> devVersions.get(0);
