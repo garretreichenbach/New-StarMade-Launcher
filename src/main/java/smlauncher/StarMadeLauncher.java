@@ -91,6 +91,16 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		try {
+			//Check version file for debug
+			File versionFile = new File(installDir, "version.txt");
+			if(versionFile.exists()) {
+				String version = Files.readString(versionFile.toPath());
+				if(version.startsWith("0.3")) debugMode = true;
+			}
+		} catch(Exception exception) {
+			exception.printStackTrace();
+		}
+		try {
 			loadVersionList();
 		} catch(IOException exception) {
 			exception.printStackTrace();
@@ -1011,7 +1021,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-		if(repair || !lookForGame(installDir) || GAME_VERSION == null || (!Objects.equals(GAME_VERSION.build, selectedVersion) && !debugMode)) {
+		if((repair || !lookForGame(installDir) || GAME_VERSION == null || (!Objects.equals(GAME_VERSION.build, selectedVersion))) && !debugMode) {
 			updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
@@ -1303,7 +1313,7 @@ public class StarMadeLauncher extends JFrame {
 
 	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
 		IndexFileEntry currentVersion = getCurrentVersion();
-		if(debugMode || (currentVersion != null && currentVersion.version.startsWith("0.3"))) return getCurrentVersion();
+		if(debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1"))) return getCurrentVersion();
 		return switch(branch) {
 			case RELEASE -> releaseVersions.get(0);
 			case DEV -> devVersions.get(0);
