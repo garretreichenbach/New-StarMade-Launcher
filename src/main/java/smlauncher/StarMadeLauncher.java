@@ -44,7 +44,7 @@ import java.util.zip.ZipFile;
  */
 public class StarMadeLauncher extends JFrame {
 
-	public static final String BUG_REPORT_URL = ""; //Todo
+	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
 	public static final String JAVA_8_URL = "https://dl.dropboxusercontent.com/s/imxj1o2tusetqou/jre8.zip?dl=0"; //Todo: Replace this with more official links instead of just dropbox.
 	public static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
 

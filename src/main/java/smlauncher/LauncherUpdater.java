@@ -55,7 +55,7 @@ public class LauncherUpdater {
 			updaterJar.deleteOnExit();
 			extractUpdater(updaterJar);
 			//Send the link to the latest launcher jar file in args
-			ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", updaterJar.getAbsolutePath(), getLatestLauncherURL(), getOutputPath());
+			ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", getLatestLauncherURL(), "StarMade Launcher" + getPlatformFolder() + ".zip");
 			processBuilder.inheritIO();
 			processBuilder.start();
 			System.exit(0);
@@ -79,7 +79,14 @@ public class LauncherUpdater {
 	}
 
 	private static String getLatestLauncherURL() {
-		return UPDATE_URL_BASE + getLatestVersion() + "/starmade-launcher" + getPlatformExtension(); //Temp link for testing
+		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade Launcher" + getPlatformFolder() + ".zip"; //Temp link for testing
+	}
+
+	private static String getPlatformFolder() {
+		String osName = System.getProperty("os.name").toLowerCase();
+		if(osName.contains("win")) return "-win32-ia32";
+		else if(osName.contains("mac")) return "-darwin-x64";
+		else return "-linux-x64";
 	}
 
 	private static String getPlatformExtension() {

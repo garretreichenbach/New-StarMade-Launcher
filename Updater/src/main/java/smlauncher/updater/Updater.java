@@ -5,6 +5,8 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Updater for updating the launcher itself, not the game. Exported in a separate jar file within the launcher jar file.
@@ -32,8 +34,22 @@ public class Updater {
 			IOUtils.copy(new URL(url).openStream(), new FileOutputStream(outputFile));
 			System.out.println("Downloaded update to " + outputFile.getAbsolutePath());
 			System.out.println("Updating launcher...");
+
+			//It should download as a .zip file, so we need to extract it
+			ZipFile zipFile = new ZipFile(outputFile);
+			for(Object object : zipFile.stream().toArray()) {
+				ZipEntry entry = (ZipEntry) object;
+				File file = new File(outputFile.getParentFile(), entry.getName());
+				if(entry.isDirectory()) file.mkdirs();
+				else {
+					file.getParentFile().mkdirs();
+					IOUtils.copy(zipFile.getInputStream(entry), new FileOutputStream(file));
+				}
+			}
+			outputFile.delete();
+
 			//Restart the launcher
-			runLauncher(outputFile.getAbsolutePath());
+			runLauncher(new File("starmade-launcher.jar").getAbsolutePath());
 		} catch(Exception exception) {
 			exception.printStackTrace();
 			System.exit(-1);
@@ -41,28 +57,11 @@ public class Updater {
 	}
 
 	private static void runLauncher(String absolutePath) {
-		String os = System.getProperty("os.name").toLowerCase();
-		if(os.contains("win")) {
-			try {
-				Runtime.getRuntime().exec("cmd /c start \"\" \"" + absolutePath + "\"");
-				System.exit(0);
-			} catch(Exception exception) {
-				exception.printStackTrace();
-			}
-		} else if(os.contains("mac")) {
-			try {
-				Runtime.getRuntime().exec("open \"" + absolutePath + "\"");
-				System.exit(0);
-			} catch(Exception exception) {
-				exception.printStackTrace();
-			}
-		} else {
-			try {
-				Runtime.getRuntime().exec("java -jar \"" + absolutePath + "\"");
-				System.exit(0);
-			} catch(Exception exception) {
-				exception.printStackTrace();
-			}
+		try {
+			Runtime.getRuntime().exec("java -jar \"" + absolutePath + "\"");
+			System.exit(0);
+		} catch(Exception exception) {
+			exception.printStackTrace();
 		}
 	}
 }
