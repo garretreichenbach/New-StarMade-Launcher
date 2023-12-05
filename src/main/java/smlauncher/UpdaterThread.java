@@ -38,15 +38,18 @@ public class UpdaterThread extends Thread {
 			boolean dbOnly = backupMode == BACKUP_MODE_DATABASE;
 			if(backupMode != BACKUP_MODE_NONE && installDir.exists()) (new StarMadeBackupTool()).backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
 
-			String buildDir = FILES_URL + "/build/starmade-build_" + entry.path;
+			String branch = "";
+			if(StarMadeLauncher.lastUsedBranch == 1) branch = "dev/";
+			else if(StarMadeLauncher.lastUsedBranch == 2) branch = "pre/";
+			String buildDir = FILES_URL + "build/" + branch + "starmade-build_" + entry.path;
 			ChecksumFile checksums = Updater.getChecksums(buildDir);
 			if(!installDir.exists()) installDir.mkdirs();
 			float finalSize = checksums.checksums.size();
 			checksums.download(false, buildDir, installDir, installDir.getPath(), new FileDowloadCallback() {
 				@Override
 				public void update(FileDownloadUpdate u) {
-					onProgress(u.index / finalSize);
-					if(u.index >= u.total - 1) {
+					onProgress((float) u.downloaded / u.totalSize);
+					if(u.downloaded >= u.totalSize) {
 						updating = false;
 						onFinished();
 					}

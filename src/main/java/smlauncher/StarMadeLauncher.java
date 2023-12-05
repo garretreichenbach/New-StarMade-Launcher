@@ -54,7 +54,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public static boolean debugMode;
 	public static boolean useSteam;
-	public static String installDir = "./StarMade";
+	public static String installDir = "StarMade";
 	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
 	private static String selectedVersion;
 	private static boolean selectVersion;
@@ -64,7 +64,7 @@ public class StarMadeLauncher extends JFrame {
 	public final ArrayList<IndexFileEntry> preReleaseVersions = new ArrayList<>();
 	private final float[] installProgress = new float[1];
 	private final JSONObject launchSettings;
-	public int lastUsedBranch;
+	public static int lastUsedBranch;
 	private UpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
@@ -965,6 +965,7 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
 		branchDropdown.addItemListener(e -> {
+			lastUsedBranch = branchDropdown.getSelectedIndex();
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
 			recreateButtons(playPanel, false);
@@ -1191,7 +1192,14 @@ public class StarMadeLauncher extends JFrame {
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				selectedVersion = GAME_VERSION.build;
 				saveLaunchSettings();
-				recreateButtons(playPanel, false);
+				SwingUtilities.invokeLater(() -> {
+					try {
+						Thread.sleep(1000);
+						recreateButtons(playPanel, false);
+					} catch(InterruptedException e) {
+						throw new RuntimeException(e);
+					}
+				});
 			}
 
 			@Override
@@ -1360,7 +1368,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	public String getStarMadeStartPath(String installDir) {
-		return installDir + File.separator + "StarMade.jar";
+		return installDir + "/StarMade.jar";
 	}
 
 	public boolean lookForGame(String installDir) {
