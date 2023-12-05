@@ -49,7 +49,7 @@ public class StarMadeLauncher extends JFrame {
 	public static final String JAVA_18_URL = "https://dl.dropboxusercontent.com/s/vkd6y9q4sgojzox/jre18.zip?dl=0";
 
 	private static final String J18ARGS = "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED";
-	public static final String LAUNCHER_VERSION = "3.0.1"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.0"; //We've had two other launchers before this
 	public static IndexFileEntry GAME_VERSION;
 
 	public static boolean debugMode;
@@ -91,18 +91,8 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		try {
-			//Check version file for debug
-			File versionFile = new File(installDir, "version.txt");
-			if(versionFile.exists()) {
-				String version = Files.readString(versionFile.toPath());
-				if(version.startsWith("0.3")) debugMode = true;
-			}
-		} catch(Exception exception) {
-			exception.printStackTrace();
-		}
-		try {
 			loadVersionList();
-		} catch(IOException exception) {
+		} catch(Exception exception) {
 			exception.printStackTrace();
 			//Todo: Offline Mode
 		}
@@ -1336,27 +1326,32 @@ public class StarMadeLauncher extends JFrame {
 			BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 			String str;
 			while((str = in.readLine()) != null) {
-				String[] vPath = str.split(" ", 2);
-				String[] vBuild = vPath[0].split("#", 2);
-				String version = vBuild[0];
-				String build = vBuild[1];
-				String path = vPath[1];
-				switch(branch) {
-					case RELEASE:
-						releaseVersions.add(new IndexFileEntry(build, path, version, branch));
-						releaseVersions.sort(Collections.reverseOrder());
+				try {
+					String[] vPath = str.split(" ", 2);
+					String[] vBuild = vPath[0].split("#", 2);
+					String version = vBuild[0];
+					String build = "";
+					if(vBuild.length == 2) build = vBuild[1];
+					String path = vPath[1];
+					switch(branch) {
+						case RELEASE:
+							releaseVersions.add(new IndexFileEntry(build, path, version, branch));
+							releaseVersions.sort(Collections.reverseOrder());
 //						System.err.println("loaded files (sorted) " + releaseVersions);
-						break;
-					case DEV:
-						devVersions.add(new IndexFileEntry(build, path, version, branch));
-						devVersions.sort(Collections.reverseOrder());
+							break;
+						case DEV:
+							devVersions.add(new IndexFileEntry(build, path, version, branch));
+							devVersions.sort(Collections.reverseOrder());
 //						System.err.println("loaded files (sorted) " + devVersions);
-						break;
-					case PRE:
-						preReleaseVersions.add(new IndexFileEntry(build, path, version, branch));
-						preReleaseVersions.sort(Collections.reverseOrder());
+							break;
+						case PRE:
+							preReleaseVersions.add(new IndexFileEntry(build, path, version, branch));
+							preReleaseVersions.sort(Collections.reverseOrder());
 //						System.err.println("loaded files (sorted) " + preReleaseVersions);
-						break;
+							break;
+					}
+				} catch(Exception exception) {
+					exception.printStackTrace();
 				}
 			}
 			in.close();
