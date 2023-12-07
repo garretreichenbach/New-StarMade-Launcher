@@ -41,6 +41,42 @@ tasks.register('all_jar', Jar) {
     dependsOn('win_jar')
     dependsOn('linux_jar')
     dependsOn('mac_jar')
+    dependsOn('copyJRE8Win')
+    dependsOn('copyJRE18Win')
+    dependsOn('copyJRE8Linux')
+    dependsOn('copyJRE18Linux')
+    dependsOn('copyJRE8Mac')
+    dependsOn('copyJRE18Mac')
+}
+
+task copyJRE8Win(type: Copy) {
+    from './java/windows/jre8'
+    into './release-builds/StarMade Launcher-win32-ia32/jre8'
+}
+
+task copyJRE18Win(type: Copy) {
+    from './java/windows/jre18'
+    into './release-builds/StarMade Launcher-win32-ia32/jre18'
+}
+
+task copyJRE8Linux(type: Copy) {
+    from './java/linux/jre8'
+    into './release-builds/StarMade Launcher-linux-x64/jre8'
+}
+
+task copyJRE18Linux(type: Copy) {
+    from './java/linux/jre18'
+    into './release-builds/StarMade Launcher-linux-x64/jre18'
+}
+
+task copyJRE8Mac(type: Copy) {
+    from './java/mac/jre8'
+    into './release-builds/StarMade Launcher-darwin-x64/jre8'
+}
+
+task copyJRE18Mac(type: Copy) {
+    from './java/mac/jre18'
+    into './release-builds/StarMade Launcher-darwin-x64/jre18'
 }
 
 tasks.register('win_jar', Jar) {
@@ -89,6 +125,12 @@ tasks.register('mac_jar', Jar) {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
     from(sourceSets.main.output)
+    from('java/mac/jre8.tar.gz') {
+        into 'jre8'
+    }
+    from('java/mac/jre18.tar.gz') {
+        into 'jre18'
+    }
     from('resources/Updater.jar') {
         into 'Updater.jar'
     }
