@@ -30,10 +30,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -45,15 +43,27 @@ import java.util.zip.ZipFile;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-
-	private static final String J18ARGS = "--add-exports java.base/jdk.internal.misc=ALL-UNNAMED --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED";
 	public static final String LAUNCHER_VERSION = "3.0.0"; //We've had two other launchers before this
+	private static final String[] J18ARGS = {
+			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
+			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
+			"--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED",
+			"--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+			"--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED",
+			"--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+			"--add-opens=java.base/java.lang=ALL-UNNAMED",
+			"--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+			"--add-opens=java.base/java.io=ALL-UNNAMED",
+			"--add-opens=java.base/java.util=ALL-UNNAMED"
+	};
+
 	public static IndexFileEntry GAME_VERSION;
 
 	public static boolean debugMode;
 	public static boolean useSteam;
 	public static String installDir = "StarMade";
 	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
+	public static int lastUsedBranch;
 	private static String selectedVersion;
 	private static boolean selectVersion;
 	private static int backup = Updater.BACK_DB;
@@ -62,7 +72,6 @@ public class StarMadeLauncher extends JFrame {
 	public final ArrayList<IndexFileEntry> preReleaseVersions = new ArrayList<>();
 	private final float[] installProgress = new float[1];
 	private final JSONObject launchSettings;
-	public static int lastUsedBranch;
 	private UpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
@@ -849,7 +858,7 @@ public class StarMadeLauncher extends JFrame {
 				if(GAME_VERSION != null) {
 					object.put("lastUsedVersion", GAME_VERSION.build);
 					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) object.put("jvm_args", "--illegal-access=permit");
-					else object.put("jvm_args", J18ARGS);
+					else object.put("jvm_args", "");
 				} else {
 					object.put("lastUsedVersion", "NONE");
 					object.put("jvm_args", "");
@@ -967,6 +976,8 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.setSelectedIndex(lastUsedBranch);
 		branchDropdown.addItemListener(e -> {
 			lastUsedBranch = branchDropdown.getSelectedIndex();
+			launchSettings.put("lastUsedBranch", lastUsedBranch);
+			saveLaunchSettings();
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
 			recreateButtons(playPanel, false);
@@ -1130,24 +1141,36 @@ public class StarMadeLauncher extends JFrame {
 		else return jre18.exists();
 	}
 
-	private String getUserArgs() {
-		return Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").trim() + " " + getLaunchSettings().getString("jvm_args").trim() + " -Xms1024m -Xmx" + getLaunchSettings().getInt("memory") + "m";
-	}
-
 	public void runStarMade(boolean server) {
-		boolean useJava8 = (GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")); //Use Java 18 on version 0.300 and above
-		String bundledJavaPath = new File((useJava8) ? getJava8Path() : getJava18Path()).getPath();
-		ProcessBuilder proc = new ProcessBuilder(bundledJavaPath);
-		proc.directory(new File(installDir));
-		proc.command().add("-jar");
-		proc.command().add("StarMade.jar");
-		proc.command().add(getUserArgs().trim());
-		if(server) proc.command().add("-server");
-		else proc.command().add("-force");
+		boolean useJava8 = GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1");
+		String bundledJavaPath = new File(useJava8 ? getJava8Path() : getJava18Path()).getPath();
+		ArrayList<String> commandComponents = new ArrayList<>();
+		commandComponents.add(bundledJavaPath);
+		if(!useJava8) commandComponents.addAll(List.of(J18ARGS));
+		commandComponents.add("-jar");
+		commandComponents.add("StarMade.jar");
+
+		if(!Objects.requireNonNull(getLaunchSettings()).getString("jvm_args").isEmpty()) {
+			String[] launchArgs = Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").split(" ");
+			for(String arg : launchArgs) {
+				if(arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
+				commandComponents.add(arg.trim());
+			}
+		}
+		commandComponents.add("-Xms1024m");
+		commandComponents.add("-Xmx" + getLaunchSettings().getInt("memory") + "m");
+
+		if(server) commandComponents.add("-server");
+		else commandComponents.add("-force");
+
+		ProcessBuilder process = new ProcessBuilder(commandComponents);
+		process.directory(new File(installDir));
+		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+		process.redirectError(ProcessBuilder.Redirect.INHERIT);
 		try {
-			proc.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-			proc.redirectError(ProcessBuilder.Redirect.INHERIT);
-			proc.start();
+			System.out.println("Command: " + String.join(" ", commandComponents));
+			process.start();
+			System.exit(0);
 		} catch(Exception exception) {
 			throw new RuntimeException(exception);
 		}
@@ -1238,7 +1261,7 @@ public class StarMadeLauncher extends JFrame {
 		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Dev")) {
 			for(IndexFileEntry version : devVersions) {
 				if(version.build.startsWith("2017")) continue;
-				
+
 				if(version.equals(devVersions.get(2))) versionDropdown.addItem(version.build + " (Latest)");
 				else versionDropdown.addItem(version.build);
 			}
