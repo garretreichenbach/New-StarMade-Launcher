@@ -51,32 +51,32 @@ tasks.register('all_jar', Jar) {
 
 task copyJRE8Win(type: Copy) {
     from './java/windows/jre8'
-    into './release-builds/StarMade Launcher-win32-ia32/jre8'
+    into './release-builds/StarMade Launcher-win32-ia32'
 }
 
 task copyJRE18Win(type: Copy) {
     from './java/windows/jre18'
-    into './release-builds/StarMade Launcher-win32-ia32/jre18'
+    into './release-builds/StarMade Launcher-win32-ia32'
 }
 
 task copyJRE8Linux(type: Copy) {
     from './java/linux/jre8'
-    into './release-builds/StarMade Launcher-linux-x64/jre8'
+    into './release-builds/StarMade Launcher-linux-x64'
 }
 
 task copyJRE18Linux(type: Copy) {
     from './java/linux/jre18'
-    into './release-builds/StarMade Launcher-linux-x64/jre18'
+    into './release-builds/StarMade Launcher-linux-x64'
 }
 
 task copyJRE8Mac(type: Copy) {
     from './java/mac/jre8'
-    into './release-builds/StarMade Launcher-darwin-x64/jre8'
+    into './release-builds/StarMade Launcher-darwin-x64'
 }
 
 task copyJRE18Mac(type: Copy) {
     from './java/mac/jre18'
-    into './release-builds/StarMade Launcher-darwin-x64/jre18'
+    into './release-builds/StarMade Launcher-darwin-x64'
 }
 
 tasks.register('win_jar', Jar) {
