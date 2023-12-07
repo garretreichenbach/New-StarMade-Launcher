@@ -56,17 +56,17 @@ public class CommunityServerList extends JTable {
 				int row = rowAtPoint(e.getPoint());
 				if(row >= 0 && row < getRowCount()) {
 					setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-					setForeground(Palette.selectedColor);
+//					setForeground(Palette.selectedColor);
 				} else {
 					setCursor(Cursor.getDefaultCursor());
-					setForeground(Palette.textColor);
+//					setForeground(Palette.textColor);
 				}
 			}
 
 			@Override
 			public void mouseExited(java.awt.event.MouseEvent e) {
 				setCursor(Cursor.getDefaultCursor());
-				setForeground(Palette.textColor);
+//				setForeground(Palette.textColor);
 			}
 
 			@Override
