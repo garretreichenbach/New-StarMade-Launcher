@@ -15,3 +15,7 @@ Note: Pretty much every class in `util` was copied over from the main repo.
 2. run `npm install`
 3. run `node package.js`
 4. run `gradlew all_jar` (Not `gradlew jar`!)
+
+# Note
+This launcher requires Java version 17 or 18 to work.
+You can download Java 17 here: https://adoptium.net/temurin/releases/?package=any&version=17
