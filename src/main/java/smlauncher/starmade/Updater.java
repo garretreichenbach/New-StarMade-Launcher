@@ -356,6 +356,7 @@ public class Updater extends Observable {
 				System.err.println("Downloaded checksums: \n" + checksums);
 
 				String buildDir = FILES_URL + f.path + "/";
+
 				checksums.download(forced, buildDir, installDir, installDirStr, new FileDowloadCallback() {
 					@Override
 					public void update(FileDownloadUpdate u) {
@@ -444,7 +445,10 @@ public class Updater extends Observable {
 	}
 
 	public enum VersionFile {
-		PRE("http://files.star-made.org/prebuildindex"), DEV("http://files.star-made.org/devbuildindex"), RELEASE("http://files.star-made.org/releasebuildindex"), ARCHIVE("http://files.star-made.org/archivebuildindex");
+		PRE("http://files.star-made.org/prebuildindex"),
+		DEV("http://files.star-made.org/devbuildindex"),
+		RELEASE("http://files.star-made.org/releasebuildindex"),
+		ARCHIVE("http://files.star-made.org/archivebuildindex");
 
 		public final String location;
 

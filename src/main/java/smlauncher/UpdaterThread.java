@@ -48,8 +48,8 @@ public class UpdaterThread extends Thread {
 			checksums.download(false, buildDir, installDir, installDir.getPath(), new FileDowloadCallback() {
 				@Override
 				public void update(FileDownloadUpdate u) {
-					onProgress((float) u.downloaded / u.totalSize);
-					if(u.downloaded >= u.totalSize) {
+					onProgress((float) u.index / u.total - 1);
+					if(u.index >= u.total - 1) {
 						updating = false;
 						onFinished();
 					}

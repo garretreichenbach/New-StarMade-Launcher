@@ -19,7 +19,7 @@ public class LauncherUpdater {
 
 	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
 //	private static final String UPDATE_URL = "http://launcher-files-origin.star-made.org/launcherbuildindex";
-	private static final String UPDATE_URL_BASE = ""; //Temp link for testing
+	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v"; //Temp link for testing
 	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json"; //Temp link for testing
 
 	public static boolean checkForUpdate() {
