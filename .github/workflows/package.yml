@@ -1,7 +1,7 @@
 name: Package
 on: [push, pull_request]
 jobs:
-  node_job:
+  build_and_publish:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,10 +24,6 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: node package.js
-  gradle_job:
-    needs: node_job
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 18
         uses: actions/setup-java@v3
@@ -52,13 +48,6 @@ jobs:
         uses: gradle/gradle-build-action@v1
         with:
           arguments: linux_jar
-  package:
-    needs: gradle_job
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: write
-    steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 18
         uses: actions/setup-java@v3
@@ -71,8 +60,6 @@ jobs:
         uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
         with:
           arguments: build
-      - name: Check current directory
-        run: ls
       - name: Change directory
         run: cd ./release-builds
       - name: Zip Windows release build
@@ -84,10 +71,6 @@ jobs:
       - name: Zip Linux release build
         run: |
           zip -r "StarMade Launcher (Linux).zip" "StarMade Launcher-linux-x64"
-  release:
-    needs: package
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Create Release
