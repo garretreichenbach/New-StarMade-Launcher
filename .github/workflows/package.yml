@@ -52,6 +52,8 @@ jobs:
         uses: gradle/gradle-build-action@v1
         with:
           arguments: linux_jar
+      - name: Check current directory
+        run: ls
   package_and_publish:
     needs: gradle_job
     runs-on: ubuntu-latest
