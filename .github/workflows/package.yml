@@ -52,6 +52,8 @@ jobs:
         run: ls
       - name: Change directory
         run: cd release-builds
+      - name: Check directory again
+        run: ls
       - name: Zip Windows release build
         run: |
           zip -r "StarMade Launcher (Windows).zip" "StarMade Launcher-win32-ia32"
