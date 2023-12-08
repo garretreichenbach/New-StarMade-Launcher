@@ -54,7 +54,6 @@ jobs:
         uses: gradle/gradle-build-action@v1
         with:
           arguments: linux_jar
-
   package_and_publish:
     needs: gradle_job
     runs-on: ubuntu-latest
@@ -74,10 +73,20 @@ jobs:
         uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
         with:
           arguments: build
-#      - name: Publish to GitHub Packages
-#        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
-#        with:
-#          arguments: publish
-#        env:
-#          USERNAME: ${{ github.actor }}
-#          TOKEN: ${{ secrets.TOKEN }}
+      - name: Zip Windows release build
+        run: |
+          zip -r "StarMade Launcher-win32-ia32.zip" "StarMade Launcher-win32-ia32"
+      - name : Zip Mac release build
+        run: |
+          zip -r "StarMade Launcher-darwin-x64.zip" "StarMade Launcher-darwin-x64"
+      - name: Zip Linux release build
+        run: |
+          zip -r "StarMade Launcher-linux-x64.zip" "StarMade Launcher-linux-x64"
+      - name: Publish to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: |
+            release-builds/StarMade Launcher-win32-ia32.zip
+            release-builds/StarMade Launcher-darwin-x64.zip
+            release-builds/StarMade Launcher-linux-x64.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
