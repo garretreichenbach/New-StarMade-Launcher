@@ -73,13 +73,13 @@ jobs:
           arguments: build
       - name: Zip Windows release build
         run: |
-          zip -r "StarMade Launcher-win32-ia32.zip" "StarMade Launcher-win32-ia32"
+          zip -r "release-builds/StarMade Launcher-win32-ia32.zip" "release-builds/StarMade Launcher-win32-ia32"
       - name : Zip Mac release build
         run: |
-          zip -r "StarMade Launcher-mac-x64.zip" "StarMade Launcher-darwin-x64"
+          zip -r "release-builds/StarMade Launcher-mac-x64.zip" "release-builds/StarMade Launcher-darwin-x64"
       - name: Zip Linux release build
         run: |
-          zip -r "StarMade Launcher-linux-x64.zip" "StarMade Launcher-linux-x64"
+          zip -r "release-builds/StarMade Launcher-linux-x64.zip" "release-builds/StarMade Launcher-linux-x64"
   release:
     needs: package_and_publish
     runs-on: ubuntu-latest
