@@ -18,4 +18,4 @@ Note: Pretty much every class in `util` was copied over from the main repo.
 
 # Note
 This launcher requires Java version 17 or 18 to work.
-You can download Java 17 here: https://www.oracle.com/java/technologies/downloads/#java17
+You can download Java 17 here: https://adoptium.net/temurin/releases/?package=any&version=17
