@@ -82,7 +82,6 @@ jobs:
           zip -r "StarMade Launcher-linux-x64.zip" "StarMade Launcher-linux-x64"
   release:
     needs: package_and_publish
-    name: Create Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
