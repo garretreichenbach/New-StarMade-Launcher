@@ -6,7 +6,6 @@ jobs:
     strategy:
       matrix:
         node-version: [ 16.x ]
-
     steps:
       - uses: actions/checkout@v3
       - name: Install Wine
@@ -25,7 +24,6 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: node package.js
-
   gradle_job:
     needs: node_job
     runs-on: ubuntu-latest
@@ -78,15 +76,57 @@ jobs:
           zip -r "StarMade Launcher-win32-ia32.zip" "StarMade Launcher-win32-ia32"
       - name : Zip Mac release build
         run: |
-          zip -r "StarMade Launcher-darwin-x64.zip" "StarMade Launcher-darwin-x64"
+          zip -r "StarMade Launcher-mac-x64.zip" "StarMade Launcher-darwin-x64"
       - name: Zip Linux release build
         run: |
           zip -r "StarMade Launcher-linux-x64.zip" "StarMade Launcher-linux-x64"
-      - name: Publish to GitHub Release
-        uses: ncipollo/release-action@v1
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          artifacts: |
-            release-builds/StarMade Launcher-win32-ia32.zip
-            release-builds/StarMade Launcher-darwin-x64.zip
-            release-builds/StarMade Launcher-linux-x64.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: true
+          prerelease: false
+      - name: Upload Release Asset Windows
+        id: upload-release-asset-win
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID
+          asset_path: ./StarMade Launcher-win32-ia32.zip
+          asset_name: StarMade Launcher-win32-ia32.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset Mac
+        id: upload-release-asset-mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID
+          asset_path: ./StarMade Launcher-mac-x64.zip
+          asset_name: StarMade Launcher-mac-x64.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset Linux
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID
+          asset_path: ./StarMade Launcher-linux-x64.zip
+          asset_name: StarMade Launcher-linux-x64.zip
+          asset_content_type: application/zip
