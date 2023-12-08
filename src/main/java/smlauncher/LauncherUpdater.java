@@ -79,14 +79,14 @@ public class LauncherUpdater {
 	}
 
 	private static String getLatestLauncherURL() {
-		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade Launcher" + getPlatformFolder() + ".zip"; //Temp link for testing
+		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade Launcher " + getPlatformFolder() + ".zip"; //Temp link for testing
 	}
 
 	private static String getPlatformFolder() {
 		String osName = System.getProperty("os.name").toLowerCase();
-		if(osName.contains("win")) return "-win32-ia32";
-		else if(osName.contains("mac")) return "-darwin-x64";
-		else return "-linux-x64";
+		if(osName.contains("win")) return "(Windows)";
+		else if(osName.contains("mac")) return "(Mac)";
+		else return "(Linux)";
 	}
 
 	private static String getPlatformExtension() {
