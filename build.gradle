@@ -44,12 +44,6 @@ tasks.register('all_jar', Jar) {
     dependsOn('win_jar')
     dependsOn('linux_jar')
     dependsOn('mac_jar')
-    dependsOn('copyJRE8Win')
-    dependsOn('copyJRE18Win')
-    dependsOn('copyJRE8Linux')
-    dependsOn('copyJRE18Linux')
-    dependsOn('copyJRE8Mac')
-    dependsOn('copyJRE18Mac')
 }
 
 task copyJRE8Win(type: Copy) {
@@ -83,6 +77,8 @@ task copyJRE18Mac(type: Copy) {
 }
 
 tasks.register('win_jar', Jar) {
+    dependsOn('copyJRE8Win')
+    dependsOn('copyJRE18Win')
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
@@ -100,6 +96,8 @@ tasks.register('win_jar', Jar) {
 }
 
 tasks.register('linux_jar', Jar) {
+    dependsOn('copyJRE8Linux')
+    dependsOn('copyJRE18Linux')
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
@@ -117,6 +115,8 @@ tasks.register('linux_jar', Jar) {
 }
 
 tasks.register('mac_jar', Jar) {
+    dependsOn('copyJRE8Mac')
+    dependsOn('copyJRE18Mac')
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
