@@ -45,9 +45,17 @@ public class UpdaterThread extends Thread {
 			ChecksumFile checksums = Updater.getChecksums(buildDir);
 			if(!installDir.exists()) installDir.mkdirs();
 			float finalSize = checksums.checksums.size();
+			if(finalSize == 0) {
+				onFinished();
+				return;
+			}
 			checksums.download(false, buildDir, installDir, installDir.getPath(), new FileDowloadCallback() {
 				@Override
 				public void update(FileDownloadUpdate u) {
+					if(u.total == 0) {
+						onFinished();
+						return;
+					}
 					onProgress((float) u.index / u.total - 1);
 					if(u.index >= u.total - 1) {
 						updating = false;
@@ -57,7 +65,7 @@ public class UpdaterThread extends Thread {
 
 				@Override
 				public void update(String u) {
-
+					if(u.contains("Nothing to download")) onFinished();
 				}
 			});
 			//onFinished();

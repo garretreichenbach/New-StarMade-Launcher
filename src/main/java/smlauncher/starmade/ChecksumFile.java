@@ -99,6 +99,10 @@ public class ChecksumFile {
 			//cb.update("Determining files to download... " + (StringTools.formatPointZero(g * p * 100.0f)) + "%  selected " + checksumsToDownload.size() + " / " + checksums.size() + "(" + (o.totalSize / 1024) / 1024 + " MB)");
 			g++;
 		}
+		if(checksumsToDownload.isEmpty()) {
+			cb.update("Nothing to download");
+			return;
+		}
 		o.startTime = System.currentTimeMillis();
 
 		ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
