@@ -44,7 +44,7 @@ import java.util.zip.ZipFile;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.7"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.8"; //We've had two other launchers before this
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -129,12 +129,11 @@ public class StarMadeLauncher extends JFrame {
 		deleteUpdaterJar();
 		if(!checkForJREs()) {
 			try {
-
 				//Download JREs from links
 				String java8URL = getJava8URL();
 				String java18URL = getJava18URL();
-				downloadJava(java8URL, "JRE8.zip");
-				downloadJava(java18URL, "JRE18.zip");
+				downloadJava(java8URL, "jre8");
+				downloadJava(java18URL, "jre18");
 				unzipJava(8);
 				unzipJava(18);
 			} catch(Exception exception) {
@@ -1206,6 +1205,9 @@ public class StarMadeLauncher extends JFrame {
 
 	private void downloadJava(String url, String destination) throws IOException {
 		URL website = new URL(url);
+		if(System.getProperty("os.name").toLowerCase().contains("win")) destination += ".zip";
+		else if(System.getProperty("os.name").toLowerCase().contains("mac")) destination += ".tar.gz";
+		else destination += ".tar.gz";
 		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 		FileOutputStream fos = new FileOutputStream(destination);
 		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
