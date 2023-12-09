@@ -50,13 +50,13 @@ jobs:
           arguments: linux_jar
       - name: Zip Windows release build
         run: |
-          zip -r "StarMade_Launcher_Windows.zip" "StarMade Launcher-win32-ia32"
+          zip -r "StarMade_Launcher_Windows.zip" "release-builds/StarMade Launcher-win32-ia32"
       - name : Zip Mac release build
         run: |
-          zip -r "StarMade_Launcher_Mac.zip" "StarMade Launcher-darwin-x64"
+          zip -r "StarMade_Launcher_Mac.zip" "release-builds/StarMade Launcher-darwin-x64"
       - name: Zip Linux release build
         run: |
-          zip -r "StarMade_Launcher_Linux.zip" "StarMade Launcher-linux-x64"
+          zip -r "StarMade_Launcher_Linux.zip" "release-builds/StarMade Launcher-linux-x64"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
