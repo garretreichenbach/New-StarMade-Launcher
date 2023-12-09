@@ -43,7 +43,7 @@ import java.util.zip.ZipFile;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.3"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.4"; //We've had two other launchers before this
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -1241,7 +1241,7 @@ public class StarMadeLauncher extends JFrame {
 				saveLaunchSettings();
 				SwingUtilities.invokeLater(() -> {
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(1);
 						recreateButtons(playPanel, false);
 					} catch(InterruptedException e) {
 						throw new RuntimeException(e);

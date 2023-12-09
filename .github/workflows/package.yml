@@ -36,18 +36,10 @@ jobs:
         uses: gradle/gradle-build-action@v1
         with:
           arguments: build
-      - name: Export jar for Windows
+      - name: Export jar for all platforms
         uses: gradle/gradle-build-action@v1
         with:
-          arguments: win_jar
-      - name: Export jar for Mac
-        uses: gradle/gradle-build-action@v1
-        with:
-          arguments: mac_jar
-      - name: Export jar for Linux
-        uses: gradle/gradle-build-action@v1
-        with:
-          arguments: linux_jar
+          arguments: all_jar
       - name: Zip Windows release build
         run: |
           zip -r "StarMade_Launcher_Windows.zip" "release-builds/StarMade Launcher-win32-ia32"

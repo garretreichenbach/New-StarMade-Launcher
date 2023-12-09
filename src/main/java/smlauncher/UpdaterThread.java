@@ -56,8 +56,10 @@ public class UpdaterThread extends Thread {
 						onFinished();
 						return;
 					}
-					onProgress((float) u.index / u.total - 1);
-					if(u.index >= u.total - 1) {
+					float progress = (float) u.index / u.total;
+					if(progress < 0) progress = u.total / u.index; //Somehow its negative sometimes
+					onProgress(progress);
+					if(u.index >= u.total) {
 						updating = false;
 						onFinished();
 					}
