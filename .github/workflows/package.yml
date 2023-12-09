@@ -57,8 +57,6 @@ jobs:
       - name: Zip Linux release build
         run: |
           zip -r "release-builds/StarMade Launcher (Linux).zip" "release-builds/StarMade Launcher-linux-x64"
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -73,6 +71,8 @@ jobs:
             - Second Change
           draft: true
           prerelease: false
+      - name: Check directory
+        run: cd release-builds && ls
       - name: Upload Release Asset Windows
         id: upload-release-asset-win
         uses: actions/upload-release-asset@v1
