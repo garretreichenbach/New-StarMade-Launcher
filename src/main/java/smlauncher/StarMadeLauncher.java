@@ -107,9 +107,15 @@ public class StarMadeLauncher extends JFrame {
 		if(GAME_VERSION == null || GAME_VERSION.build == null) lastUsedBranch = 0;
 		else {
 			switch(GAME_VERSION.build) {
-				case "RELEASE" -> lastUsedBranch = 0;
-				case "DEV" -> lastUsedBranch = 1;
-				case "PRE" -> lastUsedBranch = 2;
+				case "RELEASE":
+					lastUsedBranch = 0;
+					break;
+				case "DEV":
+					lastUsedBranch = 1;
+					break;
+				case "PRE":
+					lastUsedBranch = 2;
+					break;
 			}
 		}
 		try {
@@ -152,19 +158,20 @@ public class StarMadeLauncher extends JFrame {
 						return;
 					} else headless = true;
 				}
-				if(headless) {
-					switch(arg) {
-						case "-h", "-help" -> {
-							displayHelp();
-							return;
-						}
-						case "-steam" -> useSteam = true;
-						case "-backup" -> backup = Updater.BACK_ALL;
-						case "-backup_all" -> backup = Updater.BACK_ALL;
-						case "-no_backup" -> backup = Updater.BACK_NONE;
-					}
-					Updater.withoutGUI((args.length > 1 && "-force".equals(args[1])), installDir, buildBranch, backup, selectVersion);
-				} else startup();
+//				if(headless) {
+//					switch(arg) {
+//						case "-h", "-help" -> {
+//							displayHelp();
+//							return;
+//						}
+//						case "-steam" -> useSteam = true;
+//						case "-backup" -> backup = Updater.BACK_ALL;
+//						case "-backup_all" -> backup = Updater.BACK_ALL;
+//						case "-no_backup" -> backup = Updater.BACK_NONE;
+//					}
+//					Updater.withoutGUI((args.length > 1 && "-force".equals(args[1])), installDir, buildBranch, backup, selectVersion);
+//				} else startup();
+				startup();
 			}
 		}
 	}
@@ -877,7 +884,7 @@ public class StarMadeLauncher extends JFrame {
 
 	private int getSystemMemory() {
 		com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-		return (int) (os.getTotalMemorySize() / 1024 / 1024);
+		return (int) (os.getTotalPhysicalMemorySize() / 1024 / 1024);
 	}
 
 	private void createPlayPanel(JPanel footerPanel) {
@@ -1245,11 +1252,14 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private Updater.VersionFile getLastUsedBranch() {
-		return switch(lastUsedBranch) {
-			case 1 -> Updater.VersionFile.DEV;
-			case 2 -> Updater.VersionFile.PRE;
-			default -> Updater.VersionFile.RELEASE;
-		};
+		switch(lastUsedBranch) {
+			case 1:
+				return Updater.VersionFile.DEV;
+			case 2:
+				return Updater.VersionFile.PRE;
+			default:
+				return Updater.VersionFile.RELEASE;
+		}
 	}
 
 	private void updateVersions(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown) {
@@ -1346,12 +1356,16 @@ public class StarMadeLauncher extends JFrame {
 	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
 		IndexFileEntry currentVersion = getCurrentVersion();
 		if(debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1"))) return getCurrentVersion();
-		return switch(branch) {
-			case RELEASE -> releaseVersions.get(0);
-			case DEV -> devVersions.get(0);
-			case PRE -> preReleaseVersions.get(0);
-			default -> null;
-		};
+		switch(branch) {
+			case RELEASE:
+				return releaseVersions.get(0);
+			case DEV:
+				return devVersions.get(0);
+			case PRE:
+				return preReleaseVersions.get(0);
+			default:
+				return null;
+		}
 	}
 
 	private void loadVersionList() throws IOException {

@@ -5,8 +5,8 @@ plugins {
     id 'maven-publish'
 }
 
-targetCompatibility = 17
-sourceCompatibility = 17
+targetCompatibility = 11
+sourceCompatibility = 11
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
