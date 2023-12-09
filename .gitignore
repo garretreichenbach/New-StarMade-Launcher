@@ -18,3 +18,4 @@ StarMade Launcher.xml
 starmade-launcher.jar
 /node_modules/
 /release-builds/
+.DS_Store
