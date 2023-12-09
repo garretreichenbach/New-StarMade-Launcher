@@ -47,33 +47,33 @@ tasks.register('all_jar', Jar) {
 }
 
 task copyJRE8Win(type: Copy) {
-    from 'java/windows/jre8/jre8.zip'
-    into 'release-builds/StarMade Launcher-win32-ia32'
+    from './java/windows/jre8/jre8.zip'
+    into './release-builds/StarMade Launcher-win32-ia32/'
 }
 
 task copyJRE18Win(type: Copy) {
-    from 'java/windows/jre18/jre18.zip'
-    into 'release-builds/StarMade Launcher-win32-ia32'
+    from './java/windows/jre18/jre18.zip'
+    into './release-builds/StarMade Launcher-win32-ia32/'
 }
 
 task copyJRE8Linux(type: Copy) {
-    from 'java/linux/jre8/jre8.tar.gz'
-    into 'release-builds/StarMade Launcher-linux-x64'
+    from './java/linux/jre8/jre8.tar.gz'
+    into './release-builds/StarMade Launcher-linux-x64/'
 }
 
 task copyJRE18Linux(type: Copy) {
-    from 'java/linux/jre18/jre18.tar.gz'
-    into 'release-builds/StarMade Launcher-linux-x64'
+    from './java/linux/jre18/jre18.tar.gz'
+    into './release-builds/StarMade Launcher-linux-x64/'
 }
 
 task copyJRE8Mac(type: Copy) {
-    from 'java/mac/jre8/jre8.tar.gz'
-    into 'release-builds/StarMade Launcher-darwin-x64'
+    from './java/mac/jre8/jre8.tar.gz'
+    into './release-builds/StarMade Launcher-darwin-x64/'
 }
 
 task copyJRE18Mac(type: Copy) {
-    from 'java/mac/jre18/jre18.tar.gz'
-    into 'release-builds/StarMade Launcher-darwin-x64'
+    from './java/mac/jre18/jre18.tar.gz'
+    into './release-builds/StarMade Launcher-darwin-x64/'
 }
 
 tasks.register('win_jar', Jar) {
