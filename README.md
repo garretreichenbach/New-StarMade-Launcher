@@ -8,7 +8,7 @@ This launcher was created due to the old one being outdated and only being able 
 - Schine for making such a great game
 - The StarLoader Team for making a new launcher
 
-Note: Pretty much every class in `util` was copied over from the main repo.
+Note: Pretty much every class in `src/starmade` was copied over from the main repo.
 
 # Building from source
 1. Clone the Repo (duh)
