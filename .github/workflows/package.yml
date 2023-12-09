@@ -66,13 +66,10 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+            **Changelog:**
+            **Bug Fixes:**
           draft: true
           prerelease: false
-      - name: Check directory
-        run: cd release-builds && ls
       - name: Upload Release Asset Windows
         id: upload-release-asset-win
         uses: actions/upload-release-asset@v1
