@@ -3,27 +3,7 @@ on: [push, pull_request]
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [ 16.x ]
     steps:
-#      - uses: actions/checkout@v3
-#      - name: Install Wine
-#        run: |
-#          sudo dpkg --add-architecture i386
-#          wget -nc https://dl.winehq.org/wine-builds/winehq.key
-#          sudo apt-key add winehq.key
-#          sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
-#          sudo apt-get update
-#          sudo apt-get install --install-recommends winehq-stable
-#      - name: Use Node.js ${{ matrix.node-version }}
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: ${{ matrix.node-version }}
-#          cache: 'npm'
-#      - run: npm ci
-#      - run: npm run build --if-present
-#      - run: node package.js
       - uses: actions/checkout@v3
       - name: Set up JDK 18
         uses: actions/setup-java@v3

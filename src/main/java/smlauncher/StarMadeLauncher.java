@@ -1154,7 +1154,7 @@ public class StarMadeLauncher extends JFrame {
 				zipFile.close();
 				File zip = new File("./jre" + jre + ".zip");
 				if(zip.exists()) zip.delete();
-				//Rename the folder to JRE8
+				//Rename the folder
 				for(File file : Objects.requireNonNull(new File("./").listFiles())) {
 					if(file.getName().startsWith("jdk8") || file.getName().startsWith("jdk-18")) {
 						file.renameTo(new File("./jre" + jre));
@@ -1233,13 +1233,6 @@ public class StarMadeLauncher extends JFrame {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private boolean checkJavaVersion() {
-		File jre8 = new File("./jre8/bin/java.exe");
-		File jre18 = new File("./jre18/bin/java.exe");
-		if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) return jre8.exists();
-		else return jre18.exists();
 	}
 
 	public void runStarMade(boolean server) {
