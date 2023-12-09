@@ -40,6 +40,8 @@ jobs:
         uses: gradle/gradle-build-action@v1
         with:
           arguments: all_jar
+      - name: Check for jre
+        run: cd "release-builds/StarMade Launcher-win32-ia32" && ls -l
       - name: Zip Windows release build
         run: |
           zip -r "StarMade_Launcher_Windows.zip" "release-builds/StarMade Launcher-win32-ia32"
@@ -59,7 +61,6 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: |
             **Changelog:**
-            **Bug Fixes:**
           draft: true
           prerelease: false
       - name: Upload Release Asset Windows
