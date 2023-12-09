@@ -126,6 +126,21 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		deleteUpdaterJar();
+		if(!checkForJREs()) {
+			try {
+
+				//Download JREs from links
+				String java8URL = getJava8URL();
+				String java18URL = getJava18URL();
+				downloadJava(java8URL, "JRE8.zip");
+				downloadJava(java18URL, "JRE18.zip");
+				unzipJava(8);
+				unzipJava(18);
+			} catch(Exception exception) {
+				exception.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
 		setTitle("StarMade Launcher [" + LAUNCHER_VERSION + "]");
 		setBounds(100, 100, 800, 550);
 		setMinimumSize(new Dimension(800, 550));
@@ -140,6 +155,24 @@ public class StarMadeLauncher extends JFrame {
 		setResizable(false);
 		getRootPane().setDoubleBuffered(true);
 		setVisible(true);
+	}
+
+	private String getJava8URL() {
+		String os = System.getProperty("os.name").toLowerCase();
+		if(os.contains("win")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_windows_hotspot_8u392b08.zip";
+		else if(os.contains("mac")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_mac_hotspot_8u392b08.tar.gz";
+		else return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz";
+	}
+
+	private String getJava18URL() {
+		String os = System.getProperty("os.name").toLowerCase();
+		if(os.contains("win")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip";
+		else if(os.contains("mac")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_mac_hotspot_18.0.2.1_1.tar.gz";
+		else return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_linux_hotspot_18.0.2.1_1.tar.gz";
+	}
+
+	private boolean checkForJREs() {
+		return (new File(getJava8Path()).exists() && new File(getJava18Path()).exists());
 	}
 
 	private static void deleteUpdaterJar() {
@@ -1117,12 +1150,34 @@ public class StarMadeLauncher extends JFrame {
 			if(!jreFolder.exists()) {
 				ZipFile zipFile = new ZipFile("./jre" + jre + ".zip");
 				unzip(zipFile, new File("./"));
+				//Delete the zip file
+				zipFile.close();
+				File zip = new File("./jre" + jre + ".zip");
+				if(zip.exists()) zip.delete();
+				//Rename the folder to JRE8
+				for(File file : Objects.requireNonNull(new File("./").listFiles())) {
+					if(file.getName().startsWith("jdk8") || file.getName().startsWith("jdk-18")) {
+						file.renameTo(new File("./jre" + jre));
+						break;
+					}
+				}
 			}
 		} else {
 			File jreFolder = new File("./jre" + jre);
 			if(!jreFolder.exists()) {
 				ZipFile zipFile = new ZipFile("./jre" + jre + ".tar.gz");
 				unzip(zipFile, new File("./"));
+				//Delete the zip file
+				zipFile.close();
+				File zip = new File("./jre" + jre + ".tar.gz");
+				if(zip.exists()) zip.delete();
+				//Rename the folder to JRE8
+				for(File file : Objects.requireNonNull(new File("./").listFiles())) {
+					if(file.getName().startsWith("jdk8") || file.getName().startsWith("jdk-18")) {
+						file.renameTo(new File("./jre" + jre));
+						break;
+					}
+				}
 			}
 		}
 	}

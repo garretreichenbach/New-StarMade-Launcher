@@ -46,39 +46,7 @@ tasks.register('all_jar', Jar) {
     dependsOn('mac_jar')
 }
 
-task copyJRE8Win(type: Copy) {
-    from './java/windows/jre8/jre8.zip'
-    into './release-builds/StarMade Launcher-win32-ia32/'
-}
-
-task copyJRE18Win(type: Copy) {
-    from './java/windows/jre18/jre18.zip'
-    into './release-builds/StarMade Launcher-win32-ia32/'
-}
-
-task copyJRE8Linux(type: Copy) {
-    from './java/linux/jre8/jre8.tar.gz'
-    into './release-builds/StarMade Launcher-linux-x64/'
-}
-
-task copyJRE18Linux(type: Copy) {
-    from './java/linux/jre18/jre18.tar.gz'
-    into './release-builds/StarMade Launcher-linux-x64/'
-}
-
-task copyJRE8Mac(type: Copy) {
-    from './java/mac/jre8/jre8.tar.gz'
-    into './release-builds/StarMade Launcher-darwin-x64/'
-}
-
-task copyJRE18Mac(type: Copy) {
-    from './java/mac/jre18/jre18.tar.gz'
-    into './release-builds/StarMade Launcher-darwin-x64/'
-}
-
 tasks.register('win_jar', Jar) {
-    dependsOn('copyJRE8Win')
-    dependsOn('copyJRE18Win')
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
@@ -96,8 +64,6 @@ tasks.register('win_jar', Jar) {
 }
 
 tasks.register('linux_jar', Jar) {
-    dependsOn('copyJRE8Linux')
-    dependsOn('copyJRE18Linux')
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
@@ -115,8 +81,6 @@ tasks.register('linux_jar', Jar) {
 }
 
 tasks.register('mac_jar', Jar) {
-    dependsOn('copyJRE8Mac')
-    dependsOn('copyJRE18Mac')
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
@@ -128,12 +92,6 @@ tasks.register('mac_jar', Jar) {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
     from(sourceSets.main.output)
-    from('java/mac/jre8.tar.gz') {
-        into 'jre8'
-    }
-    from('java/mac/jre18.tar.gz') {
-        into 'jre18'
-    }
     from('resources/Updater.jar') {
         into 'Updater.jar'
     }
