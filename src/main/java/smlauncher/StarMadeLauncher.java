@@ -43,7 +43,7 @@ import java.util.zip.ZipFile;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.5"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.6"; //We've had two other launchers before this
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -71,6 +71,8 @@ public class StarMadeLauncher extends JFrame {
 	public final ArrayList<IndexFileEntry> devVersions = new ArrayList<>();
 	public final ArrayList<IndexFileEntry> preReleaseVersions = new ArrayList<>();
 	private final float[] installProgress = new float[1];
+	private final String[] fileName = {"None"};
+	private final long[] mb = new long[3];
 	private final JSONObject launchSettings;
 	private UpdaterThread updaterThread;
 	private int mouseX;
@@ -1054,7 +1056,7 @@ public class StarMadeLauncher extends JFrame {
 				@Override
 				public void mouseEntered(MouseEvent e) {
 					if(updaterThread == null || !updaterThread.updating) updateButton.setIcon(getIcon("sprites/update_roll.png"));
-					else updateButton.setToolTipText("Updating... [" + (int) (installProgress[0] * 100) + ".0%]");
+					else updateButton.setToolTipText("Updating... [" + (int) (installProgress[0] * 100) + ".0%]\nDownloading " + fileName[0] + " [" + formatBytes(mb[0]) + " / " + formatBytes(mb[1]) + " at " + formatBytes(mb[2]) + "/s]");
 				}
 
 				@Override
@@ -1100,6 +1102,13 @@ public class StarMadeLauncher extends JFrame {
 		}
 		playPanel.revalidate();
 		playPanel.repaint();
+	}
+
+	private String formatBytes(long bytes) {
+		if(bytes < 1024) return bytes + " B";
+		else if(bytes < 1024 * 1024) return bytes / 1024 + " KB";
+		else if(bytes < 1024 * 1024 * 1024) return bytes / 1024 / 1024 + " MB";
+		else return bytes / 1024 / 1024 / 1024 + " GB";
 	}
 
 	private void unzipJava(int jre) throws Exception {
@@ -1218,8 +1227,12 @@ public class StarMadeLauncher extends JFrame {
 		//Start update process and update progress bar
 		(updaterThread = new UpdaterThread(version, backupMode, new File(installDir)) {
 			@Override
-			public void onProgress(float progress) {
+			public void onProgress(float progress, String file, long mbDownloaded, long mbTotal, long mbSpeed) {
 				installProgress[0] = progress;
+				mb[0] = mbDownloaded;
+				mb[1] = mbTotal;
+				mb[2] = mbSpeed;
+				if(file != null && !file.equals("null")) fileName[0] = file;
 				int width = updateButtonEmpty.getIconWidth();
 				int height = updateButtonEmpty.getIconHeight();
 				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

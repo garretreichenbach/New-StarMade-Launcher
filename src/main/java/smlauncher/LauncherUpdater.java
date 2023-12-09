@@ -18,8 +18,6 @@ import java.nio.charset.StandardCharsets;
 public class LauncherUpdater {
 
 	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
-//	private static final String UPDATE_URL = "http://launcher-files-origin.star-made.org/launcherbuildindex";
-	//https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/untagged-ab265652e1e81f7014d8/StarMade_Launcher_Windows.zip
 	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v"; //Temp link for testing
 	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json"; //Temp link for testing
 

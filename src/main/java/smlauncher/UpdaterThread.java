@@ -58,8 +58,8 @@ public class UpdaterThread extends Thread {
 					}
 					float progress = (float) u.index / u.total;
 					if(progress < 0) progress = u.total / u.index; //Somehow its negative sometimes
-					onProgress(progress);
-					if(u.index >= u.total) {
+					onProgress(progress, u.fileName, u.downloaded, u.totalSize, (long) u.downloadSpeed);
+					if(u.index >= u.total - 1 && u.downloaded >= u.totalSize) {
 						updating = false;
 						onFinished();
 					}
@@ -79,7 +79,7 @@ public class UpdaterThread extends Thread {
 		}
 	}
 
-	public void onProgress(float progress) {}
+	public void onProgress(float progress, String currentFile, long downloaded, long total, long speed) {}
 
 	public void onFinished() {}
 
