@@ -25,8 +25,10 @@ jobs:
 #      - run: npm run build --if-present
 #      - run: node package.js
       - uses: actions/checkout@v3
-      - name: ls
-        run: cd java/windows/jre18 && ls -la
+      - name: Install lfs
+        run: |
+          sudo apt-get install git-lfs
+          git lfs install
       - name: Set up JDK 18
         uses: actions/setup-java@v3
         with:
