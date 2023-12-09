@@ -59,6 +59,7 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	public static IndexFileEntry GAME_VERSION;
+	private final String osName;
 
 	public static boolean debugMode;
 	public static boolean useSteam;
@@ -126,15 +127,17 @@ public class StarMadeLauncher extends JFrame {
 		} catch(IOException exception) {
 			exception.printStackTrace();
 		}
+		//Get current OS
+		osName = System.getProperty("os.name").toLowerCase();
+
 		deleteUpdaterJar();
 		if(!checkForJREs()) {
 			try {
 				//Download JREs from links
-				String java8URL = getJava8URL();
-				String java18URL = getJava18URL();
-				downloadJava(java8URL, "jre8");
-				downloadJava(java18URL, "jre18");
+				downloadJava(8);
 				unzipJava(8);
+
+				downloadJava(18);
 				unzipJava(18);
 			} catch(Exception exception) {
 				exception.printStackTrace();
@@ -157,17 +160,21 @@ public class StarMadeLauncher extends JFrame {
 		setVisible(true);
 	}
 
+	private String getJavaURL(int version) {
+		if (version == 8) return getJava8URL();
+		else if (version == 18) return getJava18URL();
+		else return null;
+	}
+
 	private String getJava8URL() {
-		String os = System.getProperty("os.name").toLowerCase();
-		if(os.contains("win")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_windows_hotspot_8u392b08.zip";
-		else if(os.contains("mac")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_mac_hotspot_8u392b08.tar.gz";
+		if(osName.contains("win")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_windows_hotspot_8u392b08.zip";
+		else if(osName.contains("mac")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_mac_hotspot_8u392b08.tar.gz";
 		else return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz";
 	}
 
 	private String getJava18URL() {
-		String os = System.getProperty("os.name").toLowerCase();
-		if(os.contains("win")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip";
-		else if(os.contains("mac")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_mac_hotspot_18.0.2.1_1.tar.gz";
+		if(osName.contains("win")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip";
+		else if(osName.contains("mac")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_mac_hotspot_18.0.2.1_1.tar.gz";
 		else return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_linux_hotspot_18.0.2.1_1.tar.gz";
 	}
 
@@ -1144,39 +1151,39 @@ public class StarMadeLauncher extends JFrame {
 		else return bytes / 1024 / 1024 / 1024 + " GB";
 	}
 
-	private void unzipJava(int jre) throws Exception {
-		if(System.getProperty("os.name").toLowerCase().contains("win")) {
-			File jreFolder = new File("./jre" + jre);
+	private void unzipJava(int version) throws Exception {
+		File jreFolder = new File("./jre" + version);
+
+		if(osName.contains("win")) {
 			if(!jreFolder.exists()) {
-				ZipFile zipFile = new ZipFile("./jre" + jre + ".zip");
+				ZipFile zipFile = new ZipFile("./jre" + version + ".zip");
 				unzip(zipFile, new File("./"));
 				//Delete the zip file
 				zipFile.close();
-				File zip = new File("./jre" + jre + ".zip");
+				File zip = new File("./jre" + version + ".zip");
 				if(zip.exists()) zip.delete();
 				//Rename the folder to JRE8
 				for(File file : Objects.requireNonNull(new File("./").listFiles())) {
 					if(file.getName().startsWith("jdk8") || file.getName().startsWith("jdk-18")) {
-						file.renameTo(new File("./jre" + jre));
+						file.renameTo(new File("./jre" + version));
 						break;
 					}
 				}
 			}
-		} else if(System.getProperty("os.name").toLowerCase().contains("mac")) {
+		} else if(osName.contains("mac")) {
 			//Actual java will be in /Contents/Home/
-			File jreFolder = new File("./jre" + jre);
 			if(!jreFolder.exists()) {
-				ZipFile zipFile = new ZipFile("./jre" + jre + ".tar.gz");
+				ZipFile zipFile = new ZipFile("./jre" + version + ".tar.gz");
 				unzip(zipFile, new File("./"));
 				//Delete the zip file
 				zipFile.close();
-				File zip = new File("./jre" + jre + ".tar.gz");
+				File zip = new File("./jre" + version + ".tar.gz");
 				if(zip.exists()) zip.delete();
 				//Go into the folder, and copy the contents of /Contents/Home/ to /jre<jre>/
-				File homeFolder = new File("./jre" + jre + "/Contents/Home");
+				File homeFolder = new File("./jre" + version + "/Contents/Home");
 				for(File file : Objects.requireNonNull(homeFolder.listFiles())) {
 					if(file.isDirectory()) {
-						FileUtils.copyDirectory(file, new File("./jre" + jre));
+						FileUtils.copyDirectory(file, new File("./jre" + version));
 						break;
 					}
 				}
@@ -1184,18 +1191,17 @@ public class StarMadeLauncher extends JFrame {
 				FileUtils.deleteDirectory(homeFolder);
 			}
 		} else {
-			File jreFolder = new File("./jre" + jre);
 			if(!jreFolder.exists()) {
-				ZipFile zipFile = new ZipFile("./jre" + jre + ".tar.gz");
+				ZipFile zipFile = new ZipFile("./jre" + version + ".tar.gz");
 				unzip(zipFile, new File("./"));
 				//Delete the zip file
 				zipFile.close();
-				File zip = new File("./jre" + jre + ".tar.gz");
+				File zip = new File("./jre" + version + ".tar.gz");
 				if(zip.exists()) zip.delete();
 				//Rename the folder to JRE8
 				for(File file : Objects.requireNonNull(new File("./").listFiles())) {
 					if(file.getName().startsWith("jdk8") || file.getName().startsWith("jdk-18")) {
-						file.renameTo(new File("./jre" + jre));
+						file.renameTo(new File("./jre" + version));
 						break;
 					}
 				}
@@ -1203,8 +1209,11 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private void downloadJava(String url, String destination) throws IOException {
+	private void downloadJava(int version) throws IOException {
+		String url = getJavaURL(version);
+		if (url == null) return;
 		URL website = new URL(url);
+		String destination = "jre" + version;
 		if(System.getProperty("os.name").toLowerCase().contains("win")) destination += ".zip";
 		else if(System.getProperty("os.name").toLowerCase().contains("mac")) destination += ".tar.gz";
 		else destination += ".tar.gz";
