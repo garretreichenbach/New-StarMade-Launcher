@@ -52,15 +52,20 @@ public class LauncherUpdater {
 		String latestVersion = getLatestVersion();
 		System.err.println("Updating launcher to version " + latestVersion);
 		try {
-			File updaterJar = File.createTempFile("Updater", ".jar");
-			updaterJar.deleteOnExit();
-			extractUpdater(updaterJar);
-			//Send the link to the latest launcher jar file in args
-			ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", getLatestLauncherURL(), "StarMade Launcher" + getPlatformFolder() + ".zip");
-			processBuilder.inheritIO();
-			processBuilder.start();
+			File updaterJar = new File("Updater.jar");
+			if(updaterJar.exists()) updaterJar.delete();
+			updaterJar.createNewFile();
+			try {
+				extractUpdater(updaterJar);
+				//Send the link to the latest launcher jar file in args
+				ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", "Updater.jar", getLatestLauncherURL(), "StarMade_Launcher_" + getPlatformFolder() + ".zip");
+				processBuilder.inheritIO();
+				processBuilder.start();
+			} catch(Exception e) {
+				throw new RuntimeException(e);
+			}
 			System.exit(0);
-		} catch(IOException exception) {
+		} catch(Exception exception) {
 			exception.printStackTrace();
 			(new ErrorDialog(ErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
 				try {
@@ -72,15 +77,8 @@ public class LauncherUpdater {
 		}
 	}
 
-	private static String getOutputPath() {
-		String osName = System.getProperty("os.name").toLowerCase();
-		if(osName.contains("win")) return "./starmade-launcher.exe";
-		else if(osName.contains("mac")) return "./starmade-launcher.app";
-		else return "./starmade-launcher.jar";
-	}
-
 	private static String getLatestLauncherURL() {
-		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade_Launcher_" + getPlatformFolder() + ".zip"; //Temp link for testing
+		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade_Launcher_" + getPlatformFolder() + ".zip";
 	}
 
 	private static String getPlatformFolder() {
@@ -90,26 +88,19 @@ public class LauncherUpdater {
 		else return "Linux";
 	}
 
-	private static String getPlatformExtension() {
-		String osName = System.getProperty("os.name").toLowerCase();
-		if(osName.contains("win")) return ".exe";
-		else if(osName.contains("mac")) return ".app";
-		else return ".jar";
-	}
-
 	/**
 	 * Extracts the updater .jar file from the launcher jar file.
 	 * @param out the output file
 	 */
 	public static void extractUpdater(File out) {
 		try {
-			InputStream inputStream = StarMadeLauncher.class.getResourceAsStream("/Updater.jar");
+			InputStream inputStream = StarMadeLauncher.class.getClassLoader().getResourceAsStream("Updater.jar");
 			OutputStream outputStream = new FileOutputStream(out);
 			assert inputStream != null;
 			IOUtils.copy(inputStream, outputStream);
 			inputStream.close();
 			outputStream.close();
-		} catch(IOException exception) {
+		} catch(Exception exception) {
 			exception.printStackTrace();
 		}
 	}

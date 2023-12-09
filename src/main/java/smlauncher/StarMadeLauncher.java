@@ -43,7 +43,7 @@ import java.util.zip.ZipFile;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.1"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.2"; //We've had two other launchers before this
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -123,6 +123,7 @@ public class StarMadeLauncher extends JFrame {
 		} catch(IOException exception) {
 			exception.printStackTrace();
 		}
+		deleteUpdaterJar();
 		setTitle("StarMade Launcher [" + LAUNCHER_VERSION + "]");
 		setBounds(100, 100, 800, 550);
 		setMinimumSize(new Dimension(800, 550));
@@ -137,6 +138,11 @@ public class StarMadeLauncher extends JFrame {
 		setResizable(false);
 		getRootPane().setDoubleBuffered(true);
 		setVisible(true);
+	}
+
+	private static void deleteUpdaterJar() {
+		File updaterJar = new File("Updater.jar");
+		if(updaterJar.exists()) updaterJar.delete();
 	}
 
 	public static void main(String[] args) {

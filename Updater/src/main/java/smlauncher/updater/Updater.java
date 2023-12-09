@@ -1,5 +1,6 @@
 package smlauncher.updater;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -33,28 +34,21 @@ public class Updater {
 			IOUtils.copy(new URL(url).openStream(), new FileOutputStream(outputFile));
 			System.out.println("Downloaded update to " + outputFile.getAbsolutePath());
 			System.out.println("Updating launcher...");
-
+			//Unzip the downloaded file
 			unzip(outputFile);
+			outputFile.deleteOnExit();
 			File launcherJar = new File("starmade-launcher.jar");
 			if(launcherJar.exists()) launcherJar.delete();
-			File folder = null;
+			File folder = new File("./release-builds/StarMade Launcher-win32-ia32");
 			String os = System.getProperty("os.name").toLowerCase();
-			if(os.contains("win")) folder = new File("StarMade_Launcher_Windows/release-builds/StarMade Launcher-win32-ia32");
-			else if(os.contains("mac")) folder = new File("StarMade_Launcher_Mac/release-builds/StarMade Launcher-darwin-x64");
-			else if(os.contains("linux")) folder = new File("StarMade_Launcher_Linux/release-builds/StarMade Launcher-linux-x64");
+			if(os.contains("win")) folder = new File("./release-builds/StarMade Launcher-win32-ia32");
+			else if(os.contains("mac")) folder = new File("./release-builds/StarMade Launcher-darwin-x64");
+			else if(os.contains("linux")) folder = new File("./release-builds/StarMade Launcher-linux-x64");
 			//Move everything in the folder to current directory
-			for(File file : folder.listFiles()) {
-				if(file.isDirectory()) {
-					for(File subFile : file.listFiles()) subFile.renameTo(new File(subFile.getName()));
-				} else file.renameTo(new File(file.getName()));
-			}
-			outputFile.delete();
-			(new File("StarMade_Launcher_Windows")).delete();
-			(new File("StarMade_Launcher_Mac")).delete();
-			(new File("StarMade_Launcher_Linux")).delete();
-
+			FileUtils.copyFile(new File(folder, "starmade-launcher.jar"), new File("starmade-launcher.jar"));
+			(new File("release-builds")).delete();
 			//Restart the launcher
-			runLauncher(new File("starmade-launcher.jar").getAbsolutePath());
+			runLauncher(new File("starmade-launcher.jar").getPath());
 		} catch(Exception exception) {
 			exception.printStackTrace();
 			System.exit(-1);
@@ -86,7 +80,7 @@ public class Updater {
 	private static void runLauncher(String absolutePath) {
 		try {
 			Runtime.getRuntime().exec("java -jar \"" + absolutePath + "\"");
-			System.exit(0);
+//			System.exit(0);
 		} catch(Exception exception) {
 			exception.printStackTrace();
 		}
