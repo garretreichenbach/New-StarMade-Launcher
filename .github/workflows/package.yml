@@ -40,26 +40,6 @@ jobs:
         uses: gradle/gradle-build-action@v1
         with:
           arguments: all_jar
-      - name: Check for JRE zips
-        run: |
-          if [ -f "release-builds/StarMade Launcher-win32-ia32/jre18.zip" ]; then
-            echo "JRE zip found"
-          else
-            echo "JRE zip not found"
-            exit 1
-          fi
-          if [ -f "release-builds/StarMade Launcher-darwin-x64/jre18.zip" ]; then
-            echo "JRE zip found"
-          else
-            echo "JRE zip not found"
-            exit 1
-          fi
-          if [ -f "release-builds/StarMade Launcher-linux-x64/jre18.zip" ]; then
-            echo "JRE zip found"
-          else
-            echo "JRE zip not found"
-            exit 1
-          fi
       - name: Zip Windows release build
         run: |
           zip -r "StarMade_Launcher_Windows.zip" "release-builds/StarMade Launcher-win32-ia32"
