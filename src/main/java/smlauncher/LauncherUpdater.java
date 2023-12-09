@@ -19,6 +19,7 @@ public class LauncherUpdater {
 
 	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
 //	private static final String UPDATE_URL = "http://launcher-files-origin.star-made.org/launcherbuildindex";
+	//https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/untagged-ab265652e1e81f7014d8/StarMade_Launcher_Windows.zip
 	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v"; //Temp link for testing
 	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json"; //Temp link for testing
 
@@ -79,14 +80,14 @@ public class LauncherUpdater {
 	}
 
 	private static String getLatestLauncherURL() {
-		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade Launcher " + getPlatformFolder() + ".zip"; //Temp link for testing
+		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade_Launcher_" + getPlatformFolder() + ".zip"; //Temp link for testing
 	}
 
 	private static String getPlatformFolder() {
 		String osName = System.getProperty("os.name").toLowerCase();
-		if(osName.contains("win")) return "(Windows)";
-		else if(osName.contains("mac")) return "(Mac)";
-		else return "(Linux)";
+		if(osName.contains("win")) return "Windows";
+		else if(osName.contains("mac")) return "Mac";
+		else return "Linux";
 	}
 
 	private static String getPlatformExtension() {
