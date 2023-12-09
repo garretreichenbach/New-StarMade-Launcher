@@ -160,38 +160,6 @@ public class StarMadeLauncher extends JFrame {
 		setVisible(true);
 	}
 
-	private String getJavaURL(int version) {
-		if (version == 8) return getJava8URL();
-		else if (version == 18) return getJava18URL();
-		else return null;
-	}
-
-	private String getJava8URL() {
-		String baseURL = "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_%s_hotspot_8u392b08.%s";
-		return String.format(baseURL, currentOS.toString(), currentOS.zipExtension);
-
-//		if (currentOS == OperatingSystem.WINDOWS) {
-//			return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_windows_hotspot_8u392b08.zip";
-//		} else if (currentOS == OperatingSystem.MAC) {
-//			return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_mac_hotspot_8u392b08.tar.gz";
-//		} else {
-//			return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz";
-//		}
-	}
-
-	private String getJava18URL() {
-		String baseURL = "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_%s_hotspot_18.0.2.1_1.%s";
-		return String.format(baseURL, currentOS.toString(), currentOS.zipExtension);
-
-//		if(currentOS == OperatingSystem.WINDOWS) {
-//			return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip";
-//		} else if(currentOS == OperatingSystem.MAC) {
-//			return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_mac_hotspot_18.0.2.1_1.tar.gz";
-//		} else {
-//			return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_linux_hotspot_18.0.2.1_1.tar.gz";
-//		}
-	}
-
 	private boolean checkForJREs() {
 		return (new File(getJava8Path()).exists() && new File(getJava18Path()).exists());
 	}
@@ -1165,6 +1133,25 @@ public class StarMadeLauncher extends JFrame {
 		else return bytes / 1024 / 1024 / 1024 + " GB";
 	}
 
+	private void downloadJava(int version) throws IOException {
+		String url = getJavaURL(version);
+		if (url == null) return;
+
+		URL website = new URL(url);
+		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+
+		String destination = "jre" + version + currentOS.zipExtension;
+		FileOutputStream fos = new FileOutputStream(destination);
+		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+		fos.close();
+	}
+
+	private String getJavaURL(int version) {
+		JavaVersion javaVersion = JavaVersion.getWithValue(version);
+		if (javaVersion == null) return null;
+		return String.format(javaVersion.baseURL, currentOS.toString(), currentOS.zipExtension);
+	}
+
 	private void unzipJava(int version) throws Exception {
 		File jreFolder = new File("./jre" + version);
 
@@ -1221,20 +1208,6 @@ public class StarMadeLauncher extends JFrame {
 				}
 			}
 		}
-	}
-
-	private void downloadJava(int version) throws IOException {
-		String url = getJavaURL(version);
-		if (url == null) return;
-		URL website = new URL(url);
-		String destination = "jre" + version;
-		if(System.getProperty("os.name").toLowerCase().contains("win")) destination += ".zip";
-		else if(System.getProperty("os.name").toLowerCase().contains("mac")) destination += ".tar.gz";
-		else destination += ".tar.gz";
-		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-		FileOutputStream fos = new FileOutputStream(destination);
-		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		fos.close();
 	}
 
 	private void unzip(ZipFile zipFile, File file) {
