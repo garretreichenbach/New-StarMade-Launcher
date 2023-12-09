@@ -59,7 +59,7 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	public static IndexFileEntry GAME_VERSION;
-	private final String osName;
+	private final OperatingSystem currentOS;
 
 	public static boolean debugMode;
 	public static boolean useSteam;
@@ -128,7 +128,7 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		//Get current OS
-		osName = System.getProperty("os.name").toLowerCase();
+		currentOS = OperatingSystem.getCurrent();
 
 		deleteUpdaterJar();
 		if(!checkForJREs()) {
@@ -167,15 +167,29 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private String getJava8URL() {
-		if(osName.contains("win")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_windows_hotspot_8u392b08.zip";
-		else if(osName.contains("mac")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_mac_hotspot_8u392b08.tar.gz";
-		else return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz";
+		String baseURL = "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_%s_hotspot_8u392b08.%s";
+		return String.format(baseURL, currentOS.toString(), currentOS.zipExtension);
+
+//		if (currentOS == OperatingSystem.WINDOWS) {
+//			return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_windows_hotspot_8u392b08.zip";
+//		} else if (currentOS == OperatingSystem.MAC) {
+//			return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_mac_hotspot_8u392b08.tar.gz";
+//		} else {
+//			return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz";
+//		}
 	}
 
 	private String getJava18URL() {
-		if(osName.contains("win")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip";
-		else if(osName.contains("mac")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_mac_hotspot_18.0.2.1_1.tar.gz";
-		else return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_linux_hotspot_18.0.2.1_1.tar.gz";
+		String baseURL = "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_%s_hotspot_18.0.2.1_1.%s";
+		return String.format(baseURL, currentOS.toString(), currentOS.zipExtension);
+
+//		if(currentOS == OperatingSystem.WINDOWS) {
+//			return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip";
+//		} else if(currentOS == OperatingSystem.MAC) {
+//			return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_mac_hotspot_18.0.2.1_1.tar.gz";
+//		} else {
+//			return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_linux_hotspot_18.0.2.1_1.tar.gz";
+//		}
 	}
 
 	private boolean checkForJREs() {
@@ -1154,7 +1168,7 @@ public class StarMadeLauncher extends JFrame {
 	private void unzipJava(int version) throws Exception {
 		File jreFolder = new File("./jre" + version);
 
-		if(osName.contains("win")) {
+		if(currentOS == OperatingSystem.WINDOWS) {
 			if(!jreFolder.exists()) {
 				ZipFile zipFile = new ZipFile("./jre" + version + ".zip");
 				unzip(zipFile, new File("./"));
@@ -1170,7 +1184,7 @@ public class StarMadeLauncher extends JFrame {
 					}
 				}
 			}
-		} else if(osName.contains("mac")) {
+		} else if(currentOS == OperatingSystem.MAC) {
 			//Actual java will be in /Contents/Home/
 			if(!jreFolder.exists()) {
 				ZipFile zipFile = new ZipFile("./jre" + version + ".tar.gz");
