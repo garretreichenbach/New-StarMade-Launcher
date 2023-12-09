@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
@@ -35,24 +34,52 @@ public class Updater {
 			System.out.println("Downloaded update to " + outputFile.getAbsolutePath());
 			System.out.println("Updating launcher...");
 
-			//It should download as a .zip file, so we need to extract it
-			ZipFile zipFile = new ZipFile(outputFile);
-			for(Object object : zipFile.stream().toArray()) {
-				ZipEntry entry = (ZipEntry) object;
-				File file = new File(outputFile.getParentFile(), entry.getName());
-				if(entry.isDirectory()) file.mkdirs();
-				else {
-					file.getParentFile().mkdirs();
-					IOUtils.copy(zipFile.getInputStream(entry), new FileOutputStream(file));
-				}
+			unzip(outputFile);
+			File launcherJar = new File("starmade-launcher.jar");
+			if(launcherJar.exists()) launcherJar.delete();
+			File folder = null;
+			String os = System.getProperty("os.name").toLowerCase();
+			if(os.contains("win")) folder = new File("StarMade_Launcher_Windows/release-builds/StarMade Launcher-win32-ia32");
+			else if(os.contains("mac")) folder = new File("StarMade_Launcher_Mac/release-builds/StarMade Launcher-darwin-x64");
+			else if(os.contains("linux")) folder = new File("StarMade_Launcher_Linux/release-builds/StarMade Launcher-linux-x64");
+			//Move everything in the folder to current directory
+			for(File file : folder.listFiles()) {
+				if(file.isDirectory()) {
+					for(File subFile : file.listFiles()) subFile.renameTo(new File(subFile.getName()));
+				} else file.renameTo(new File(file.getName()));
 			}
 			outputFile.delete();
+			(new File("StarMade_Launcher_Windows")).delete();
+			(new File("StarMade_Launcher_Mac")).delete();
+			(new File("StarMade_Launcher_Linux")).delete();
 
 			//Restart the launcher
 			runLauncher(new File("starmade-launcher.jar").getAbsolutePath());
 		} catch(Exception exception) {
 			exception.printStackTrace();
 			System.exit(-1);
+		}
+	}
+
+	private static void unzip(File file) {
+		try {
+			ZipFile zipFile = new ZipFile(file);
+			zipFile.stream().forEach(zipEntry -> {
+				try {
+					File outputFile = new File(zipEntry.getName());
+					if(zipEntry.isDirectory()) outputFile.mkdirs();
+					else {
+						if(outputFile.exists()) outputFile.delete();
+						outputFile.createNewFile();
+						IOUtils.copy(zipFile.getInputStream(zipEntry), new FileOutputStream(outputFile));
+					}
+				} catch(Exception exception) {
+					exception.printStackTrace();
+				}
+			});
+			zipFile.close();
+		} catch(Exception exception) {
+			exception.printStackTrace();
 		}
 	}
 
