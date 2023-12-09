@@ -17,10 +17,11 @@ MANIFEST.MF
 /jre*
 /JRE*
 
-# Game Folders
+# Game Files
 /StarMade/
-launch-settings.json
 StarMade Launcher.xml
+StarMade_Launcher*.zip
+launch-settings.json
 version.txt
 
 # MacOS Files
