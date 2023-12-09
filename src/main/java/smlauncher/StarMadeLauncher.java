@@ -1,6 +1,7 @@
 package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
@@ -30,8 +31,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -43,7 +44,7 @@ import java.util.zip.ZipFile;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.6"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.7"; //We've had two other launchers before this
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -1161,6 +1162,27 @@ public class StarMadeLauncher extends JFrame {
 						break;
 					}
 				}
+			}
+		} else if(System.getProperty("os.name").toLowerCase().contains("mac")) {
+			//Actual java will be in /Contents/Home/
+			File jreFolder = new File("./jre" + jre);
+			if(!jreFolder.exists()) {
+				ZipFile zipFile = new ZipFile("./jre" + jre + ".tar.gz");
+				unzip(zipFile, new File("./"));
+				//Delete the zip file
+				zipFile.close();
+				File zip = new File("./jre" + jre + ".tar.gz");
+				if(zip.exists()) zip.delete();
+				//Go into the folder, and copy the contents of /Contents/Home/ to /jre<jre>/
+				File homeFolder = new File("./jre" + jre + "/Contents/Home");
+				for(File file : Objects.requireNonNull(homeFolder.listFiles())) {
+					if(file.isDirectory()) {
+						FileUtils.copyDirectory(file, new File("./jre" + jre));
+						break;
+					}
+				}
+				//Delete the old folder
+				FileUtils.deleteDirectory(homeFolder);
 			}
 		} else {
 			File jreFolder = new File("./jre" + jre);
