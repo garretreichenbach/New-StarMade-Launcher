@@ -1,11 +1,11 @@
 package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
 import smlauncher.content.LauncherContentPanel;
+import smlauncher.downloader.JavaDownloader;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
@@ -25,19 +25,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Main class for the StarMade Launcher.
  *
  * @author TheDerpGamer (TheDerpGamer#0027)
+ * @author SlavSquatSuperstar
  */
 public class StarMadeLauncher extends JFrame {
 
@@ -57,7 +54,7 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	public static IndexFileEntry GAME_VERSION;
-
+	private final OperatingSystem currentOS;
 	public static boolean debugMode;
 	public static boolean useSteam;
 	public static String installDir = "StarMade";
@@ -107,6 +104,7 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 			//Todo: Offline Mode
 		}
+
 		GAME_VERSION = getCurrentVersion();
 		if(GAME_VERSION == null || GAME_VERSION.build == null) lastUsedBranch = 0;
 		else {
@@ -128,15 +126,14 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		deleteUpdaterJar();
+
+		// Get the current OS
+		currentOS = OperatingSystem.getCurrent();
 		if(!checkForJREs()) {
 			try {
-				//Download JREs from links
-				String java8URL = getJava8URL();
-				String java18URL = getJava18URL();
-				downloadJava(java8URL, "jre8");
-				downloadJava(java18URL, "jre18");
-				unzipJava(8);
-				unzipJava(18);
+				//Download JREs
+				new JavaDownloader(JavaVersion.JAVA_8).downloadAndUnzip();
+				new JavaDownloader(JavaVersion.JAVA_18).downloadAndUnzip();
 			} catch(Exception exception) {
 				exception.printStackTrace();
 				JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -158,22 +155,9 @@ public class StarMadeLauncher extends JFrame {
 		setVisible(true);
 	}
 
-	private String getJava8URL() {
-		String os = System.getProperty("os.name").toLowerCase();
-		if(os.contains("win")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_windows_hotspot_8u392b08.zip";
-		else if(os.contains("mac")) return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_mac_hotspot_8u392b08.tar.gz";
-		else return "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u392-b08/OpenJDK8U-jre_x64_linux_hotspot_8u392b08.tar.gz";
-	}
-
-	private String getJava18URL() {
-		String os = System.getProperty("os.name").toLowerCase();
-		if(os.contains("win")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_windows_hotspot_18.0.2.1_1.zip";
-		else if(os.contains("mac")) return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_mac_hotspot_18.0.2.1_1.tar.gz";
-		else return "https://github.com/adoptium/temurin18-binaries/releases/download/jdk-18.0.2.1%2B1/OpenJDK18U-jre_x64_linux_hotspot_18.0.2.1_1.tar.gz";
-	}
-
 	private boolean checkForJREs() {
-		return (new File(getJava8Path()).exists() && new File(getJava18Path()).exists());
+		return (new File(getJavaPath(JavaVersion.JAVA_8)).exists()
+				&& new File(getJavaPath(JavaVersion.JAVA_18)).exists());
 	}
 
 	private static void deleteUpdaterJar() {
@@ -1128,8 +1112,11 @@ public class StarMadeLauncher extends JFrame {
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				saveLaunchSettings();
 				try {
-					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) unzipJava(8);
-					else unzipJava(18);
+					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) {
+						new JavaDownloader(JavaVersion.JAVA_8).downloadAndUnzip();
+					} else {
+						new JavaDownloader(JavaVersion.JAVA_18).downloadAndUnzip();
+					}
 				} catch(Exception exception) {
 					exception.printStackTrace();
 					(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
@@ -1161,7 +1148,7 @@ public class StarMadeLauncher extends JFrame {
 		else if(bytes < 1024 * 1024 * 1024) return bytes / 1024 / 1024 + " MB";
 		else return bytes / 1024 / 1024 / 1024 + " GB";
 	}
-
+  
 	private void unzipJava(int jre) throws Exception {
 		if(System.getProperty("os.name").toLowerCase().contains("win")) {
 			File jreFolder = new File("./jre" + jre);
@@ -1255,10 +1242,18 @@ public class StarMadeLauncher extends JFrame {
 
 	public void runStarMade(boolean server) {
 		boolean useJava8 = GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1");
-		String bundledJavaPath = new File(useJava8 ? getJava8Path() : getJava18Path()).getPath();
+		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getPath();
+
 		ArrayList<String> commandComponents = new ArrayList<>();
 		commandComponents.add(bundledJavaPath);
 		if(!useJava8) commandComponents.addAll(List.of(J18ARGS));
+
+		if(currentOS == OperatingSystem.MAC) {
+			// Run OpenGL on main thread on macOS
+			// Needs to be added before "-jar"
+			commandComponents.add("-XstartOnFirstThread");
+		}
+
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
 
@@ -1281,6 +1276,7 @@ public class StarMadeLauncher extends JFrame {
 
 		ProcessBuilder process = new ProcessBuilder(commandComponents);
 		process.directory(new File(installDir));
+		System.out.println("installed in " + new File(installDir).getAbsolutePath());
 		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 		process.redirectError(ProcessBuilder.Redirect.INHERIT);
 		try {
@@ -1292,16 +1288,11 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private String getJava8Path() {
-		String javaPath = "./jre8/bin/java";
-		if(System.getProperty("os.name").toLowerCase().contains("win")) javaPath += ".exe";
-		return javaPath;
-	}
-
-	private String getJava18Path() {
-		String javaPath = "./jre18/bin/java";
-		if(System.getProperty("os.name").toLowerCase().contains("win")) javaPath += ".exe";
-		return javaPath;
+	// TODO only looks for jre inside starmade game folder
+	// TODO move extracted jar to starmade folder, read from launch-settings.json
+	private String getJavaPath(JavaVersion version) {
+		System.out.println("currently at " + new File(".").getAbsolutePath());
+		return String.format(currentOS.javaPath, version.number);
 	}
 
 	private void createServerPanel(JPanel footerPanel) {

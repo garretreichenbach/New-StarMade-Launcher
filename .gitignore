@@ -1,20 +1,29 @@
+# Project and IDE Folders
 /.idea/
 /.gradle/
+
+# Build Outputs
 /build/
-/StarMade Launcher.jar
-launch-settings.json
-/jre8/
-/jre18/
-/StarMade/
-version.txt
-MANIFEST.MF
-/jre8.zip
-/jre18.zip
-.idea/workspace.xml
-StarMade Launcher.exe
-launcher-test/3.0.0/starmade-launcher.exe
-StarMade Launcher.xml
 /launcher-test/
-starmade-launcher.jar
 /node_modules/
 /release-builds/
+MANIFEST.MF
+
+# Executables
+[Ss]tar[Mm]ade[ -][Ll]auncher.jar
+[Ss]tar[Mm]ade[ -][Ll]auncher.exe
+
+# Extracted folders
+/jdk*
+/jre*
+
+# Game Files
+/StarMade/
+StarMade Launcher.xml
+StarMade_Launcher*.zip
+launch-settings.json
+version.txt
+
+# MacOS Files
+.DS_Store
+.java-version
