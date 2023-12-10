@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import smlauncher.misc.ErrorDialog;
+import smlauncher.util.OperatingSystem;
 
 import java.awt.*;
 import java.io.*;
@@ -21,26 +22,15 @@ public class LauncherUpdater {
 	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v"; //Temp link for testing
 	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json"; //Temp link for testing
 
+	/**
+	 * Checks whether the launcher should be updated.
+	 */
 	public static boolean checkForUpdate() {
 		String currentVersion = StarMadeLauncher.LAUNCHER_VERSION;
 		String latestVersion = getLatestVersion();
 		System.err.println("Current Launcher Version: " + currentVersion);
 		System.err.println("Latest Launcher Version: " + latestVersion);
 		return !currentVersion.equals(latestVersion);
-	}
-
-	private static String getLatestVersion() {
-		try {
-			String indexJSON = new String(new URL(INDEX_URL).openStream().readAllBytes(), StandardCharsets.UTF_8);
-			System.err.println(indexJSON);
-			JSONObject index = new JSONObject(indexJSON);
-			JSONArray versions = index.getJSONArray("versions");
-			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);
-			return latestVersion.getString("version");
-		} catch(IOException exception) {
-			exception.printStackTrace();
-			return "UNKNOWN";
-		}
 	}
 
 	/**
@@ -50,56 +40,79 @@ public class LauncherUpdater {
 		String latestVersion = getLatestVersion();
 		System.err.println("Updating launcher to version " + latestVersion);
 		try {
+			// Copy updater jar
 			File updaterJar = new File("Updater.jar");
-			if(updaterJar.exists()) updaterJar.delete();
-			updaterJar.createNewFile();
-			try {
-				extractUpdater(updaterJar);
-				//Send the link to the latest launcher jar file in args
-				ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", "Updater.jar", getLatestLauncherURL(), "StarMade_Launcher_" + getPlatformFolder() + ".zip");
-				processBuilder.inheritIO();
-				processBuilder.start();
-			} catch(Exception e) {
-				throw new RuntimeException(e);
-			}
+//			if (updaterJar.exists()) updaterJar.delete();
+			extractUpdater(updaterJar);
+
+			// Run updater jar
+			// Send the link to the latest launcher jar file in args
+			ProcessBuilder processBuilder = new ProcessBuilder(
+					"java", "-jar", "Updater.jar",
+					getLatestLauncherURL(), getZipFileName()
+			);
+			processBuilder.inheritIO();
+			processBuilder.start();
 			System.exit(0);
-		} catch(Exception exception) {
-			exception.printStackTrace();
-			(new ErrorDialog(ErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
+		} catch (Exception exception) {
+			System.out.println("Could not update launcher");
+			// Open website to launcher download
+			new ErrorDialog(ErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
 				try {
 					Desktop.getDesktop().browse(new URL(DOWNLOAD_URL).toURI());
-				} catch(Exception exception1) {
-					exception1.printStackTrace();
+				} catch (Exception exception1) {
+					System.out.println("Could not open launcher website");
 				}
-			})).setVisible(true);
+			}).setVisible(true);
+		}
+	}
+
+	// Helper Methods
+
+	private static String getLatestVersion() {
+		try (InputStream stream = new URL(INDEX_URL).openStream()) {
+			String indexJSON = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+//			System.err.println(indexJSON);
+			JSONObject index = new JSONObject(indexJSON);
+			JSONArray versions = index.getJSONArray("versions");
+			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);
+			return latestVersion.getString("version");
+		} catch (IOException exception) {
+			System.out.println("Could not get latest version");
+			return "UNKNOWN";
 		}
 	}
 
 	private static String getLatestLauncherURL() {
-		return UPDATE_URL_BASE + getLatestVersion() + "/StarMade_Launcher_" + getPlatformFolder() + ".zip";
+		return UPDATE_URL_BASE + getLatestVersion() + "/" + getZipFileName();
+	}
+
+	private static String getZipFileName() {
+		return "StarMade_Launcher_" + getPlatformFolder() + ".zip";
 	}
 
 	private static String getPlatformFolder() {
-		String osName = System.getProperty("os.name").toLowerCase();
-		if(osName.contains("win")) return "Windows";
-		else if(osName.contains("mac")) return "Mac";
+		OperatingSystem currentOS = OperatingSystem.getCurrent();
+		if (currentOS == OperatingSystem.WINDOWS) return "Windows";
+		else if (currentOS == OperatingSystem.MAC) return "Mac";
 		else return "Linux";
 	}
 
 	/**
 	 * Extracts the updater .jar file from the launcher jar file.
+	 *
 	 * @param out the output file
 	 */
-	public static void extractUpdater(File out) {
-		try {
-			InputStream inputStream = StarMadeLauncher.class.getClassLoader().getResourceAsStream("Updater.jar");
-			OutputStream outputStream = new FileOutputStream(out);
+	private static void extractUpdater(File out) {
+		try (
+				InputStream inputStream = StarMadeLauncher.class.getClassLoader().getResourceAsStream("Updater.jar");
+				OutputStream outputStream = new FileOutputStream(out)
+		) {
 			assert inputStream != null;
 			IOUtils.copy(inputStream, outputStream);
-			inputStream.close();
-			outputStream.close();
-		} catch(Exception exception) {
-			exception.printStackTrace();
+		} catch (Exception exception) {
+			System.out.println("Could not extract updater jar");
 		}
 	}
+
 }
