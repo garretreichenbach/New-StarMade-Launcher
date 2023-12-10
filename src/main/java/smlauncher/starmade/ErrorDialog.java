@@ -3,8 +3,9 @@ package smlauncher.starmade;
 import javax.swing.*;
 import java.awt.*;
 
+// TODO seems like duplicate of {misc.ErrorDialog}
 /**
- * [Description]
+ * Simple dialog for showing error messages.
  *
  * @author TheDerpGamer (TheDerpGamer#0027)
  */

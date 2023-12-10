@@ -43,10 +43,11 @@ public class CommunityServerList extends JTable {
 
 		for(int i = 0; i < serverList.getJSONArray("servers").length(); i++) {
 			JSONObject server = serverList.getJSONArray("servers").getJSONObject(i);
-			CommunityServer communityServer = new CommunityServer();
-			communityServer.name = server.getString("name");
-			communityServer.description = server.getString("description");
-			communityServer.url = server.getString("url");
+			CommunityServer communityServer = new CommunityServer(
+					server.getString("name"),
+					server.getString("description"),
+					server.getString("url")
+			);
 			tableModel.addRow(new Object[] {communityServer.name, communityServer.description});
 		}
 
