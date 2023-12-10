@@ -40,6 +40,7 @@ import java.util.zip.ZipFile;
  * Main class for the StarMade Launcher.
  *
  * @author TheDerpGamer (TheDerpGamer#0027)
+ * @author SlavSquatSuperstar
  */
 public class StarMadeLauncher extends JFrame {
 
@@ -134,11 +135,11 @@ public class StarMadeLauncher extends JFrame {
 		if(!checkForJREs()) {
 			try {
 				//Download JREs from links
-				downloadJava(8);
-				unzipJava(8);
+				downloadJava(JavaVersion.JAVA_8);
+				unzipJava(JavaVersion.JAVA_8);
 
-				downloadJava(18);
-				unzipJava(18);
+				downloadJava(JavaVersion.JAVA_18);
+				unzipJava(JavaVersion.JAVA_18);
 			} catch(Exception exception) {
 				exception.printStackTrace();
 				JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1099,8 +1100,8 @@ public class StarMadeLauncher extends JFrame {
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				saveLaunchSettings();
 				try {
-					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) unzipJava(8);
-					else unzipJava(18);
+					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) unzipJava(JavaVersion.JAVA_18);
+					else unzipJava(JavaVersion.JAVA_18);
 				} catch(Exception exception) {
 					exception.printStackTrace();
 					(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
@@ -1133,88 +1134,70 @@ public class StarMadeLauncher extends JFrame {
 		else return bytes / 1024 / 1024 / 1024 + " GB";
 	}
 
-	private void downloadJava(int version) throws IOException {
+	private void downloadJava(JavaVersion version) throws IOException {
 		String url = getJavaURL(version);
 		if (url == null) return;
 
 		URL website = new URL(url);
 		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 
-		String destination = "jre" + version + currentOS.zipExtension;
+		String destination = String.format("jre%d.%s", version.number, currentOS.zipExtension);
 		FileOutputStream fos = new FileOutputStream(destination);
 		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 		fos.close();
 	}
 
-	private String getJavaURL(int version) {
-		JavaVersion javaVersion = JavaVersion.getWithValue(version);
-		if (javaVersion == null) return null;
-		return String.format(javaVersion.baseURL, currentOS.toString(), currentOS.zipExtension);
+	private String getJavaURL(JavaVersion version) {
+		return String.format(version.baseURL, currentOS.toString(), currentOS.zipExtension);
 	}
 
-	private void unzipJava(int version) throws Exception {
-		File jreFolder = new File("./jre" + version);
+	private void unzipJava(JavaVersion version) throws Exception {
+		int number = version.number;
 
-		if(currentOS == OperatingSystem.WINDOWS) {
-			if(!jreFolder.exists()) {
-				ZipFile zipFile = new ZipFile("./jre" + version + ".zip");
-				unzip(zipFile, new File("./"));
-				//Delete the zip file
-				zipFile.close();
-				File zip = new File("./jre" + version + ".zip");
-				if(zip.exists()) zip.delete();
-				//Rename the folder to JRE8
-				for(File file : Objects.requireNonNull(new File("./").listFiles())) {
-					if(file.getName().startsWith("jdk8") || file.getName().startsWith("jdk-18")) {
-						file.renameTo(new File("./jre" + version));
-						break;
-					}
-				}
-			}
-		} else if(currentOS == OperatingSystem.MAC) {
-			//Actual java will be in /Contents/Home/
-			if(!jreFolder.exists()) {
-				ZipFile zipFile = new ZipFile("./jre" + version + ".tar.gz");
-				unzip(zipFile, new File("./"));
-				//Delete the zip file
-				zipFile.close();
-				File zip = new File("./jre" + version + ".tar.gz");
-				if(zip.exists()) zip.delete();
-				//Go into the folder, and copy the contents of /Contents/Home/ to /jre<jre>/
-				File homeFolder = new File("./jre" + version + "/Contents/Home");
-				for(File file : Objects.requireNonNull(homeFolder.listFiles())) {
-					if(file.isDirectory()) {
-						FileUtils.copyDirectory(file, new File("./jre" + version));
-						break;
-					}
-				}
-				//Delete the old folder
-				FileUtils.deleteDirectory(homeFolder);
-			}
+		String jreFolderName = "./jre" + number;
+		File jreFolder = new File(jreFolderName);
+		if (jreFolder.isDirectory()) return; //The folder already exists, don't unzip
+
+		//Unzip the file
+		String filename = String.format("./jre%d.%s", number, currentOS.zipExtension);
+		ZipFile zipFile = new ZipFile(filename);
+		unzip(zipFile, new File("./"));
+		zipFile.close();
+
+		//Delete the zip file
+		File zip = new File(filename);
+		if(zip.exists()) zip.delete();
+
+		if(currentOS == OperatingSystem.MAC) {
+			//Actual java will be inside /Contents/Home/bin/
+			//Copy /Contents/Home/bin/ to /jre<#>/
+			//Go into the folder, and copy the contents of /Contents/Home/ to /jre<#>/
+			File homeFolder = new File(jreFolderName + "/Contents/Home");
+			File binFolder = new File(homeFolder.getName() + "/bin");
+			FileUtils.copyDirectory(binFolder, jreFolder);
+
+			// TODO do we need other folders?
+			// TODO maybe just rename /Contents/Home/ to /jre<#>/
+
+			//Delete the old folder
+			FileUtils.deleteDirectory(homeFolder);
 		} else {
-			if(!jreFolder.exists()) {
-				ZipFile zipFile = new ZipFile("./jre" + version + ".tar.gz");
-				unzip(zipFile, new File("./"));
-				//Delete the zip file
-				zipFile.close();
-				File zip = new File("./jre" + version + ".tar.gz");
-				if(zip.exists()) zip.delete();
-				//Rename the folder to JRE8
-				for(File file : Objects.requireNonNull(new File("./").listFiles())) {
-					if(file.getName().startsWith("jdk8") || file.getName().startsWith("jdk-18")) {
-						file.renameTo(new File("./jre" + version));
-						break;
-					}
+			//Rename the extracted folder to jre<#>
+			for(File file : Objects.requireNonNull(new File("./").listFiles())) {
+				if(file.getName().startsWith(version.fileStart)) {
+					file.renameTo(jreFolder);
+					break;
 				}
 			}
 		}
 	}
 
-	private void unzip(ZipFile zipFile, File file) {
+	// TODO problems unzipping tar.gz
+	private void unzip(ZipFile zipFile, File destinationFile) {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while(entries.hasMoreElements()) {
 			ZipEntry entry = entries.nextElement();
-			File entryDestination = new File(file, entry.getName());
+			File entryDestination = new File(destinationFile, entry.getName());
 			entryDestination.getParentFile().mkdirs();
 			if(entry.isDirectory()) continue;
 			try {
