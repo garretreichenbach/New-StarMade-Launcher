@@ -20,53 +20,31 @@ public class JavaDownloaderTest {
 	private JavaDownloader dl;
 
 	@Test
-	void canDownloadOnWindows() {
-		dl = new JavaDownloader(OperatingSystem.WINDOWS, JavaVersion.JAVA_8);
-		assertDoesNotThrow(() -> dl.download());
-		cleanupZip();
+	void canDownloadAndUnzipOnWindows() {
+		testCanDownloadAndUnzip(OperatingSystem.WINDOWS, JavaVersion.JAVA_8);
+		testCanDownloadAndUnzip(OperatingSystem.WINDOWS, JavaVersion.JAVA_18);
 	}
 
 	@Test
-	void canDownloadOnMac() {
-		dl = new JavaDownloader(OperatingSystem.MAC, JavaVersion.JAVA_8);
-		assertDoesNotThrow(() -> dl.download());
-		cleanupZip();
+	void canDownloadAndUnzipOnMac() {
+		testCanDownloadAndUnzip(OperatingSystem.MAC, JavaVersion.JAVA_8);
+		testCanDownloadAndUnzip(OperatingSystem.MAC, JavaVersion.JAVA_18);
 	}
 
 	@Test
-	void canDownloadOnLinux() {
-		dl = new JavaDownloader(OperatingSystem.LINUX, JavaVersion.JAVA_8);
-		assertDoesNotThrow(() -> dl.download());
-		cleanupZip();
-	}
-
-	@Test
-	void canUnzipOnWindows() {
-		dl = new JavaDownloader(OperatingSystem.WINDOWS, JavaVersion.JAVA_18);
-		assertDoesNotThrow(() -> dl.downloadAndUnzip());
-		cleanupFolder();
-	}
-
-	@Test
-	void canUnzipOnLinux() {
-		dl = new JavaDownloader(OperatingSystem.WINDOWS, JavaVersion.JAVA_18);
-		assertDoesNotThrow(() -> dl.downloadAndUnzip());
-		cleanupFolder();
-	}
-
-	@Test
-	void canUnzipOnMac() {
-		dl = new JavaDownloader(OperatingSystem.WINDOWS, JavaVersion.JAVA_18);
-		assertDoesNotThrow(() -> dl.downloadAndUnzip());
-		cleanupFolder();
+	void canDownloadAndUnzipOnLinux() {
+		testCanDownloadAndUnzip(OperatingSystem.LINUX, JavaVersion.JAVA_8);
+		testCanDownloadAndUnzip(OperatingSystem.LINUX, JavaVersion.JAVA_18);
 	}
 
 	// Helper Methods
-
-	private void testCanDownload(OperatingSystem os, JavaVersion version) {
+	
+	private void testCanDownloadAndUnzip(OperatingSystem os, JavaVersion version) {
 		dl = new JavaDownloader(os, version);
 		assertDoesNotThrow(() -> dl.download());
+		assertDoesNotThrow(() -> dl.unzip());
 		cleanupZip();
+		cleanupFolder();
 	}
 
 	private void cleanupZip() {

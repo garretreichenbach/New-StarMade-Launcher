@@ -19,6 +19,7 @@ repositories {
 dependencies {
     implementation 'com.formdev:flatlaf:3.0'
     implementation 'commons-io:commons-io:2.11.0'
+    implementation 'org.codehaus.plexus:plexus-archiver:4.9.0'
     implementation 'org.jasypt:jasypt:1.9.3'
     implementation 'org.json:json:20230227'
     implementation 'it.unimi.dsi:fastutil:8.5.12'
