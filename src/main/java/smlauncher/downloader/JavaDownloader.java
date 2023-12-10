@@ -1,4 +1,4 @@
-package smlauncher.download;
+package smlauncher.downloader;
 
 import org.apache.commons.io.FileUtils;
 import smlauncher.JavaVersion;
@@ -94,10 +94,10 @@ public class JavaDownloader {
 	// Helper Methods
 
 	private String getJavaURL() {
-		return String.format(version.baseURL, currentOS.toString(), currentOS.zipExtension);
+		return String.format(version.fmtURL, currentOS.toString(), currentOS.zipExtension);
 	}
 
-	private String getZipFilename() {
+	String getZipFilename() {
 		return String.format("jre%d.%s", version.number, currentOS.zipExtension);
 	}
 

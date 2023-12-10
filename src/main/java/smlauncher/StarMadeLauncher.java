@@ -5,7 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
 import smlauncher.content.LauncherContentPanel;
-import smlauncher.download.JavaDownloader;
+import smlauncher.downloader.JavaDownloader;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
