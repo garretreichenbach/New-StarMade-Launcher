@@ -56,6 +56,7 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	public static IndexFileEntry GAME_VERSION;
+	private final OperatingSystem currentOS;
 	public static boolean debugMode;
 	public static boolean useSteam;
 	public static String installDir = "StarMade";
@@ -102,6 +103,7 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 			//Todo: Offline Mode
 		}
+
 		GAME_VERSION = getCurrentVersion();
 		if(GAME_VERSION == null || GAME_VERSION.build == null) lastUsedBranch = 0;
 		else {
@@ -124,6 +126,8 @@ public class StarMadeLauncher extends JFrame {
 		}
 		deleteUpdaterJar();
 
+		// Get the current OS
+		currentOS = OperatingSystem.getCurrent();
 		if(!checkForJREs()) {
 			try {
 				//Download JREs
@@ -1140,6 +1144,14 @@ public class StarMadeLauncher extends JFrame {
 		ArrayList<String> commandComponents = new ArrayList<>();
 		commandComponents.add(bundledJavaPath);
 		if(!useJava8) commandComponents.addAll(List.of(J18ARGS));
+
+		if(currentOS == OperatingSystem.MAC) {
+			// Run OpenGL on main thread on macOS
+			// Needs to be added before "-jar"
+			System.out.println("on Mac, running OpenGL on main thread");
+			commandComponents.add("-XstartOnFirstThread");
+		}
+
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
 
@@ -1158,6 +1170,7 @@ public class StarMadeLauncher extends JFrame {
 
 		ProcessBuilder process = new ProcessBuilder(commandComponents);
 		process.directory(new File(installDir));
+		System.out.println("installed in " + new File(installDir).getAbsolutePath());
 		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 		process.redirectError(ProcessBuilder.Redirect.INHERIT);
 		try {
@@ -1169,10 +1182,11 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	// TODO only looks for jre inside starmade folder
+	// TODO only looks for jre inside starmade game folder
+	// TODO move extracted jar to starmade folder, read from launch-settings.json
 	private String getJavaPath(JavaVersion version) {
 		System.out.println("currently at " + new File(".").getAbsolutePath());
-		return String.format(OperatingSystem.getCurrent().javaPath, version.number);
+		return String.format(currentOS.javaPath, version.number);
 	}
 
 	private void createServerPanel(JPanel footerPanel) {
