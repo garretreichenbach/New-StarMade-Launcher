@@ -1556,7 +1556,9 @@ public class StarMadeLauncher extends JFrame {
 		if(centerScrollPane == null) {
 			centerScrollPane = new JScrollPane(currentPanel);
 			centerScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			centerScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
 			centerScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+			centerScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 			centerPanel.add(centerScrollPane, BorderLayout.CENTER);
 		}
 		centerScrollPane.setViewportView(currentPanel);
