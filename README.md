@@ -8,14 +8,12 @@ This launcher was created due to the old one being outdated and only being able 
 - Schine for making such a great game
 - The StarLoader Team for making a new launcher
 
-Note: Pretty much every class in `util` was copied over from the main repo.
+Note: Pretty much every class in `src/starmade` was copied over from the main repo.
 
 # Building from source
 1. Clone the Repo (duh)
-2. run `npm install`
-3. run `node package.js`
 4. run `gradlew all_jar` (Not `gradlew jar`!)
 
 # Note
-This launcher requires Java version 17 or 18 to work.
-You can download Java 17 here: https://adoptium.net/temurin/releases/?package=any&version=17
+This launcher requires at least Java 11 to work.
+You can download Java 11 here: https://adoptium.net/temurin/releases/?version=11
