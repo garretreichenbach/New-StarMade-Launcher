@@ -1,5 +1,5 @@
 #!/bin/sh
-# Compile and run the launcher for Unix computers
+# Compile and run the launcher for Mac/Linux
 
 # Navigate to the project directory
 SCRIPT_DIR=$(dirname "$0")

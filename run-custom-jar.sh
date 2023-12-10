@@ -1,5 +1,5 @@
 #!/bin/sh
-# Run the custom jar file for Unix computers
+# Run the custom jar file for Unix
 
 # Navigate to the project directory
 SCRIPT_DIR=$(dirname "$0")
@@ -21,7 +21,7 @@ case "$OSTYPE" in
   ;;
 esac
 
-# Run the jar file
+# Run the custom jar file
 echo "Running custom StarMade jar..."
 
 if $is_mac; then
