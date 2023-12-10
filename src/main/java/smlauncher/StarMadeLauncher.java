@@ -38,7 +38,7 @@ import java.util.zip.ZipFile;
 /**
  * Main class for the StarMade Launcher.
  *
- * @author TheDerpGamer (TheDerpGamer#0027)
+ * @author TheDerpGamer
  * @author SlavSquatSuperstar
  */
 public class StarMadeLauncher extends JFrame {
