@@ -13,9 +13,9 @@ MANIFEST.MF
 [Ss]tar[Mm]ade[ -][Ll]auncher.jar
 [Ss]tar[Mm]ade[ -][Ll]auncher.exe
 
-# JREs
+# Extracted folders
+/jdk*
 /jre*
-/JRE*
 
 # Game Files
 /StarMade/

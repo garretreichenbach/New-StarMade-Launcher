@@ -80,7 +80,7 @@ public class JavaDownloader {
 		// Delete the zip file
 		if (zipFile.exists()) zipFile.delete();
 
-//		moveExtractedFolder(getJreFolderName());
+		moveExtractedFolder(getJreFolderName());
 	}
 
 	private void unzipFile(ZipFile zipFile, File destinationFile) {
@@ -105,24 +105,33 @@ public class JavaDownloader {
 		}
 	}
 
-	// TODO do we need other folders?
-	// TODO maybe just rename /<home>/ to /jre<#>/
 	private void moveExtractedFolder(String jreFolderName) throws IOException {
 		File jreFolder = new File(getJreFolderName());
 
 		if (currentOS == OperatingSystem.MAC) {
-			// Actual java will be inside /Contents/Home/bin/
+			// Actual java will be inside <extracted>/Contents/Home/bin/
 			// Copy /Contents/Home/bin/ to /jre<#>/
 			// Go into the folder, and copy the contents of /Contents/Home/ to /jre<#>/
-			File homeFolder = new File(jreFolderName + "/Contents/Home");
-			FileUtils.copyDirectory(homeFolder, jreFolder);
-
-			// Delete the old folder
-			FileUtils.deleteDirectory(jreFolder);
-		} else {
-			// Move the extracted folder to jre<#>
 			for (File file : Objects.requireNonNull(new File("./").listFiles())) {
 				if (file.getName().startsWith(version.fileStart)) {
+					System.out.println("found " + file.getPath());
+
+					// Copy <extracted>/Contents/Home/bin/ to /jre<#>/
+					File homeFolder = new File(file.getPath() + "/Contents/Home");
+					System.out.println("moved " + homeFolder.getPath());
+					FileUtils.copyDirectory(homeFolder, jreFolder);
+
+					// Delete the extracted folder
+					FileUtils.deleteDirectory(file);
+					break;
+				}
+			}
+		} else {
+			// Find the extracted folder
+			for (File file : Objects.requireNonNull(new File("./").listFiles())) {
+				if (file.getName().startsWith(version.fileStart)) {
+					// Move the extracted folder to jre<#>
+					System.out.println("renamed " + file.getPath());
 					file.renameTo(jreFolder);
 					break;
 				}

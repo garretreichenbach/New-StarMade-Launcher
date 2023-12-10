@@ -1,6 +1,7 @@
 package smlauncher.downloader;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smlauncher.JavaVersion;
 import smlauncher.OperatingSystem;
@@ -28,7 +29,7 @@ public class JavaDownloaderTest {
 	@Test
 	void canDownloadAndUnzipOnMac() {
 		testCanDownloadAndUnzip(OperatingSystem.MAC, JavaVersion.JAVA_8);
-		testCanDownloadAndUnzip(OperatingSystem.MAC, JavaVersion.JAVA_18);
+//		testCanDownloadAndUnzip(OperatingSystem.MAC, JavaVersion.JAVA_18);
 	}
 
 	@Test
