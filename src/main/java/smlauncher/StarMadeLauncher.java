@@ -1,6 +1,7 @@
 package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
@@ -25,10 +26,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Main class for the StarMade Launcher.
