@@ -33,6 +33,8 @@ public class JavaDownloader {
 	}
 
 	public void downloadAndUnzip() throws Exception {
+		// The folder already exists, don't unzip
+		if (doesJreFolderExist()) return;
 		download();
 		unzip();
 	}
@@ -51,37 +53,36 @@ public class JavaDownloader {
 	}
 
 	public void unzip() throws Exception {
-		int number = version.number;
-
-		String jreFolderName = "./jre" + number;
-		File jreFolder = new File(jreFolderName);
-		if (jreFolder.isDirectory()) return; //The folder already exists, don't unzip
-
-		//Unzip the file
+		// Unzip the file
 		String zipFilename = getZipFilename();
 		ZipFile zipFile = new ZipFile(zipFilename);
 		unzipFile(zipFile, new File("./"));
 		zipFile.close();
 
-		//Delete the zip file
+		// Delete the zip file
 		File zip = new File(zipFilename);
 		if (zip.exists()) zip.delete();
 
+		moveExtractedFolder(getJreFolderName());
+	}
+
+	// TODO do we need other folders?
+	// TODO maybe just rename /<home>/ to /jre<#>/
+	private void moveExtractedFolder(String jreFolderName) throws IOException {
+		File jreFolder = new File(getJreFolderName());
+
 		if (currentOS == OperatingSystem.MAC) {
-			//Actual java will be inside /Contents/Home/bin/
-			//Copy /Contents/Home/bin/ to /jre<#>/
-			//Go into the folder, and copy the contents of /Contents/Home/ to /jre<#>/
+			// Actual java will be inside /Contents/Home/bin/
+			// Copy /Contents/Home/bin/ to /jre<#>/
+			// Go into the folder, and copy the contents of /Contents/Home/ to /jre<#>/
 			File homeFolder = new File(jreFolderName + "/Contents/Home");
 			File binFolder = new File(homeFolder.getName() + "/bin");
 			FileUtils.copyDirectory(binFolder, jreFolder);
 
-			// TODO do we need other folders?
-			// TODO maybe just rename /Contents/Home/ to /jre<#>/
-
-			//Delete the old folder
+			// Delete the old folder
 			FileUtils.deleteDirectory(homeFolder);
 		} else {
-			//Rename the extracted folder to jre<#>
+			// Move the extracted folder to jre<#>
 			for (File file : Objects.requireNonNull(new File("./").listFiles())) {
 				if (file.getName().startsWith(version.fileStart)) {
 					file.renameTo(jreFolder);
@@ -93,12 +94,21 @@ public class JavaDownloader {
 
 	// Helper Methods
 
+	private boolean doesJreFolderExist() {
+		File jreFolder = new File(getJreFolderName());
+		return jreFolder.isDirectory();
+	}
+
 	private String getJavaURL() {
 		return String.format(version.fmtURL, currentOS.toString(), currentOS.zipExtension);
 	}
 
 	String getZipFilename() {
 		return String.format("jre%d.%s", version.number, currentOS.zipExtension);
+	}
+
+	String getJreFolderName() {
+		return "./jre" + version.number;
 	}
 
 	// TODO problems unzipping tar.gz
