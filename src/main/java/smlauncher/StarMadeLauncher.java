@@ -53,11 +53,12 @@ public class StarMadeLauncher extends JFrame {
 			"--add-opens=java.base/java.util=ALL-UNNAMED"
 	};
 
-	public static IndexFileEntry GAME_VERSION;
+	public String installDir = "StarMade";
+	public IndexFileEntry gameVersion;
 	private final OperatingSystem currentOS;
 	public static boolean debugMode;
 	public static boolean useSteam;
-	public static String installDir = "StarMade";
+
 	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
 	public static int lastUsedBranch;
 	private static String selectedVersion;
@@ -101,7 +102,6 @@ public class StarMadeLauncher extends JFrame {
 			if(resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
 		} catch(Exception exception) {
 			System.out.println("Could not set window icon");
-			exception.printStackTrace();
 		}
 
 		// Fetch game versions
@@ -109,45 +109,36 @@ public class StarMadeLauncher extends JFrame {
 			loadVersionList();
 		} catch(Exception exception) {
 			System.out.println("Could not load versions list, switching to offline");
-			exception.printStackTrace();
 			//Todo: Offline Mode
 		}
 
+		// Read launch settings and game directory
+		launchSettings = readLaunchSettings();
+		installDir = launchSettings.getString("installDir");
+
 		// Read game version
-		// TODO getCurrentVersion() and getLaunchSettings() have a circular dependency
-		GAME_VERSION = getCurrentVersion();
-		if(GAME_VERSION == null || GAME_VERSION.build == null) lastUsedBranch = 0;
-		else {
-			switch(GAME_VERSION.build) {
-				case "RELEASE":
-					lastUsedBranch = 0;
-					break;
-				case "DEV":
-					lastUsedBranch = 1;
-					break;
-				case "PRE":
-					lastUsedBranch = 2;
-					break;
-			}
-		}
+		gameVersion = getCurrentVersion();
+		setGameVersion(gameVersion);
 
-		// Read launch settings
-		launchSettings = getLaunchSettings();
+		// Read game branch
+		lastUsedBranch = getBranchForVersion(gameVersion);
+		launchSettings.put("lastUsedBranch", lastUsedBranch);
 
+		saveLaunchSettings();
 		deleteUpdaterJar();
 
+		// TODO download jre into install dir
+
 		// Get the current OS
-		System.out.println("installed at " + installDir);
 		currentOS = OperatingSystem.getCurrent();
-		if(!checkForJREs()) {
-			try {
-				//Download JREs
-				new JavaDownloader(JavaVersion.JAVA_8).downloadAndUnzip();
-				new JavaDownloader(JavaVersion.JAVA_18).downloadAndUnzip();
-			} catch(Exception exception) {
-				exception.printStackTrace();
-				JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
-			}
+
+		// Download JREs
+		try {
+			downloadJRE(JavaVersion.JAVA_8);
+			downloadJRE(JavaVersion.JAVA_18);
+		} catch(Exception exception) {
+			System.out.println("Could not download JREs");
+			JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 
 		// Create launcher UI
@@ -161,9 +152,9 @@ public class StarMadeLauncher extends JFrame {
 		setVisible(true);
 	}
 
-	private boolean checkForJREs() {
-		return (new File(getJavaPath(JavaVersion.JAVA_8)).exists()
-				&& new File(getJavaPath(JavaVersion.JAVA_18)).exists());
+	private void downloadJRE(JavaVersion version) throws Exception {
+		if (new File(getJavaPath(version)).exists()) return;
+		new JavaDownloader(version).setInstallDir(installDir).downloadAndUnzip();
 	}
 
 	private static void deleteUpdaterJar() {
@@ -340,13 +331,14 @@ public class StarMadeLauncher extends JFrame {
 		try {
 			File versionFile = new File(installDir, "version.txt");
 			if(!versionFile.exists()) return null;
+
 			String version = Files.readString(versionFile.toPath());
 			version = version.substring(0, version.indexOf('#'));
 			for(IndexFileEntry entry : releaseVersions) if(version.equals(entry.build)) return entry;
 			for(IndexFileEntry entry : devVersions) if(version.equals(entry.build)) return entry;
 			for(IndexFileEntry entry : preReleaseVersions) if(version.equals(entry.build)) return entry;
 		} catch(IOException exception) {
-			exception.printStackTrace();
+			System.out.println("Could not read game version from file");
 		}
 		return null;
 	}
@@ -612,7 +604,7 @@ public class StarMadeLauncher extends JFrame {
 //			northPanel.setBackground(Palette.paneColor);
 //			northPanel.setForeground(Palette.foregroundColor);
 			dialogPanel.add(northPanel, BorderLayout.NORTH);
-			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 2048, getSystemMemory(), Objects.requireNonNull(getLaunchSettings()).getInt("memory"));
+			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 2048, getSystemMemory(), Objects.requireNonNull(readLaunchSettings()).getInt("memory"));
 //			slider.setBackground(Palette.paneColor);
 			JLabel sliderLabel = new JLabel("Memory: " + slider.getValue() + " MB");
 //			sliderLabel.setBackground(Palette.paneColor);
@@ -652,7 +644,7 @@ public class StarMadeLauncher extends JFrame {
 //			launchArgs.setBackground(Palette.paneColor);
 			launchArgs.setDoubleBuffered(true);
 			launchArgs.setOpaque(true);
-			launchArgs.setText(getLaunchSettings().getString("launchArgs"));
+			launchArgs.setText(readLaunchSettings().getString("launchArgs"));
 			launchArgs.setLineWrap(true);
 			launchArgs.setWrapStyleWord(true);
 			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -863,60 +855,70 @@ public class StarMadeLauncher extends JFrame {
 		centerPanel.add(background, BorderLayout.CENTER);
 	}
 
-	private void saveLaunchSettings() {
-		try {
-			File file = new File("launch-settings.json");
-			if(file.exists()) file.delete();
-			file.createNewFile();
-			FileWriter writer = new FileWriter("launch-settings.json", StandardCharsets.UTF_8);
-			writer.write(launchSettings.toString());
-			writer.flush();
-			writer.close();
-		} catch(IOException exception) {
-			exception.printStackTrace();
+	private JSONObject readLaunchSettings() {
+		File jsonFile = new File("./launch-settings.json");
+		JSONObject defaultSettings = getDefaultLaunchSettings();
+
+		// Return default if not present
+		if (!jsonFile.exists()) {
+			try (FileWriter writer = new FileWriter(jsonFile, StandardCharsets.UTF_8)) {
+				writer.write(defaultSettings.toString());
+				writer.flush();
+			} catch (IOException e){
+				System.out.println("Could not create launch settings file");
+			}
+			return defaultSettings;
+		}
+
+		// Read the settings file
+		try (FileReader reader = new FileReader(jsonFile, StandardCharsets.UTF_8)){
+			String text = IOUtils.toString(reader);
+			return new JSONObject(text);
+		} catch(IOException e) {
+			System.out.println("Could not read launch settings from file");
+		}
+		return defaultSettings;
+	}
+
+	private JSONObject getDefaultLaunchSettings() {
+		JSONObject settings = new JSONObject();
+		settings.put("memory", 4096);
+		settings.put("launchArgs", "");
+		settings.put("installDir", "StarMade");
+		settings.put("lastUsedBranch", 0); // Release
+		settings.put("lastUsedVersion", "NONE");
+		settings.put("jvm_args", "");
+		return settings;
+	}
+
+	private void setGameVersion(IndexFileEntry gameVersion) {
+		if(gameVersion != null) {
+			launchSettings.put("lastUsedVersion", gameVersion.build);
+
+			if(usingOldVersion()) launchSettings.put("jvm_args", "--illegal-access=permit");
+			else launchSettings.put("jvm_args", "");
+		} else {
+			launchSettings.put("lastUsedVersion", "NONE");
+			launchSettings.put("jvm_args", "");
 		}
 	}
 
-	private JSONObject getLaunchSettings() {
-		File file = new File("launch-settings.json");
-		try {
-			FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
-			String data = IOUtils.toString(reader);
-			JSONObject object = new JSONObject(data);
-			reader.close();
-			installDir = object.getString("installDir");
-			return object;
-		} catch(Exception exception) {
-			try {
-				file.createNewFile();
-				JSONObject object = new JSONObject();
-				object.put("memory", 4096);
-				object.put("launchArgs", "");
-				object.put("installDir", installDir);
-				object.put("lastUsedBranch", 0);
-				if(GAME_VERSION != null) {
-					object.put("lastUsedVersion", GAME_VERSION.build);
-					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) object.put("jvm_args", "--illegal-access=permit");
-					else object.put("jvm_args", "");
-				} else {
-					object.put("lastUsedVersion", "NONE");
-					object.put("jvm_args", "");
-				}
-				FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
-				writer.write(object.toString());
-				writer.flush();
-				writer.close();
-				return object;
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-			return null;
+	private void saveLaunchSettings() {
+		try (FileWriter writer = new FileWriter("launch-settings.json", StandardCharsets.UTF_8)) {
+			writer.write(launchSettings.toString());
+			writer.flush();
+		} catch(IOException exception) {
+			System.out.println("Could not save launch settings to file");
 		}
+	}
+
+	private boolean usingOldVersion() {
+		return gameVersion.build.startsWith("0.2") || gameVersion.build.startsWith("0.1");
 	}
 
 	private int getSystemMemory() {
 		com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-		return (int) (os.getTotalPhysicalMemorySize() / 1024 / 1024);
+		return (int) (os.getTotalPhysicalMemorySize() / (1024 * 1024));
 	}
 
 	private void createPlayPanel(JPanel footerPanel) {
@@ -1011,7 +1013,7 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		lastUsedBranch = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
+		lastUsedBranch = Objects.requireNonNull(readLaunchSettings()).getInt("lastUsedBranch");
 		branchDropdown.setSelectedIndex(lastUsedBranch);
 		branchDropdown.addItemListener(e -> {
 			lastUsedBranch = branchDropdown.getSelectedIndex();
@@ -1031,7 +1033,7 @@ public class StarMadeLauncher extends JFrame {
 			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
 			recreateButtons(playPanel, false);
 		});
-		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
+		String lastUsedVersion = Objects.requireNonNull(readLaunchSettings()).getString("lastUsedVersion");
 		if(lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
 		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
 			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
@@ -1062,7 +1064,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-		if((repair || !lookForGame(installDir) || GAME_VERSION == null || (!Objects.equals(GAME_VERSION.build, selectedVersion))) && !debugMode) {
+		if((repair || !lookForGame(installDir) || gameVersion == null || (!Objects.equals(gameVersion.build, selectedVersion))) && !debugMode) {
 			updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
@@ -1098,14 +1100,11 @@ public class StarMadeLauncher extends JFrame {
 			playButton.setBorderPainted(false);
 			playButton.addActionListener(e -> {
 				dispose();
-				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
+				launchSettings.put("lastUsedVersion", gameVersion.build);
 				saveLaunchSettings();
 				try {
-					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) {
-						new JavaDownloader(JavaVersion.JAVA_8).downloadAndUnzip();
-					} else {
-						new JavaDownloader(JavaVersion.JAVA_18).downloadAndUnzip();
-					}
+					if(usingOldVersion()) downloadJRE(JavaVersion.JAVA_8);
+					else downloadJRE(JavaVersion.JAVA_18);
 				} catch(Exception exception) {
 					exception.printStackTrace();
 					(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
@@ -1134,19 +1133,19 @@ public class StarMadeLauncher extends JFrame {
 	private String formatBytes(long bytes) {
 		if(bytes < 1024) return bytes + " B";
 		else if(bytes < 1024 * 1024) return bytes / 1024 + " KB";
-		else if(bytes < 1024 * 1024 * 1024) return bytes / 1024 / 1024 + " MB";
-		else return bytes / 1024 / 1024 / 1024 + " GB";
+		else if(bytes < 1024 * 1024 * 1024) return bytes / (1024 * 1024) + " MB";
+		else return bytes / (1024 * 1024 * 1024) + " GB";
 	}
 
 	private boolean checkJavaVersion() {
 		File jre8 = new File("./jre8/bin/java.exe");
 		File jre18 = new File("./jre18/bin/java.exe");
-		if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) return jre8.exists();
+		if(usingOldVersion()) return jre8.exists();
 		else return jre18.exists();
 	}
 
 	public void runStarMade(boolean server) {
-		boolean useJava8 = GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1");
+		boolean useJava8 = usingOldVersion();
 		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getPath();
 
 		ArrayList<String> commandComponents = new ArrayList<>();
@@ -1162,15 +1161,15 @@ public class StarMadeLauncher extends JFrame {
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
 
-		if(!Objects.requireNonNull(getLaunchSettings()).getString("jvm_args").isEmpty()) {
-			String[] launchArgs = Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").split(" ");
+		if(!Objects.requireNonNull(readLaunchSettings()).getString("jvm_args").isEmpty()) {
+			String[] launchArgs = Objects.requireNonNull(readLaunchSettings()).getString("launchArgs").split(" ");
 			for(String arg : launchArgs) {
 				if(arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
 				commandComponents.add(arg.trim());
 			}
 		}
 		commandComponents.add("-Xms1024m");
-		commandComponents.add("-Xmx" + getLaunchSettings().getInt("memory") + "m");
+		commandComponents.add("-Xmx" + readLaunchSettings().getInt("memory") + "m");
 
 		if(server) commandComponents.add("-server");
 		else commandComponents.add("-force");
@@ -1192,8 +1191,7 @@ public class StarMadeLauncher extends JFrame {
 	// TODO only looks for jre inside starmade game folder
 	// TODO move extracted jar to starmade folder, read from launch-settings.json
 	private String getJavaPath(JavaVersion version) {
-		System.out.println("currently at " + new File(".").getAbsolutePath());
-		return String.format(currentOS.javaPath, version.number);
+		return installDir + "/" + String.format(currentOS.javaPath, version.number);
 	}
 
 	private void createServerPanel(JPanel footerPanel) {
@@ -1233,10 +1231,10 @@ public class StarMadeLauncher extends JFrame {
 
 			@Override
 			public void onFinished() {
-				GAME_VERSION = getCurrentVersion();
-				assert GAME_VERSION != null;
-				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
-				selectedVersion = GAME_VERSION.build;
+				gameVersion = getCurrentVersion();
+				assert gameVersion != null;
+				launchSettings.put("lastUsedVersion", gameVersion.build);
+				selectedVersion = gameVersion.build;
 				saveLaunchSettings();
 				SwingUtilities.invokeLater(() -> {
 					try {
@@ -1266,6 +1264,20 @@ public class StarMadeLauncher extends JFrame {
 				return Updater.VersionFile.RELEASE;
 		}
 	}
+
+	private int getBranchForVersion(IndexFileEntry gameVersion) {
+		if(gameVersion == null || gameVersion.build == null) return 0;
+		switch(gameVersion.build) {
+			case "DEV":
+				return 1;
+			case "PRE":
+				return 2;
+			default:
+				return 0;
+		}
+	}
+
+
 
 	private void updateVersions(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown) {
 		if(Objects.equals(branchDropdown.getSelectedItem(), "Release")) {

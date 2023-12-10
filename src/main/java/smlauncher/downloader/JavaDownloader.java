@@ -28,6 +28,7 @@ public class JavaDownloader {
 
 	private final OperatingSystem currentOS;
 	private final JavaVersion version;
+	private String installDir;
 
 	public JavaDownloader(JavaVersion version) {
 		this(OperatingSystem.getCurrent(), version);
@@ -36,6 +37,12 @@ public class JavaDownloader {
 	public JavaDownloader(OperatingSystem currentOS, JavaVersion version) {
 		this.currentOS = currentOS;
 		this.version = version;
+		installDir = ".";
+	}
+
+	public JavaDownloader setInstallDir(String installDir) {
+		this.installDir = installDir;
+		return this;
 	}
 
 	public void downloadAndUnzip() throws IOException {
@@ -73,31 +80,7 @@ public class JavaDownloader {
 		unzipper.extract();
 
 		cleanupZip(); // Delete the zip file
-
 		moveExtractedFolder();
-	}
-
-	// Doesn't work for tar.gz
-	private void unzipFile(ZipFile zipFile, File destinationFile) {
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-		while (entries.hasMoreElements()) {
-			ZipEntry entry = entries.nextElement();
-			File entryDestination = new File(destinationFile, entry.getName());
-			entryDestination.getParentFile().mkdirs();
-			if (entry.isDirectory()) continue;
-
-			try (InputStream in = zipFile.getInputStream(entry);
-				 OutputStream out = new FileOutputStream(entryDestination)) {
-				byte[] buffer = new byte[1024];
-				int len;
-				while ((len = in.read(buffer)) > 0) {
-					out.write(buffer, 0, len);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	private void moveExtractedFolder() throws IOException {
@@ -133,7 +116,7 @@ public class JavaDownloader {
 	}
 
 	private String getJreFolderName() {
-		return "./jre" + version.number;
+		return installDir + "/jre" + version.number;
 	}
 
 	void cleanupZip() {

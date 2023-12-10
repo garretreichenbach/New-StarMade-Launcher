@@ -7,9 +7,9 @@ package smlauncher;
  */
 public enum OperatingSystem {
 
-	WINDOWS("zip", "./jre%d/bin/java.exe"),
-	MAC("tar.gz", "./jre%d/Contents/Home/bin/java"),
-	LINUX("tar.gz", "./jre%d/bin/java");
+	WINDOWS("zip", "jre%d/bin/java.exe"),
+	MAC("tar.gz", "jre%d/Contents/Home/bin/java"),
+	LINUX("tar.gz", "jre%d/bin/java");
 
 	public final String zipExtension; // The archive file extension
 	public final String javaPath; // Path to the java executable
