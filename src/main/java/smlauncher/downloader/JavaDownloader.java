@@ -38,7 +38,7 @@ public class JavaDownloader {
 		this.version = version;
 	}
 
-	public void downloadAndUnzip() throws Exception {
+	public void downloadAndUnzip() throws IOException {
 		// Don't unzip if the folder already exists
 		if (doesJreFolderExist()) return;
 		download();
@@ -58,7 +58,7 @@ public class JavaDownloader {
 		fos.close();
 	}
 
-	public void unzip() throws Exception {
+	public void unzip() throws IOException {
 		String zipFilename = getZipFilename();
 		File zipFile = new File(zipFilename);
 
@@ -72,17 +72,12 @@ public class JavaDownloader {
 		unzipper.setDestDirectory(new File("./"));
 		unzipper.extract();
 
-		// Doesn't work for tar.gz
-//		ZipFile zipFile = new ZipFile(zipFilename);
-//		unzipFile(zipFile, new File("./"));
-//		zipFile.close();
+		cleanupZip(); // Delete the zip file
 
-		// Delete the zip file
-		if (zipFile.exists()) zipFile.delete();
-
-		moveExtractedFolder(getJreFolderName());
+		moveExtractedFolder();
 	}
 
+	// Doesn't work for tar.gz
 	private void unzipFile(ZipFile zipFile, File destinationFile) {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
@@ -105,37 +100,32 @@ public class JavaDownloader {
 		}
 	}
 
-	private void moveExtractedFolder(String jreFolderName) throws IOException {
+	private void moveExtractedFolder() throws IOException {
 		File jreFolder = new File(getJreFolderName());
+		File extractedFolder = null;
 
+		// Find the extracted folder
+		for (File file : Objects.requireNonNull(new File("./").listFiles())) {
+			if (file.getName().startsWith(version.fileStart)) {
+				extractedFolder = file;
+				break;
+			}
+		}
+		if (extractedFolder == null) throw new IOException("Could not find extracted folder");
+
+		// On Mac Java path is inside Contents/Home/bin/
 		if (currentOS == OperatingSystem.MAC) {
-			// Actual java will be inside <extracted>/Contents/Home/bin/
-			// Copy /Contents/Home/bin/ to /jre<#>/
-			// Go into the folder, and copy the contents of /Contents/Home/ to /jre<#>/
-			for (File file : Objects.requireNonNull(new File("./").listFiles())) {
-				if (file.getName().startsWith(version.fileStart)) {
-					System.out.println("found " + file.getPath());
+			// Copy Contents/Home/bin/ to jre<#>/
+			File homeFolder = new File(extractedFolder.getPath() + "/Contents/Home");
+			System.out.println("moved " + homeFolder.getPath());
+			FileUtils.copyDirectory(homeFolder, jreFolder);
 
-					// Copy <extracted>/Contents/Home/bin/ to /jre<#>/
-					File homeFolder = new File(file.getPath() + "/Contents/Home");
-					System.out.println("moved " + homeFolder.getPath());
-					FileUtils.copyDirectory(homeFolder, jreFolder);
-
-					// Delete the extracted folder
-					FileUtils.deleteDirectory(file);
-					break;
-				}
-			}
+			// Delete the extracted folder
+			FileUtils.cleanDirectory(extractedFolder);
+			FileUtils.deleteDirectory(extractedFolder);
 		} else {
-			// Find the extracted folder
-			for (File file : Objects.requireNonNull(new File("./").listFiles())) {
-				if (file.getName().startsWith(version.fileStart)) {
-					// Move the extracted folder to jre<#>
-					System.out.println("renamed " + file.getPath());
-					file.renameTo(jreFolder);
-					break;
-				}
-			}
+			// Move the extracted folder to jre<#>/
+			extractedFolder.renameTo(jreFolder);
 		}
 	}
 
@@ -150,12 +140,28 @@ public class JavaDownloader {
 		return String.format(version.fmtURL, currentOS.toString(), currentOS.zipExtension);
 	}
 
-	String getZipFilename() {
+	private String getZipFilename() {
 		return String.format("jre%d.%s", version.number, currentOS.zipExtension);
 	}
 
-	String getJreFolderName() {
+	private String getJreFolderName() {
 		return "./jre" + version.number;
+	}
+
+	void cleanupZip() {
+		File zipFile = new File(getZipFilename());
+		if (zipFile.exists()) zipFile.delete();
+	}
+
+	void cleanupFolder() {
+		File jreFolder = new File(getJreFolderName());
+		try {
+			if (jreFolder.exists()) {
+				FileUtils.cleanDirectory(jreFolder);
+				FileUtils.deleteDirectory(jreFolder);
+			}
+		} catch (IOException ignored) {
+		}
 	}
 
 }

@@ -44,24 +44,8 @@ public class JavaDownloaderTest {
 		dl = new JavaDownloader(os, version);
 		assertDoesNotThrow(() -> dl.download());
 		assertDoesNotThrow(() -> dl.unzip());
-		cleanupZip();
-		cleanupFolder();
-	}
-
-	private void cleanupZip() {
-		File zipFile = new File(dl.getZipFilename());
-		if (zipFile.exists()) zipFile.delete();
-	}
-
-	private void cleanupFolder() {
-		File jreFolder = new File(dl.getJreFolderName());
-		try {
-			if (jreFolder.exists()) {
-				FileUtils.cleanDirectory(jreFolder);
-				FileUtils.deleteDirectory(jreFolder);
-			}
-		} catch (IOException ignored) {
-		}
+		dl.cleanupZip();
+		dl.cleanupFolder();
 	}
 
 }
