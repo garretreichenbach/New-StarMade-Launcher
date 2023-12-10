@@ -1,13 +1,8 @@
 package smlauncher.downloader;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smlauncher.JavaVersion;
 import smlauncher.OperatingSystem;
-
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -39,7 +34,7 @@ public class JavaDownloaderTest {
 	}
 
 	// Helper Methods
-	
+
 	private void testCanDownloadAndUnzip(OperatingSystem os, JavaVersion version) {
 		dl = new JavaDownloader(os, version);
 		assertDoesNotThrow(() -> dl.download());

@@ -117,7 +117,6 @@ public class JavaDownloader {
 		if (currentOS == OperatingSystem.MAC) {
 			// Copy Contents/Home/bin/ to jre<#>/
 			File homeFolder = new File(extractedFolder.getPath() + "/Contents/Home");
-			System.out.println("moved " + homeFolder.getPath());
 			FileUtils.copyDirectory(homeFolder, jreFolder);
 
 			// Delete the extracted folder
