@@ -1,4 +1,4 @@
-package smlauncher;
+package smlauncher.util;
 
 /**
  * A computer's operating system (OS).

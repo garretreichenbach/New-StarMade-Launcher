@@ -1,23 +1,16 @@
 package smlauncher.downloader;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.tar.TGZUnArchiver;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
-import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import smlauncher.JavaVersion;
-import smlauncher.OperatingSystem;
+import smlauncher.util.OperatingSystem;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Enumeration;
 import java.util.Objects;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Downloads a JDK from the web and unzips it.

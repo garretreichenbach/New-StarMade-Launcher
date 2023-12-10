@@ -1,8 +1,7 @@
 package smlauncher.downloader;
 
 import org.junit.jupiter.api.Test;
-import smlauncher.JavaVersion;
-import smlauncher.OperatingSystem;
+import smlauncher.util.OperatingSystem;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 

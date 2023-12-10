@@ -6,9 +6,11 @@ import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
 import smlauncher.content.LauncherContentPanel;
 import smlauncher.downloader.JavaDownloader;
+import smlauncher.downloader.JavaVersion;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
+import smlauncher.util.OperatingSystem;
 import smlauncher.util.Palette;
 
 import javax.imageio.ImageIO;
@@ -54,13 +56,14 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	public String installDir = "StarMade";
+	private final smlauncher.util.OperatingSystem currentOS;
 	public IndexFileEntry gameVersion;
-	private final OperatingSystem currentOS;
+	public static int lastUsedBranch;
+
 	public static boolean debugMode;
 	public static boolean useSteam;
 
 	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
-	public static int lastUsedBranch;
 	private static String selectedVersion;
 	private static boolean selectVersion;
 	private static int backup = Updater.BACK_DB;
@@ -130,7 +133,7 @@ public class StarMadeLauncher extends JFrame {
 		// TODO download jre into install dir
 
 		// Get the current OS
-		currentOS = OperatingSystem.getCurrent();
+		currentOS = smlauncher.util.OperatingSystem.getCurrent();
 
 		// Download JREs
 		try {
@@ -551,7 +554,7 @@ public class StarMadeLauncher extends JFrame {
 		footerLabel.add(footerPanelButtons);
 		footerPanelButtons.setBounds(0, 0, 800, 30);
 		if(getCurrentVersion() == null) selectedVersion = null;
-		else selectedVersion = getCurrentVersion().build;
+		else selectedVersion = gameVersion.build;
 		createPlayPanel(footerPanel);
 		createServerPanel(footerPanel);
 		JPanel bottomPanel = new JPanel();
@@ -1010,6 +1013,7 @@ public class StarMadeLauncher extends JFrame {
 				return this;
 			}
 		});
+		// TODO need to set branch/version drop down to correct index on start
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
