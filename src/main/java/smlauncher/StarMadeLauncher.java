@@ -1501,6 +1501,7 @@ public class StarMadeLauncher extends JFrame {
 				assert GAME_VERSION != null;
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				selectedVersion = GAME_VERSION.build;
+				launchSettings.put("lastUsedBranch", lastUsedBranch);
 				saveLaunchSettings();
 				SwingUtilities.invokeLater(() -> {
 					try {
