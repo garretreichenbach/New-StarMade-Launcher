@@ -1141,6 +1141,7 @@ public class StarMadeLauncher extends JFrame {
 	public void runStarMade(boolean server) {
 		boolean useJava8 = GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1");
 		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getPath();
+
 		ArrayList<String> commandComponents = new ArrayList<>();
 		commandComponents.add(bundledJavaPath);
 		if(!useJava8) commandComponents.addAll(List.of(J18ARGS));
@@ -1148,7 +1149,6 @@ public class StarMadeLauncher extends JFrame {
 		if(currentOS == OperatingSystem.MAC) {
 			// Run OpenGL on main thread on macOS
 			// Needs to be added before "-jar"
-			System.out.println("on Mac, running OpenGL on main thread");
 			commandComponents.add("-XstartOnFirstThread");
 		}
 

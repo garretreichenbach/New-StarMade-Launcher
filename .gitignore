@@ -26,3 +26,4 @@ version.txt
 
 # MacOS Files
 .DS_Store
+.java-version
