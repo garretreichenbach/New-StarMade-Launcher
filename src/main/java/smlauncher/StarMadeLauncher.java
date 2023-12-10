@@ -329,12 +329,13 @@ public class StarMadeLauncher extends JFrame {
 
 	public static void displayHelp() {
 		System.out.println("StarMade Launcher " + LAUNCHER_VERSION + " Help:");
-		System.out.println("-version version selection prompt");
-		System.out.println("-no_gui dont start gui (needed for linux dedicated servers)");
-		System.out.println("-no_backup dont create backup (default backup is server database only)");
-		System.out.println("-backup_all create backup of everything (default backup is server database only)");
-		System.out.println("-pre use pre branch (default is release)");
-		System.out.println("-dev use dev branch (default is release)");
+		System.out.println("-version : Version selection prompt");
+		System.out.println("-no_gui : Don't start gui (needed for linux dedicated servers)");
+		System.out.println("-no_backup : Don't create backup (default backup is server database only)");
+		System.out.println("-backup_all : Create backup of everything (default backup is server database only)");
+		System.out.println("-pre : Use pre branch (default is release)");
+		System.out.println("-dev : Use dev branch (default is release)");
+		System.out.println("-server -port:<port> : Start in server mode");
 	}
 
 	public static String getVersionShort(IndexFileEntry version) {
