@@ -1,11 +1,11 @@
 package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
 import smlauncher.content.LauncherContentPanel;
+import smlauncher.download.JavaDownloader;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
@@ -27,14 +27,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Main class for the StarMade Launcher.
@@ -60,8 +56,6 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	public static IndexFileEntry GAME_VERSION;
-	private final OperatingSystem currentOS;
-
 	public static boolean debugMode;
 	public static boolean useSteam;
 	public static String installDir = "StarMade";
@@ -128,18 +122,13 @@ public class StarMadeLauncher extends JFrame {
 		} catch(IOException exception) {
 			exception.printStackTrace();
 		}
-		//Get current OS
-		currentOS = OperatingSystem.getCurrent();
-
 		deleteUpdaterJar();
+
 		if(!checkForJREs()) {
 			try {
-				//Download JREs from links
-				downloadJava(JavaVersion.JAVA_8);
-				unzipJava(JavaVersion.JAVA_8);
-
-				downloadJava(JavaVersion.JAVA_18);
-				unzipJava(JavaVersion.JAVA_18);
+				//Download JREs
+				new JavaDownloader(JavaVersion.JAVA_8).downloadAndUnzip();
+				new JavaDownloader(JavaVersion.JAVA_18).downloadAndUnzip();
 			} catch(Exception exception) {
 				exception.printStackTrace();
 				JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -162,7 +151,8 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private boolean checkForJREs() {
-		return (new File(getJava8Path()).exists() && new File(getJava18Path()).exists());
+		return (new File(getJavaPath(JavaVersion.JAVA_8)).exists()
+				&& new File(getJavaPath(JavaVersion.JAVA_18)).exists());
 	}
 
 	private static void deleteUpdaterJar() {
@@ -1100,8 +1090,11 @@ public class StarMadeLauncher extends JFrame {
 				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
 				saveLaunchSettings();
 				try {
-					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) unzipJava(JavaVersion.JAVA_18);
-					else unzipJava(JavaVersion.JAVA_18);
+					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) {
+						new JavaDownloader(JavaVersion.JAVA_8).unzip();
+					} else {
+						new JavaDownloader(JavaVersion.JAVA_18).unzip();
+					}
 				} catch(Exception exception) {
 					exception.printStackTrace();
 					(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
@@ -1134,86 +1127,6 @@ public class StarMadeLauncher extends JFrame {
 		else return bytes / 1024 / 1024 / 1024 + " GB";
 	}
 
-	private void downloadJava(JavaVersion version) throws IOException {
-		String url = getJavaURL(version);
-		if (url == null) return;
-
-		URL website = new URL(url);
-		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-
-		String destination = String.format("jre%d.%s", version.number, currentOS.zipExtension);
-		FileOutputStream fos = new FileOutputStream(destination);
-		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		fos.close();
-	}
-
-	private String getJavaURL(JavaVersion version) {
-		return String.format(version.baseURL, currentOS.toString(), currentOS.zipExtension);
-	}
-
-	private void unzipJava(JavaVersion version) throws Exception {
-		int number = version.number;
-
-		String jreFolderName = "./jre" + number;
-		File jreFolder = new File(jreFolderName);
-		if (jreFolder.isDirectory()) return; //The folder already exists, don't unzip
-
-		//Unzip the file
-		String filename = String.format("./jre%d.%s", number, currentOS.zipExtension);
-		ZipFile zipFile = new ZipFile(filename);
-		unzip(zipFile, new File("./"));
-		zipFile.close();
-
-		//Delete the zip file
-		File zip = new File(filename);
-		if(zip.exists()) zip.delete();
-
-		if(currentOS == OperatingSystem.MAC) {
-			//Actual java will be inside /Contents/Home/bin/
-			//Copy /Contents/Home/bin/ to /jre<#>/
-			//Go into the folder, and copy the contents of /Contents/Home/ to /jre<#>/
-			File homeFolder = new File(jreFolderName + "/Contents/Home");
-			File binFolder = new File(homeFolder.getName() + "/bin");
-			FileUtils.copyDirectory(binFolder, jreFolder);
-
-			// TODO do we need other folders?
-			// TODO maybe just rename /Contents/Home/ to /jre<#>/
-
-			//Delete the old folder
-			FileUtils.deleteDirectory(homeFolder);
-		} else {
-			//Rename the extracted folder to jre<#>
-			for(File file : Objects.requireNonNull(new File("./").listFiles())) {
-				if(file.getName().startsWith(version.fileStart)) {
-					file.renameTo(jreFolder);
-					break;
-				}
-			}
-		}
-	}
-
-	// TODO problems unzipping tar.gz
-	private void unzip(ZipFile zipFile, File destinationFile) {
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while(entries.hasMoreElements()) {
-			ZipEntry entry = entries.nextElement();
-			File entryDestination = new File(destinationFile, entry.getName());
-			entryDestination.getParentFile().mkdirs();
-			if(entry.isDirectory()) continue;
-			try {
-				InputStream in = zipFile.getInputStream(entry);
-				OutputStream out = new FileOutputStream(entryDestination);
-				byte[] buffer = new byte[1024];
-				int len;
-				while((len = in.read(buffer)) > 0) out.write(buffer, 0, len);
-				in.close();
-				out.close();
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private boolean checkJavaVersion() {
 		File jre8 = new File("./jre8/bin/java.exe");
 		File jre18 = new File("./jre18/bin/java.exe");
@@ -1223,7 +1136,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public void runStarMade(boolean server) {
 		boolean useJava8 = GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1");
-		String bundledJavaPath = new File(useJava8 ? getJava8Path() : getJava18Path()).getPath();
+		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getPath();
 		ArrayList<String> commandComponents = new ArrayList<>();
 		commandComponents.add(bundledJavaPath);
 		if(!useJava8) commandComponents.addAll(List.of(J18ARGS));
@@ -1256,15 +1169,9 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private String getJava8Path() {
-		String javaPath = "./jre8/bin/java";
-		if(System.getProperty("os.name").toLowerCase().contains("win")) javaPath += ".exe";
-		return javaPath;
-	}
-
-	private String getJava18Path() {
-		String javaPath = "./jre18/bin/java";
-		if(System.getProperty("os.name").toLowerCase().contains("win")) javaPath += ".exe";
+	private String getJavaPath(JavaVersion version) {
+		String javaPath = String.format("./jre%d/bin/java", version.number);
+		if (OperatingSystem.getCurrent() == OperatingSystem.WINDOWS) javaPath += ".exe";
 		return javaPath;
 	}
 
