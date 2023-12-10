@@ -7,14 +7,16 @@ package smlauncher;
  */
 public enum OperatingSystem {
 
-	WINDOWS("zip"),
-	MAC("tar.gz"),
-	LINUX("tar.gz");
+	WINDOWS("zip", "./jre%d/bin/java.exe"),
+	MAC("tar.gz", "./jre%d/Contents/Home/bin/java"),
+	LINUX("tar.gz", "./jre%d/bin/java");
 
 	public final String zipExtension; // The archive file extension
+	public final String javaPath; // Path to the java executable
 
-	OperatingSystem(String zipExtension) {
+	OperatingSystem(String zipExtension, String javaPath) {
 		this.zipExtension = zipExtension;
+		this.javaPath = javaPath;
 	}
 
 	public static OperatingSystem getCurrent() {

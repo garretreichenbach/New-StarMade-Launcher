@@ -1091,9 +1091,9 @@ public class StarMadeLauncher extends JFrame {
 				saveLaunchSettings();
 				try {
 					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) {
-						new JavaDownloader(JavaVersion.JAVA_8).unzip();
+						new JavaDownloader(JavaVersion.JAVA_8).downloadAndUnzip();
 					} else {
-						new JavaDownloader(JavaVersion.JAVA_18).unzip();
+						new JavaDownloader(JavaVersion.JAVA_18).downloadAndUnzip();
 					}
 				} catch(Exception exception) {
 					exception.printStackTrace();
@@ -1169,10 +1169,10 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
+	// TODO only looks for jre inside starmade folder
 	private String getJavaPath(JavaVersion version) {
-		String javaPath = String.format("./jre%d/bin/java", version.number);
-		if (OperatingSystem.getCurrent() == OperatingSystem.WINDOWS) javaPath += ".exe";
-		return javaPath;
+		System.out.println("currently at " + new File(".").getAbsolutePath());
+		return String.format(OperatingSystem.getCurrent().javaPath, version.number);
 	}
 
 	private void createServerPanel(JPanel footerPanel) {

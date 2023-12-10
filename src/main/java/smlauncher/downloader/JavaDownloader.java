@@ -113,19 +113,8 @@ public class JavaDownloader {
 		}
 		if (extractedFolder == null) throw new IOException("Could not find extracted folder");
 
-		// On Mac Java path is inside Contents/Home/bin/
-		if (currentOS == OperatingSystem.MAC) {
-			// Copy Contents/Home/bin/ to jre<#>/
-			File homeFolder = new File(extractedFolder.getPath() + "/Contents/Home");
-			FileUtils.copyDirectory(homeFolder, jreFolder);
-
-			// Delete the extracted folder
-			FileUtils.cleanDirectory(extractedFolder);
-			FileUtils.deleteDirectory(extractedFolder);
-		} else {
-			// Move the extracted folder to jre<#>/
-			extractedFolder.renameTo(jreFolder);
-		}
+		// Rename the extracted folder to jre<#>/
+		extractedFolder.renameTo(jreFolder);
 	}
 
 	// Helper Methods
