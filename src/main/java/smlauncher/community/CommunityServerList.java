@@ -8,7 +8,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -20,12 +22,24 @@ import java.nio.charset.StandardCharsets;
  * @author TheDerpGamer
  */
 public class CommunityServerList extends JTable {
+	/**
+	 * Copy InputStream to byte array
+	 * <a href="https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java">From</a>
+	 */
+	public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		byte[] buffer = new byte[0xFFFF];
+		for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
+			os.write(buffer, 0, len);
+		}
+		return os.toByteArray();
+	}
 
 	private JSONObject serverList;
 
 	public CommunityServerList(String url) {
 		try {
-			serverList = new JSONObject(new String(new URL(url).openStream().readAllBytes(), StandardCharsets.UTF_8));
+			serverList = new JSONObject(new String(getBytesFromInputStream(new URL(url).openStream()), StandardCharsets.UTF_8));
 		} catch(IOException exception) {
 			exception.printStackTrace();
 			serverList = new JSONObject();
