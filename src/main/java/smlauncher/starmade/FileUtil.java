@@ -835,6 +835,9 @@ public class FileUtil {
 				cb.downloaded(count, n);
 			}
 		}
+		if(cb != null){
+			cb.doneDownloading();
+		}
 		return count;
 	}
 

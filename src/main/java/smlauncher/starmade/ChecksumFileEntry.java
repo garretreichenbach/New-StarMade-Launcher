@@ -70,6 +70,22 @@ public class ChecksumFileEntry {
 			FileUtil.copyURLToFile(FileUtil.convertToURLEscapingIllegalCharacters(sourceFilePath), file, 50000, 50000, new DownloadCallback() {
 
 				@Override
+				public void doneDownloading() {
+					int s = Integer.MAX_VALUE;
+					synchronized (ChecksumFile.running) {
+						for (ChecksumFileEntry en : ChecksumFile.running) {
+							s = Math.min(en.index, s);
+						}
+					}
+					if (s == index) {
+						cb.done(e);
+					} else {
+
+//						System.err.println(s+" INDNN "+index+": "+ChecksumFile.running);
+					}
+				}
+
+				@Override
 				public void downloaded(long size, long diff) {
 
 					o.lastSpeedSize += diff;
