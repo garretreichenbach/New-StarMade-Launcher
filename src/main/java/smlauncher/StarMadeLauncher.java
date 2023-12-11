@@ -347,18 +347,22 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private IndexFileEntry getCurrentVersion() {
-		try {
-			File versionFile = new File(installDir, "version.txt");
-			if(!versionFile.exists()) return null;
-			String version = Files.readString(versionFile.toPath());
-			version = version.substring(0, version.indexOf('#'));
-			for(IndexFileEntry entry : releaseVersions) if(version.equals(entry.build)) return entry;
-			for(IndexFileEntry entry : devVersions) if(version.equals(entry.build)) return entry;
-			for(IndexFileEntry entry : preReleaseVersions) if(version.equals(entry.build)) return entry;
-		} catch(IOException exception) {
-			exception.printStackTrace();
+	private static String readStringFromFile(File f){
+		try(Scanner scanner = new Scanner(f)){
+			return scanner.nextLine();
+		}catch (IOException e){
+			throw new RuntimeException(e);
 		}
+	}
+
+	private IndexFileEntry getCurrentVersion() {
+        File versionFile = new File(installDir, "version.txt");
+        if(!versionFile.exists()) return null;
+        String version = readStringFromFile(versionFile);
+        version = version.substring(0, version.indexOf('#'));
+        for(IndexFileEntry entry : releaseVersions) if(version.equals(entry.build)) return entry;
+        for(IndexFileEntry entry : devVersions) if(version.equals(entry.build)) return entry;
+        for(IndexFileEntry entry : preReleaseVersions) if(version.equals(entry.build)) return entry;
 		return null;
 	}
 
@@ -880,7 +884,7 @@ public class StarMadeLauncher extends JFrame {
 			File file = new File("launch-settings.json");
 			if(file.exists()) file.delete();
 			file.createNewFile();
-			FileWriter writer = new FileWriter("launch-settings.json", StandardCharsets.UTF_8);
+			FileWriter writer = new FileWriter("launch-settings.json");
 			writer.write(launchSettings.toString());
 			writer.flush();
 			writer.close();
@@ -892,7 +896,7 @@ public class StarMadeLauncher extends JFrame {
 	private JSONObject getLaunchSettings() {
 		File file = new File("launch-settings.json");
 		try {
-			FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
+			FileReader reader = new FileReader(file);
 			String data = IOUtils.toString(reader);
 			JSONObject object = new JSONObject(data);
 			reader.close();
@@ -914,7 +918,7 @@ public class StarMadeLauncher extends JFrame {
 					object.put("lastUsedVersion", "NONE");
 					object.put("jvm_args", "");
 				}
-				FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
+				FileWriter writer = new FileWriter(file);
 				writer.write(object.toString());
 				writer.flush();
 				writer.close();
@@ -1153,7 +1157,7 @@ public class StarMadeLauncher extends JFrame {
 		else if(bytes < 1024 * 1024 * 1024) return bytes / 1024 / 1024 + " MB";
 		else return bytes / 1024 / 1024 / 1024 + " GB";
 	}
-  
+
 	private void unzipJava(int jre) throws Exception {
 		if(System.getProperty("os.name").toLowerCase().contains("win")) {
 			File jreFolder = new File("./jre" + jre);
@@ -1251,7 +1255,7 @@ public class StarMadeLauncher extends JFrame {
 
 		ArrayList<String> commandComponents = new ArrayList<>();
 		commandComponents.add(bundledJavaPath);
-		if(!useJava8) commandComponents.addAll(List.of(J18ARGS));
+		if(!useJava8) commandComponents.addAll(Arrays.asList(J18ARGS));
 
 		if(currentOS == OperatingSystem.MAC) {
 			// Run OpenGL on main thread on macOS

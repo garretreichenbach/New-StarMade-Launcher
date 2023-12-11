@@ -5,8 +5,8 @@ plugins {
     id 'maven-publish'
 }
 
-targetCompatibility = 11
-sourceCompatibility = 11
+targetCompatibility = 8
+sourceCompatibility = 8
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
@@ -71,6 +71,10 @@ tasks.register('win_jar', Jar) {
     from('resources/Updater.jar') {
         into 'Updater.jar'
     }
+    copy {
+        from('release-assets/windows/')
+        into 'release-builds/StarMade Launcher-win32-ia32'
+    }
 }
 
 tasks.register('linux_jar', Jar) {
@@ -88,6 +92,10 @@ tasks.register('linux_jar', Jar) {
     from('resources/Updater.jar') {
         into 'Updater.jar'
     }
+    copy {
+        from('release-assets/linux/')
+        into 'release-builds/StarMade Launcher-linux-x64'
+    }
 }
 
 tasks.register('mac_jar', Jar) {
@@ -104,5 +112,9 @@ tasks.register('mac_jar', Jar) {
     from(sourceSets.main.output)
     from('resources/Updater.jar') {
         into 'Updater.jar'
+    }
+    copy {
+        from('release-assets/macos/')
+        into 'release-builds/StarMade Launcher-darwin-x64'
     }
 }
