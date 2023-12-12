@@ -33,20 +33,6 @@ public class LauncherUpdater {
 		return !currentVersion.equals(latestVersion);
 	}
 
-	private static String getLatestVersion() {
-		try {
-			String indexJSON = new String(getBytesFromInputStream(new URL(INDEX_URL).openStream()), StandardCharsets.UTF_8);
-			System.err.println(indexJSON);
-			JSONObject index = new JSONObject(indexJSON);
-			JSONArray versions = index.getJSONArray("versions");
-			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);
-			return latestVersion.getString("version");
-		} catch(IOException exception) {
-			exception.printStackTrace();
-			return "UNKNOWN";
-		}
-	}
-
 	/**
 	 * Updates the launcher to the latest version and restarts it.
 	 */
@@ -85,7 +71,7 @@ public class LauncherUpdater {
 
 	private static String getLatestVersion() {
 		try (InputStream stream = new URL(INDEX_URL).openStream()) {
-			String indexJSON = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+			String indexJSON = new String(getBytesFromInputStream(stream), StandardCharsets.UTF_8);
 //			System.err.println(indexJSON);
 			JSONObject index = new JSONObject(indexJSON);
 			JSONArray versions = index.getJSONArray("versions");

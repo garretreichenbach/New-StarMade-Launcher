@@ -1,7 +1,6 @@
 package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
@@ -28,14 +27,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Main class for the StarMade Launcher.
@@ -60,7 +53,7 @@ public class StarMadeLauncher extends JFrame {
 			"--add-opens=java.base/java.util=ALL-UNNAMED"
 	};
 
-	public String installDir = "StarMade";
+	public static String installDir = "StarMade"; // todo make not static
 	private final smlauncher.util.OperatingSystem currentOS;
 	public IndexFileEntry gameVersion;
 	public static int lastUsedBranch;
@@ -124,7 +117,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 
 		// Read launch settings and game directory
-		launchSettings = readLaunchSettings();
+		launchSettings = getLaunchSettings();
 		installDir = launchSettings.getString("installDir");
 
 		// Read game version
@@ -348,11 +341,11 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private static String readStringFromFile(File f){
+	private static String readStringFromFile(File f) throws IOException{
 		try(Scanner scanner = new Scanner(f)){
 			return scanner.nextLine();
 		}catch (IOException e){
-			throw new RuntimeException(e);
+			throw e;
 		}
 	}
 
@@ -633,7 +626,7 @@ public class StarMadeLauncher extends JFrame {
 //			northPanel.setBackground(Palette.paneColor);
 //			northPanel.setForeground(Palette.foregroundColor);
 			dialogPanel.add(northPanel, BorderLayout.NORTH);
-			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 2048, getSystemMemory(), Objects.requireNonNull(readLaunchSettings()).getInt("memory"));
+			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 2048, getSystemMemory(), Objects.requireNonNull(getLaunchSettings()).getInt("memory"));
 //			slider.setBackground(Palette.paneColor);
 			JLabel sliderLabel = new JLabel("Memory: " + slider.getValue() + " MB");
 //			sliderLabel.setBackground(Palette.paneColor);
@@ -673,7 +666,7 @@ public class StarMadeLauncher extends JFrame {
 //			launchArgs.setBackground(Palette.paneColor);
 			launchArgs.setDoubleBuffered(true);
 			launchArgs.setOpaque(true);
-			launchArgs.setText(readLaunchSettings().getString("launchArgs"));
+			launchArgs.setText(getLaunchSettings().getString("launchArgs"));
 			launchArgs.setLineWrap(true);
 			launchArgs.setWrapStyleWord(true);
 			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -885,8 +878,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
 	}
-
-	private JSONObject readLaunchSettings() {
+	private JSONObject getLaunchSettings() {
 		File jsonFile = new File("./launch-settings.json");
 		JSONObject defaultSettings = getDefaultLaunchSettings();
 
@@ -945,43 +937,6 @@ public class StarMadeLauncher extends JFrame {
 
 	private boolean usingOldVersion() {
 		return gameVersion.build.startsWith("0.2") || gameVersion.build.startsWith("0.1");
-	}
-
-	private JSONObject getLaunchSettings() {
-		File file = new File("launch-settings.json");
-		try {
-			FileReader reader = new FileReader(file);
-			String data = IOUtils.toString(reader);
-			JSONObject object = new JSONObject(data);
-			reader.close();
-			installDir = object.getString("installDir");
-			return object;
-		} catch(Exception exception) {
-			try {
-				file.createNewFile();
-				JSONObject object = new JSONObject();
-				object.put("memory", 4096);
-				object.put("launchArgs", "");
-				object.put("installDir", installDir);
-				object.put("lastUsedBranch", 0);
-				if(GAME_VERSION != null) {
-					object.put("lastUsedVersion", GAME_VERSION.build);
-					if(GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1")) object.put("jvm_args", "--illegal-access=permit");
-					else object.put("jvm_args", "");
-				} else {
-					object.put("lastUsedVersion", "NONE");
-					object.put("jvm_args", "");
-				}
-				FileWriter writer = new FileWriter(file);
-				writer.write(object.toString());
-				writer.flush();
-				writer.close();
-				return object;
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
 	}
 
 	private int getSystemMemory() {
@@ -1084,7 +1039,7 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		lastUsedBranch = Objects.requireNonNull(readLaunchSettings()).getInt("lastUsedBranch");
+		lastUsedBranch = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
 		branchDropdown.setSelectedIndex(lastUsedBranch);
 		branchDropdown.addItemListener(e -> {
 			lastUsedBranch = branchDropdown.getSelectedIndex();
@@ -1106,7 +1061,7 @@ public class StarMadeLauncher extends JFrame {
 			saveLaunchSettings();
 			recreateButtons(playPanel, false);
 		});
-		String lastUsedVersion = Objects.requireNonNull(readLaunchSettings()).getString("lastUsedVersion");
+		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
 		if(lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
 		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
 			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
@@ -1234,15 +1189,15 @@ public class StarMadeLauncher extends JFrame {
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
 
-		if(!Objects.requireNonNull(readLaunchSettings()).getString("jvm_args").isEmpty()) {
-			String[] launchArgs = Objects.requireNonNull(readLaunchSettings()).getString("launchArgs").split(" ");
+		if(!Objects.requireNonNull(getLaunchSettings()).getString("jvm_args").isEmpty()) {
+			String[] launchArgs = Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").split(" ");
 			for(String arg : launchArgs) {
 				if(arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
 				commandComponents.add(arg.trim());
 			}
 		}
 		commandComponents.add("-Xms1024m");
-		commandComponents.add("-Xmx" + readLaunchSettings().getInt("memory") + "m");
+		commandComponents.add("-Xmx" + getLaunchSettings().getInt("memory") + "m");
 
 		commandComponents.add("-force");
 		if(portField != null) port = Integer.parseInt(portField.getText());
@@ -1466,10 +1421,10 @@ public class StarMadeLauncher extends JFrame {
 
 			@Override
 			public void onFinished() {
-				GAME_VERSION = getCurrentVersion();
-				assert GAME_VERSION != null;
-				launchSettings.put("lastUsedVersion", GAME_VERSION.build);
-				selectedVersion = GAME_VERSION.build;
+				gameVersion = getCurrentVersion();
+				assert gameVersion != null;
+				launchSettings.put("lastUsedVersion", gameVersion.build);
+				selectedVersion = gameVersion.build;
 				launchSettings.put("lastUsedBranch", lastUsedBranch);
 				saveLaunchSettings();
 				SwingUtilities.invokeLater(() -> {
