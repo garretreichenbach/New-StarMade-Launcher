@@ -437,6 +437,7 @@ public class Updater extends Observable {
 		openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + StarMadeLauncher.LAUNCHER_VERSION);
 		openConnection.setConnectTimeout(10000);
 		openConnection.setReadTimeout(10000);
+		// TODO URL is wrong
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 		ChecksumFile f = new ChecksumFile();
 		f.parse(in);

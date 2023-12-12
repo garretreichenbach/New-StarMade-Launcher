@@ -22,18 +22,6 @@ public enum GameBranch {
 		this.url = url;
 	}
 
-	public static GameBranch getForVersion(IndexFileEntry gameVersion) {
-		if (gameVersion == null || gameVersion.build == null) return RELEASE;
-		switch (gameVersion.build) {
-			case "DEV":
-				return DEV;
-			case "PRE":
-				return PRE;
-			default:
-				return RELEASE;
-		}
-	}
-
 	public static GameBranch getForIndex(int index) {
 		switch (index) {
 			case 1:
