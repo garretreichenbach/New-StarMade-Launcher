@@ -1,12 +1,12 @@
 package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import smlauncher.community.LauncherCommunityPanel;
 import smlauncher.content.LauncherContentPanel;
 import smlauncher.downloader.JavaDownloader;
 import smlauncher.downloader.JavaVersion;
+import smlauncher.fileio.TextFileUtil;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
@@ -39,7 +39,7 @@ import java.util.*;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.10"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.10";
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -103,15 +103,15 @@ public class StarMadeLauncher extends JFrame {
 		// Set window icon
 		try {
 			URL resource = StarMadeLauncher.class.getResource("/sprites/icon.png");
-			if(resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
-		} catch(Exception exception) {
+			if (resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
+		} catch (Exception exception) {
 			System.out.println("Could not set window icon");
 		}
 
 		// Fetch game versions
 		try {
 			loadVersionList();
-		} catch(Exception exception) {
+		} catch (Exception exception) {
 			System.out.println("Could not load versions list, switching to offline");
 			//Todo: Offline Mode
 		}
@@ -138,7 +138,7 @@ public class StarMadeLauncher extends JFrame {
 		try {
 			downloadJRE(JavaVersion.JAVA_8);
 			downloadJRE(JavaVersion.JAVA_18);
-		} catch(Exception exception) {
+		} catch (Exception exception) {
 			System.out.println("Could not download JREs");
 			JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
@@ -161,30 +161,30 @@ public class StarMadeLauncher extends JFrame {
 
 	private static void deleteUpdaterJar() {
 		File updaterJar = new File("Updater.jar");
-		if(updaterJar.exists()) updaterJar.delete();
+		if (updaterJar.exists()) updaterJar.delete();
 	}
 
 	public static void main(String[] args) {
 		boolean headless = false;
-		if(args == null || args.length == 0) startup();
+		if (args == null || args.length == 0) startup();
 		else {
-			for(String arg : args) {
+			for (String arg : args) {
 				arg = arg.toLowerCase();
-				if(arg.equals("-debug_mode")) debugMode = true;
-				if(arg.contains("-version")) {
+				if (arg.equals("-debug_mode")) debugMode = true;
+				if (arg.contains("-version")) {
 					selectVersion = true;
-					if(arg.contains("-dev")) buildBranch = Updater.VersionFile.DEV;
-					else if(arg.contains("-pre")) buildBranch = Updater.VersionFile.PRE;
+					if (arg.contains("-dev")) buildBranch = Updater.VersionFile.DEV;
+					else if (arg.contains("-pre")) buildBranch = Updater.VersionFile.PRE;
 					else buildBranch = Updater.VersionFile.RELEASE;
-				} else if("-no_gui".equals(arg) || "-nogui".equals(arg)) {
-					if(GraphicsEnvironment.isHeadless()) {
+				} else if ("-no_gui".equals(arg) || "-nogui".equals(arg)) {
+					if (GraphicsEnvironment.isHeadless()) {
 						displayHelp();
 						System.out.println("Please use the '-nogui' parameter to run the launcher in text mode!");
 						return;
 					} else headless = true;
 				}
-				if(headless) {
-					switch(arg) {
+				if (headless) {
+					switch (arg) {
 						case "-h":
 						case "-help":
 							displayHelp();
@@ -200,10 +200,11 @@ public class StarMadeLauncher extends JFrame {
 							serverMode = true;
 							break;
 					}
-					if(arg.startsWith("-port:")) {
+					if (arg.startsWith("-port:")) {
 						try {
 							port = Integer.parseInt(arg.substring(6));
-						} catch(NumberFormatException ignored) {}
+						} catch (NumberFormatException ignored) {
+						}
 					}
 					Updater.withoutGUI((args.length > 1 && "-force".equals(args[1])), installDir, buildBranch, backup, selectVersion);
 				} else startup();
@@ -216,7 +217,7 @@ public class StarMadeLauncher extends JFrame {
 		EventQueue.invokeLater(() -> {
 			try {
 				FlatDarkLaf.setup();
-				if(LauncherUpdater.checkForUpdate()) {
+				if (LauncherUpdater.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog dialog = new JDialog();
 					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -268,7 +269,7 @@ public class StarMadeLauncher extends JFrame {
 					buttonPanel.add(cancelButton);
 					dialog.setVisible(true);
 				} else startFrame();
-			} catch(Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
@@ -280,13 +281,13 @@ public class StarMadeLauncher extends JFrame {
 			//For steam: keep it repainting so the damn overlays go away
 			try {
 				Thread.sleep(1200);
-			} catch(InterruptedException e) {
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			while(frame.isVisible()) {
+			while (frame.isVisible()) {
 				try {
 					Thread.sleep(500);
-				} catch(InterruptedException exception) {
+				} catch (InterruptedException exception) {
 					exception.printStackTrace();
 				}
 				EventQueue.invokeLater(frame::repaint);
@@ -297,7 +298,7 @@ public class StarMadeLauncher extends JFrame {
 	public static ImageIcon getIcon(String s) {
 		try {
 			return new ImageIcon(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s))));
-		} catch(IOException exception) {
+		} catch (IOException exception) {
 			return new ImageIcon();
 		}
 	}
@@ -305,7 +306,7 @@ public class StarMadeLauncher extends JFrame {
 	public static ImageIcon getIcon(String s, int width, int height) {
 		try {
 			return new ImageIcon(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s))).getScaledInstance(width, height, Image.SCALE_SMOOTH));
-		} catch(IOException exception) {
+		} catch (IOException exception) {
 			return new ImageIcon();
 		}
 	}
@@ -328,7 +329,7 @@ public class StarMadeLauncher extends JFrame {
 	private static String getCurrentUser() {
 		try {
 			return StarMadeCredentials.read().getUser();
-		} catch(Exception ignored) {
+		} catch (Exception ignored) {
 			return null;
 		}
 	}
@@ -336,15 +337,15 @@ public class StarMadeLauncher extends JFrame {
 	private static void removeCurrentUser() {
 		try {
 			StarMadeCredentials.removeFile();
-		} catch(IOException exception) {
+		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
 	}
 
-	private static String readStringFromFile(File f) throws IOException{
-		try(Scanner scanner = new Scanner(f)){
+	private static String readStringFromFile(File f) throws IOException {
+		try (Scanner scanner = new Scanner(f)) {
 			return scanner.nextLine();
-		}catch (IOException e){
+		} catch (IOException e) {
 			throw e;
 		}
 	}
@@ -352,14 +353,14 @@ public class StarMadeLauncher extends JFrame {
 	private IndexFileEntry getCurrentVersion() {
 		try {
 			File versionFile = new File(installDir, "version.txt");
-			if(!versionFile.exists()) return null;
+			if (!versionFile.exists()) return null;
 
 			String version = readStringFromFile(versionFile);
 			version = version.substring(0, version.indexOf('#'));
-			for(IndexFileEntry entry : releaseVersions) if(version.equals(entry.build)) return entry;
-			for(IndexFileEntry entry : devVersions) if(version.equals(entry.build)) return entry;
-			for(IndexFileEntry entry : preReleaseVersions) if(version.equals(entry.build)) return entry;
-		} catch(IOException exception) {
+			for (IndexFileEntry entry : releaseVersions) if (version.equals(entry.build)) return entry;
+			for (IndexFileEntry entry : devVersions) if (version.equals(entry.build)) return entry;
+			for (IndexFileEntry entry : preReleaseVersions) if (version.equals(entry.build)) return entry;
+		} catch (IOException exception) {
 			System.out.println("Could not read game version from file");
 		}
 		return null;
@@ -410,7 +411,7 @@ public class StarMadeLauncher extends JFrame {
 				mouseX = e.getX();
 				mouseY = e.getY();
 				//If the mouse is on the top panel buttons, don't drag the window
-				if(mouseX > 770 || mouseY > 30) {
+				if (mouseX > 770 || mouseY > 30) {
 					mouseX = 0;
 					mouseY = 0;
 				}
@@ -420,7 +421,8 @@ public class StarMadeLauncher extends JFrame {
 		topPanel.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if(mouseX != 0 && mouseY != 0) setLocation(getLocation().x + e.getX() - mouseX, getLocation().y + e.getY() - mouseY);
+				if (mouseX != 0 && mouseY != 0)
+					setLocation(getLocation().x + e.getX() - mouseX, getLocation().y + e.getY() - mouseY);
 				super.mouseDragged(e);
 			}
 		});
@@ -436,7 +438,7 @@ public class StarMadeLauncher extends JFrame {
 			//Resize the image to the left panel
 			image = image.getScaledInstance(150, 500, Image.SCALE_SMOOTH);
 			leftLabel.setIcon(new ImageIcon(image));
-		} catch(IOException exception) {
+		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
 		//Stretch the image to the left panel
@@ -454,7 +456,7 @@ public class StarMadeLauncher extends JFrame {
 		list.setVisibleRowCount(-1);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setCellRenderer((list1, value, index, isSelected, cellHasFocus) -> {
-			if(isSelected) {
+			if (isSelected) {
 				value.setForeground(Palette.selectedColor);
 				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.selectedColor));
 			} else {
@@ -468,17 +470,17 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				int index = list.locationToIndex(e.getPoint());
-				if(index != -1) list.setSelectedIndex(index);
+				if (index != -1) list.setSelectedIndex(index);
 				else list.clearSelection();
 			}
 		});
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount() == 1) {
+				if (e.getClickCount() == 1) {
 					int index = list.locationToIndex(e.getPoint());
-					if(index != -1) {
-						switch(index) {
+					if (index != -1) {
+						switch (index) {
 							case 0:
 								createNewsPanel();
 								break;
@@ -502,7 +504,7 @@ public class StarMadeLauncher extends JFrame {
 		listModel.addElement(new JLabel("FORUMS"));
 		listModel.addElement(new JLabel("CONTENT"));
 		listModel.addElement(new JLabel("COMMUNITY"));
-		for(int i = 0; i < listModel.size(); i++) {
+		for (int i = 0; i < listModel.size(); i++) {
 			JLabel label = listModel.get(i);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setFont(new Font("Roboto", Font.BOLD, 18));
@@ -572,7 +574,7 @@ public class StarMadeLauncher extends JFrame {
 		footerPanelButtons.add(dedicatedServerButton);
 		footerLabel.add(footerPanelButtons);
 		footerPanelButtons.setBounds(0, 0, 800, 30);
-		if(getCurrentVersion() == null) selectedVersion = null;
+		if (getCurrentVersion() == null) selectedVersion = null;
 		else selectedVersion = gameVersion.build;
 		createPlayPanel(footerPanel);
 		createServerPanel(footerPanel);
@@ -637,11 +639,11 @@ public class StarMadeLauncher extends JFrame {
 			northPanel.add(sliderLabel, BorderLayout.NORTH);
 			slider.setDoubleBuffered(true);
 			slider.setOpaque(true);
-			if(getSystemMemory() > 16384) { //Make sure the slider is not too squished for people that have a really epic gamer pc
+			if (getSystemMemory() > 16384) { //Make sure the slider is not too squished for people that have a really epic gamer pc
 				slider.setMajorTickSpacing(2048);
 				slider.setMajorTickSpacing(1024);
 				slider.setLabelTable(slider.createStandardLabels(4096));
-			} else if(getSystemMemory() > 8192) {
+			} else if (getSystemMemory() > 8192) {
 				slider.setMajorTickSpacing(1024);
 				slider.setMinorTickSpacing(512);
 				slider.setLabelTable(slider.createStandardLabels(2048));
@@ -753,10 +755,10 @@ public class StarMadeLauncher extends JFrame {
 			installLabelPanel.add(installLabelPath);
 			installLabelPath.addActionListener(e1 -> {
 				String path = installLabelPath.getText();
-				if(path == null || path.isEmpty()) return;
+				if (path == null || path.isEmpty()) return;
 				File file = new File(path);
-				if(!file.exists()) return;
-				if(!file.isDirectory()) file = file.getParentFile();
+				if (!file.exists()) return;
+				if (!file.isDirectory()) file = file.getParentFile();
 				installDir = file.getAbsolutePath();
 				installLabelPath.setText(installDir);
 			});
@@ -773,9 +775,9 @@ public class StarMadeLauncher extends JFrame {
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int result = fileChooser.showOpenDialog(dialog);
-				if(result == JFileChooser.APPROVE_OPTION) {
+				if (result == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
-					if(!file.isDirectory()) file = file.getParentFile();
+					if (!file.isDirectory()) file = file.getParentFile();
 					installDir = file.getAbsolutePath();
 					installLabelPath.setText(installDir);
 				}
@@ -789,15 +791,16 @@ public class StarMadeLauncher extends JFrame {
 			dialogPanel.add(repairButton);
 			repairButton.addActionListener(e1 -> {
 				Updater.VersionFile branch = getLastUsedBranch();
-				if(branch == null) branch = Updater.VersionFile.RELEASE;
+				if (branch == null) branch = Updater.VersionFile.RELEASE;
 				IndexFileEntry version = getLatestVersion(branch);
-				if(version != null) {
-					if(updaterThread == null || !updaterThread.updating) {
+				if (version != null) {
+					if (updaterThread == null || !updaterThread.updating) {
 						dialog.dispose();
 						recreateButtons(playPanel, true);
 						updateGame(updateButton, version);
 					}
-				} else JOptionPane.showMessageDialog(dialog, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
+				} else
+					JOptionPane.showMessageDialog(dialog, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
 			});
 
 			JPanel buttonPanel = new JPanel();
@@ -821,7 +824,7 @@ public class StarMadeLauncher extends JFrame {
 			cancelButton.addActionListener(e1 -> dialog.dispose());
 			dialog.setVisible(true);
 		});
-		if(serverPanel != null) serverPanel.setVisible(false);
+		if (serverPanel != null) serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
 		normalPlayButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -852,7 +855,7 @@ public class StarMadeLauncher extends JFrame {
 			}
 		});
 		dedicatedServerButton.addActionListener(e -> {
-			if(updaterThread == null || !updaterThread.updating) { //Don't allow this while the game is updating
+			if (updaterThread == null || !updaterThread.updating) { //Don't allow this while the game is updating
 				footerLabel.setIcon(getIcon("sprites/footer_dedicated_bg.jpg"));
 				versionPanel.setVisible(false);
 				playPanelButtons.removeAll();
@@ -873,31 +876,31 @@ public class StarMadeLauncher extends JFrame {
 			//Resize the image to the left panel
 			image = image.getScaledInstance(800, 500, Image.SCALE_SMOOTH);
 			background.setIcon(new ImageIcon(image));
-		} catch(IOException exception) {
+		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
 	}
+
 	private JSONObject getLaunchSettings() {
 		File jsonFile = new File("./launch-settings.json");
 		JSONObject defaultSettings = getDefaultLaunchSettings();
 
 		// Return default if not present
 		if (!jsonFile.exists()) {
-			try (FileWriter writer = new FileWriter(jsonFile, StandardCharsets.UTF_8)) {
-				writer.write(defaultSettings.toString());
-				writer.flush();
-			} catch (IOException e){
+			try {
+				TextFileUtil.writeText(jsonFile, defaultSettings.toString());
+			} catch (IOException e) {
 				System.out.println("Could not create launch settings file");
 			}
 			return defaultSettings;
 		}
 
 		// Read the settings file
-		try (FileReader reader = new FileReader(jsonFile, StandardCharsets.UTF_8)){
-			String text = IOUtils.toString(reader);
-			return new JSONObject(text);
-		} catch(IOException e) {
+		try {
+			String jsonText = TextFileUtil.readText(jsonFile);
+			return new JSONObject(jsonText);
+		} catch (IOException e) {
 			System.out.println("Could not read launch settings from file");
 		}
 		return defaultSettings;
@@ -915,10 +918,10 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void setGameVersion(IndexFileEntry gameVersion) {
-		if(gameVersion != null) {
+		if (gameVersion != null) {
 			launchSettings.put("lastUsedVersion", gameVersion.build);
 
-			if(usingOldVersion()) launchSettings.put("jvm_args", "--illegal-access=permit");
+			if (usingOldVersion()) launchSettings.put("jvm_args", "--illegal-access=permit");
 			else launchSettings.put("jvm_args", "");
 		} else {
 			launchSettings.put("lastUsedVersion", "NONE");
@@ -927,10 +930,10 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void saveLaunchSettings() {
-		try (FileWriter writer = new FileWriter("launch-settings.json", StandardCharsets.UTF_8)) {
-			writer.write(launchSettings.toString());
-			writer.flush();
-		} catch(IOException exception) {
+		File settingsFile = new File("launch-settings.json");
+		try {
+			TextFileUtil.writeText(settingsFile, launchSettings.toString());
+		} catch (IOException exception) {
 			System.out.println("Could not save launch settings to file");
 		}
 	}
@@ -945,13 +948,13 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createPlayPanel(JPanel footerPanel) {
-		if(playPanel != null) {
+		if (playPanel != null) {
 			playPanel.removeAll();
 			playPanel.revalidate();
 			playPanel.repaint();
 		}
 		serverMode = false;
-		if(portField != null) portField.setVisible(false);
+		if (portField != null) portField.setVisible(false);
 		playPanel = new JPanel();
 		playPanel.setDoubleBuffered(true);
 		playPanel.setOpaque(false);
@@ -997,7 +1000,7 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if(isSelected) setBackground(Palette.selectedColor);
+				if (isSelected) setBackground(Palette.selectedColor);
 				else setBackground(Palette.deselectedColor);
 				return this;
 			}
@@ -1030,7 +1033,7 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if(isSelected) setBackground(Palette.selectedColor);
+				if (isSelected) setBackground(Palette.selectedColor);
 				else setBackground(Palette.deselectedColor);
 				return this;
 			}
@@ -1055,16 +1058,16 @@ public class StarMadeLauncher extends JFrame {
 		versionDropdown.removeAllItems();
 		updateVersions(versionDropdown, branchDropdown);
 		versionDropdown.addItemListener(e -> {
-			if(versionDropdown.getSelectedIndex() == -1) return;
+			if (versionDropdown.getSelectedIndex() == -1) return;
 			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
 			getLaunchSettings().put("lastUsedVersion", selectedVersion);
 			saveLaunchSettings();
 			recreateButtons(playPanel, false);
 		});
 		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
-		if(lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
-		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
-			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
+		if (lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
+		for (int i = 0; i < versionDropdown.getItemCount(); i++) {
+			if (versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
 				versionDropdown.setSelectedIndex(i);
 				break;
 			}
@@ -1077,7 +1080,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void recreateButtons(JPanel playPanel, boolean repair) {
-		if(playPanelButtons != null) {
+		if (playPanelButtons != null) {
 			playPanelButtons.removeAll();
 			playPanel.remove(playPanelButtons);
 		}
@@ -1092,7 +1095,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-		if((repair || !lookForGame(installDir) || gameVersion == null || (!Objects.equals(gameVersion.build, selectedVersion))) && !debugMode) {
+		if ((repair || !lookForGame(installDir) || gameVersion == null || (!Objects.equals(gameVersion.build, selectedVersion))) && !debugMode) {
 			updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
@@ -1100,22 +1103,26 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.setBorderPainted(false);
 			updateButton.addActionListener(e -> {
 				Updater.VersionFile branch = getLastUsedBranch();
-				if(branch == null) branch = Updater.VersionFile.RELEASE;
+				if (branch == null) branch = Updater.VersionFile.RELEASE;
 				IndexFileEntry version = getLatestVersion(branch);
-				if(version != null) {
-					if(updaterThread == null || !updaterThread.updating) updateGame(updateButton, version);
-				} else JOptionPane.showMessageDialog(null, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
+				if (version != null) {
+					if (updaterThread == null || !updaterThread.updating) updateGame(updateButton, version);
+				} else
+					JOptionPane.showMessageDialog(null, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
 			});
 			updateButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.updating) updateButton.setIcon(getIcon("sprites/update_roll.png"));
-					else updateButton.setToolTipText("Updating... [" + (int) (installProgress[0] * 100) + ".0%]\nDownloading " + fileName[0] + " [" + formatBytes(mb[0]) + " / " + formatBytes(mb[1]) + " at " + formatBytes(mb[2]) + "/s]");
+					if (updaterThread == null || !updaterThread.updating)
+						updateButton.setIcon(getIcon("sprites/update_roll.png"));
+					else
+						updateButton.setToolTipText("Updating... [" + (int) (installProgress[0] * 100) + ".0%]\nDownloading " + fileName[0] + " [" + formatBytes(mb[0]) + " / " + formatBytes(mb[1]) + " at " + formatBytes(mb[2]) + "/s]");
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.updating) updateButton.setIcon(getIcon("sprites/update_btn.png"));
+					if (updaterThread == null || !updaterThread.updating)
+						updateButton.setIcon(getIcon("sprites/update_btn.png"));
 					else updateButton.setToolTipText("");
 				}
 			});
@@ -1131,9 +1138,9 @@ public class StarMadeLauncher extends JFrame {
 				launchSettings.put("lastUsedVersion", gameVersion.build);
 				saveLaunchSettings();
 				try {
-					if(usingOldVersion()) downloadJRE(JavaVersion.JAVA_8);
+					if (usingOldVersion()) downloadJRE(JavaVersion.JAVA_8);
 					else downloadJRE(JavaVersion.JAVA_18);
-				} catch(Exception exception) {
+				} catch (Exception exception) {
 					exception.printStackTrace();
 					(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
 					return;
@@ -1159,16 +1166,16 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private String formatBytes(long bytes) {
-		if(bytes < 1024) return bytes + " B";
-		else if(bytes < 1024 * 1024) return bytes / 1024 + " KB";
-		else if(bytes < 1024 * 1024 * 1024) return bytes / (1024 * 1024) + " MB";
+		if (bytes < 1024) return bytes + " B";
+		else if (bytes < 1024 * 1024) return bytes / 1024 + " KB";
+		else if (bytes < 1024 * 1024 * 1024) return bytes / (1024 * 1024) + " MB";
 		else return bytes / (1024 * 1024 * 1024) + " GB";
 	}
 
 	private boolean checkJavaVersion() {
 		File jre8 = new File("./jre8/bin/java.exe");
 		File jre18 = new File("./jre18/bin/java.exe");
-		if(usingOldVersion()) return jre8.exists();
+		if (usingOldVersion()) return jre8.exists();
 		else return jre18.exists();
 	}
 
@@ -1178,9 +1185,9 @@ public class StarMadeLauncher extends JFrame {
 
 		ArrayList<String> commandComponents = new ArrayList<>();
 		commandComponents.add(bundledJavaPath);
-		if(!useJava8) commandComponents.addAll(Arrays.asList(J18ARGS));
+		if (!useJava8) commandComponents.addAll(Arrays.asList(J18ARGS));
 
-		if(currentOS == OperatingSystem.MAC) {
+		if (currentOS == OperatingSystem.MAC) {
 			// Run OpenGL on main thread on macOS
 			// Needs to be added before "-jar"
 			commandComponents.add("-XstartOnFirstThread");
@@ -1189,10 +1196,10 @@ public class StarMadeLauncher extends JFrame {
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
 
-		if(!Objects.requireNonNull(getLaunchSettings()).getString("jvm_args").isEmpty()) {
+		if (!Objects.requireNonNull(getLaunchSettings()).getString("jvm_args").isEmpty()) {
 			String[] launchArgs = Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").split(" ");
-			for(String arg : launchArgs) {
-				if(arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
+			for (String arg : launchArgs) {
+				if (arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
 				commandComponents.add(arg.trim());
 			}
 		}
@@ -1200,8 +1207,8 @@ public class StarMadeLauncher extends JFrame {
 		commandComponents.add("-Xmx" + getLaunchSettings().getInt("memory") + "m");
 
 		commandComponents.add("-force");
-		if(portField != null) port = Integer.parseInt(portField.getText());
-		if(server) {
+		if (portField != null) port = Integer.parseInt(portField.getText());
+		if (server) {
 			commandComponents.add("-server");
 			commandComponents.add("-port:" + port);
 		}
@@ -1215,7 +1222,7 @@ public class StarMadeLauncher extends JFrame {
 			System.out.println("Command: " + String.join(" ", commandComponents));
 			process.start();
 			System.exit(0);
-		} catch(Exception exception) {
+		} catch (Exception exception) {
 			throw new RuntimeException(exception);
 		}
 	}
@@ -1225,7 +1232,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createServerPanel(JPanel footerPanel) {
-		if(serverPanel != null) {
+		if (serverPanel != null) {
 			serverPanel.removeAll();
 			serverPanel.revalidate();
 			serverPanel.repaint();
@@ -1276,7 +1283,7 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if(isSelected) setBackground(Palette.selectedColor);
+				if (isSelected) setBackground(Palette.selectedColor);
 				else setBackground(Palette.deselectedColor);
 				return this;
 			}
@@ -1309,7 +1316,7 @@ public class StarMadeLauncher extends JFrame {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if(isSelected) setBackground(Palette.selectedColor);
+				if (isSelected) setBackground(Palette.selectedColor);
 				else setBackground(Palette.deselectedColor);
 				return this;
 			}
@@ -1333,16 +1340,16 @@ public class StarMadeLauncher extends JFrame {
 		versionDropdown.removeAllItems();
 		updateVersions(versionDropdown, branchDropdown);
 		versionDropdown.addItemListener(e -> {
-			if(versionDropdown.getSelectedIndex() == -1) return;
+			if (versionDropdown.getSelectedIndex() == -1) return;
 			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
 			getLaunchSettings().put("lastUsedVersion", selectedVersion);
 			saveLaunchSettings();
 			recreateButtons(playPanel, false);
 		});
 		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
-		if(lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
-		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
-			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
+		if (lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
+		for (int i = 0; i < versionDropdown.getItemCount(); i++) {
+			if (versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
 				versionDropdown.setSelectedIndex(i);
 				break;
 			}
@@ -1374,8 +1381,8 @@ public class StarMadeLauncher extends JFrame {
 				char c = e.getKeyChar();
 				try {
 					int port = Integer.parseInt(portField.getText() + c);
-					if(port > 65535 || port < 1 || !Character.isDigit(c)) e.consume();
-				} catch(Exception ignored) {
+					if (port > 65535 || port < 1 || !Character.isDigit(c)) e.consume();
+				} catch (Exception ignored) {
 					e.consume();
 				}
 			}
@@ -1393,8 +1400,8 @@ public class StarMadeLauncher extends JFrame {
 		String[] options = {"Backup Database", "Backup Everything", "Don't Backup"};
 		int choice = JOptionPane.showOptionDialog(this, "Would you like to backup your database, everything, or nothing?", "Backup", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		int backupMode = UpdaterThread.BACKUP_MODE_NONE;
-		if(choice == 0) backupMode = UpdaterThread.BACKUP_MODE_DATABASE;
-		else if(choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
+		if (choice == 0) backupMode = UpdaterThread.BACKUP_MODE_DATABASE;
+		else if (choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
 		ImageIcon updateButtonEmpty = getIcon("sprites/update_load_empty.png");
 		ImageIcon updateButtonFilled = getIcon("sprites/update_load_full.png");
 		updateButton.setIcon(updateButtonEmpty);
@@ -1406,7 +1413,7 @@ public class StarMadeLauncher extends JFrame {
 				mb[0] = mbDownloaded;
 				mb[1] = mbTotal;
 				mb[2] = mbSpeed;
-				if(file != null && !file.equals("null")) fileName[0] = file;
+				if (file != null && !file.equals("null")) fileName[0] = file;
 				int width = updateButtonEmpty.getIconWidth();
 				int height = updateButtonEmpty.getIconHeight();
 				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -1431,7 +1438,7 @@ public class StarMadeLauncher extends JFrame {
 					try {
 						Thread.sleep(1);
 						recreateButtons(playPanel, false);
-					} catch(InterruptedException e) {
+					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}
 				});
@@ -1446,7 +1453,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private Updater.VersionFile getLastUsedBranch() {
-		switch(lastUsedBranch) {
+		switch (lastUsedBranch) {
 			case 1:
 				return Updater.VersionFile.DEV;
 			case 2:
@@ -1457,8 +1464,8 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private int getBranchForVersion(IndexFileEntry gameVersion) {
-		if(gameVersion == null || gameVersion.build == null) return 0;
-		switch(gameVersion.build) {
+		if (gameVersion == null || gameVersion.build == null) return 0;
+		switch (gameVersion.build) {
 			case "DEV":
 				return 1;
 			case "PRE":
@@ -1469,28 +1476,28 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void updateVersions(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown) {
-		if(Objects.equals(branchDropdown.getSelectedItem(), "Release")) {
-			for(IndexFileEntry version : releaseVersions) {
-				if(version.equals(releaseVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)");
+		if (Objects.equals(branchDropdown.getSelectedItem(), "Release")) {
+			for (IndexFileEntry version : releaseVersions) {
+				if (version.equals(releaseVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)");
 				else versionDropdown.addItem(version.build);
 			}
-		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Dev")) {
-			for(IndexFileEntry version : devVersions) {
-				if(version.build.startsWith("2017")) continue;
+		} else if (Objects.equals(branchDropdown.getSelectedItem(), "Dev")) {
+			for (IndexFileEntry version : devVersions) {
+				if (version.build.startsWith("2017")) continue;
 
-				if(version.equals(devVersions.get(2))) versionDropdown.addItem(version.build + " (Latest)");
+				if (version.equals(devVersions.get(2))) versionDropdown.addItem(version.build + " (Latest)");
 				else versionDropdown.addItem(version.build);
 			}
-		} else if(Objects.equals(branchDropdown.getSelectedItem(), "Pre-Release")) {
-			for(IndexFileEntry version : preReleaseVersions) {
-				if(version.equals(preReleaseVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)");
+		} else if (Objects.equals(branchDropdown.getSelectedItem(), "Pre-Release")) {
+			for (IndexFileEntry version : preReleaseVersions) {
+				if (version.equals(preReleaseVersions.get(0))) versionDropdown.addItem(version.build + " (Latest)");
 				else versionDropdown.addItem(version.build);
 			}
 		}
 	}
 
 	private void createScroller(JPanel currentPanel) {
-		if(centerScrollPane == null) {
+		if (centerScrollPane == null) {
 			centerScrollPane = new JScrollPane(currentPanel);
 			centerScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			centerScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
@@ -1502,7 +1509,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createNewsPanel() {
-		if(newsPanel == null) newsPanel = new LauncherNewsPanel();
+		if (newsPanel == null) newsPanel = new LauncherNewsPanel();
 		createScroller(newsPanel);
 		newsPanel.updatePanel();
 		SwingUtilities.invokeLater(() -> {
@@ -1512,11 +1519,11 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createForumsPanel() {
-		if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 			String ccURL = "https://starmadedock.net/forums/";
 			try {
 				Desktop.getDesktop().browse(new URI(ccURL));
-			} catch(IOException | URISyntaxException exception) {
+			} catch (IOException | URISyntaxException exception) {
 				exception.printStackTrace();
 			}
 		}
@@ -1532,11 +1539,11 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createContentPanel() {
-		if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 			String ccURL = "https://starmadedock.net/content/";
 			try {
 				Desktop.getDesktop().browse(new URI(ccURL));
-			} catch(IOException | URISyntaxException exception) {
+			} catch (IOException | URISyntaxException exception) {
 				exception.printStackTrace();
 			}
 		}
@@ -1563,8 +1570,9 @@ public class StarMadeLauncher extends JFrame {
 
 	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
 		IndexFileEntry currentVersion = getCurrentVersion();
-		if(debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1"))) return getCurrentVersion();
-		switch(branch) {
+		if (debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1")))
+			return getCurrentVersion();
+		switch (branch) {
 			case RELEASE:
 				return releaseVersions.get(0);
 			case DEV:
@@ -1581,7 +1589,7 @@ public class StarMadeLauncher extends JFrame {
 		releaseVersions.clear();
 		devVersions.clear();
 		preReleaseVersions.clear();
-		for(Updater.VersionFile branch : Updater.VersionFile.values()) {
+		for (Updater.VersionFile branch : Updater.VersionFile.values()) {
 			url = new URL(branch.location);
 			URLConnection openConnection = url.openConnection();
 			openConnection.setConnectTimeout(10000);
@@ -1589,15 +1597,15 @@ public class StarMadeLauncher extends JFrame {
 			openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + LAUNCHER_VERSION);
 			BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 			String str;
-			while((str = in.readLine()) != null) {
+			while ((str = in.readLine()) != null) {
 				try {
 					String[] vPath = str.split(" ", 2);
 					String[] vBuild = vPath[0].split("#", 2);
 					String version = vBuild[0];
 					String build = "";
-					if(vBuild.length == 2) build = vBuild[1];
+					if (vBuild.length == 2) build = vBuild[1];
 					String path = vPath[1];
-					switch(branch) {
+					switch (branch) {
 						case RELEASE:
 							releaseVersions.add(new IndexFileEntry(build, path, version, branch));
 							releaseVersions.sort(Collections.reverseOrder());
@@ -1614,7 +1622,7 @@ public class StarMadeLauncher extends JFrame {
 //						System.err.println("loaded files (sorted) " + preReleaseVersions);
 							break;
 					}
-				} catch(Exception exception) {
+				} catch (Exception exception) {
 					exception.printStackTrace();
 				}
 			}

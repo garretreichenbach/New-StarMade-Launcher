@@ -17,7 +17,7 @@ import java.util.Objects;
  *
  * @author SlavSquatSuperstar
  */
-// TODO make static
+// TODO make static?
 public class JavaDownloader {
 
 	private final OperatingSystem currentOS;
