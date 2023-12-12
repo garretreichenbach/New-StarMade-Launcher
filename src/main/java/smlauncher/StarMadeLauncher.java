@@ -6,6 +6,7 @@ import smlauncher.community.LauncherCommunityPanel;
 import smlauncher.content.LauncherContentPanel;
 import smlauncher.downloader.JavaDownloader;
 import smlauncher.downloader.JavaVersion;
+import smlauncher.fileio.TextFileUtil;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
@@ -54,12 +55,9 @@ public class StarMadeLauncher extends JFrame {
 
 	private final OperatingSystem currentOS;
 	public IndexFileEntry gameVersion;
-	public static int lastBranchIndex;
-
+	public static GameBranch lastUsedBranch = GameBranch.RELEASE;
 	public static boolean debugMode;
 	public static boolean useSteam;
-
-	public static GameBranch buildBranch = GameBranch.RELEASE;
 	private static String selectedVersion;
 	private static boolean selectVersion;
 	private static int backup = Updater.BACK_DB;
@@ -120,8 +118,8 @@ public class StarMadeLauncher extends JFrame {
 		setGameVersion(gameVersion);
 
 		// Read game branch
-		lastBranchIndex = GameBranch.getForVersion(gameVersion).index;
-		launchSettings.put("lastUsedBranch", lastBranchIndex);
+		lastUsedBranch = GameBranch.getForVersion(gameVersion);
+		launchSettings.put("lastUsedBranch", lastUsedBranch.index);
 
 		LaunchSettings.saveLaunchSettings(launchSettings);
 		deleteUpdaterJar();
@@ -163,6 +161,7 @@ public class StarMadeLauncher extends JFrame {
 		boolean headless = false;
 		if (args == null || args.length == 0) startup();
 		else {
+			GameBranch buildBranch = GameBranch.RELEASE;
 			for (String arg : args) {
 				arg = arg.toLowerCase();
 				if (arg.equals("-debug_mode")) debugMode = true;
@@ -318,10 +317,6 @@ public class StarMadeLauncher extends JFrame {
 		System.out.println("-server -port:<port> : Start in server mode");
 	}
 
-	public static String getVersionShort(IndexFileEntry version) {
-		return version.version.split("#")[0];
-	}
-
 	private static String getCurrentUser() {
 		try {
 			return StarMadeCredentials.read().getUser();
@@ -338,24 +333,20 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private static String readStringFromFile(File f) throws IOException {
-		try (Scanner scanner = new Scanner(f)) {
-			return scanner.nextLine();
-		} catch (IOException e) {
-			throw e;
-		}
-	}
-
 	private IndexFileEntry getCurrentVersion() {
 		try {
+			String version;
 			File versionFile = new File(LaunchSettings.getInstallDir(), "version.txt");
-			if (!versionFile.exists()) return null;
+			if (versionFile.exists()) {
+				version = TextFileUtil.readText(versionFile);
+			} else {
+				version = launchSettings.getString("lastUsedVersion");
+			}
+			String build = version.substring(0, version.indexOf('#'));
 
-			String version = readStringFromFile(versionFile);
-			version = version.substring(0, version.indexOf('#'));
-			for (IndexFileEntry entry : releaseVersions) if (version.equals(entry.build)) return entry;
-			for (IndexFileEntry entry : devVersions) if (version.equals(entry.build)) return entry;
-			for (IndexFileEntry entry : preReleaseVersions) if (version.equals(entry.build)) return entry;
+			for (IndexFileEntry entry : releaseVersions) if (build.equals(entry.build)) return entry;
+			for (IndexFileEntry entry : devVersions) if (build.equals(entry.build)) return entry;
+			for (IndexFileEntry entry : preReleaseVersions) if (build.equals(entry.build)) return entry;
 		} catch (IOException exception) {
 			System.out.println("Could not read game version from file");
 		}
@@ -788,9 +779,7 @@ public class StarMadeLauncher extends JFrame {
 			repairButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			dialogPanel.add(repairButton);
 			repairButton.addActionListener(e1 -> {
-				GameBranch branch = GameBranch.getForIndex(lastBranchIndex);
-				if (branch == null) branch = GameBranch.RELEASE;
-				IndexFileEntry version = getLatestVersion(branch);
+				IndexFileEntry version = getLatestVersion(lastUsedBranch);
 				if (version != null) {
 					if (updaterThread == null || !updaterThread.updating) {
 						dialog[0].dispose();
@@ -1005,11 +994,11 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		lastBranchIndex = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
-		branchDropdown.setSelectedIndex(lastBranchIndex);
+		branchDropdown.setSelectedIndex(lastUsedBranch.index);
 		branchDropdown.addItemListener(e -> {
-			lastBranchIndex = branchDropdown.getSelectedIndex();
-			launchSettings.put("lastUsedBranch", lastBranchIndex);
+			int branchIndex = branchDropdown.getSelectedIndex();
+			lastUsedBranch = GameBranch.getForIndex(branchIndex);
+			launchSettings.put("lastUsedBranch", branchIndex);
 			saveLaunchSettings();
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
@@ -1065,9 +1054,7 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.setContentAreaFilled(false);
 			updateButton.setBorderPainted(false);
 			updateButton.addActionListener(e -> {
-				GameBranch branch = GameBranch.getForIndex(lastBranchIndex);
-				if (branch == null) branch = GameBranch.RELEASE;
-				IndexFileEntry version = getLatestVersion(branch);
+				IndexFileEntry version = getLatestVersion(lastUsedBranch);
 				if (version != null) {
 					if (updaterThread == null || !updaterThread.updating) updateGame(version);
 				} else
@@ -1126,13 +1113,6 @@ public class StarMadeLauncher extends JFrame {
 		}
 		playPanel.revalidate();
 		playPanel.repaint();
-	}
-
-	private String formatBytes(long bytes) {
-		if (bytes < 1024) return bytes + " B";
-		else if (bytes < 1024 * 1024) return bytes / 1024 + " KB";
-		else if (bytes < 1024 * 1024 * 1024) return bytes / (1024 * 1024) + " MB";
-		else return bytes / (1024 * 1024 * 1024) + " GB";
 	}
 
 	public void runStarMade(boolean server) {
@@ -1293,11 +1273,11 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		lastBranchIndex = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
-		branchDropdown.setSelectedIndex(lastBranchIndex);
+		branchDropdown.setSelectedIndex(lastUsedBranch.index);
 		branchDropdown.addItemListener(e -> {
-			lastBranchIndex = branchDropdown.getSelectedIndex();
-			launchSettings.put("lastUsedBranch", lastBranchIndex);
+			int branchIndex = branchDropdown.getSelectedIndex();
+			lastUsedBranch = GameBranch.getForIndex(branchIndex);
+			launchSettings.put("lastUsedBranch", branchIndex);
 			saveLaunchSettings();
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
@@ -1401,7 +1381,7 @@ public class StarMadeLauncher extends JFrame {
 				assert gameVersion != null;
 				launchSettings.put("lastUsedVersion", gameVersion.build);
 				selectedVersion = gameVersion.build;
-				launchSettings.put("lastUsedBranch", lastBranchIndex);
+				launchSettings.put("lastUsedBranch", lastUsedBranch.index);
 				saveLaunchSettings();
 				SwingUtilities.invokeLater(() -> {
 					try {
@@ -1531,10 +1511,11 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void loadVersionList() throws IOException {
-		URL url;
 		releaseVersions.clear();
 		devVersions.clear();
 		preReleaseVersions.clear();
+
+		URL url;
 		for (GameBranch branch : GameBranch.values()) {
 			url = new URL(branch.url);
 			URLConnection openConnection = url.openConnection();
@@ -1542,34 +1523,30 @@ public class StarMadeLauncher extends JFrame {
 			openConnection.setReadTimeout(10000);
 			openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + LAUNCHER_VERSION);
 			BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
-			String str;
-			while ((str = in.readLine()) != null) {
+			String line;
+			while ((line = in.readLine()) != null) {
 				try {
-					String[] vPath = str.split(" ", 2);
-					String[] vBuild = vPath[0].split("#", 2);
-					String version = vBuild[0];
-					String build = "";
-					if (vBuild.length == 2) build = vBuild[1];
-					String path = vPath[1];
+					IndexFileEntry entry = IndexFileEntry.create(line, branch);
 					switch (branch) {
 						case RELEASE:
-							releaseVersions.add(new IndexFileEntry(build, path, version, branch));
-							releaseVersions.sort(Collections.reverseOrder());
-//						System.err.println("loaded files (sorted) " + releaseVersions);
+							releaseVersions.add(entry);
 							break;
 						case DEV:
-							devVersions.add(new IndexFileEntry(build, path, version, branch));
-							devVersions.sort(Collections.reverseOrder());
-//						System.err.println("loaded files (sorted) " + devVersions);
+							devVersions.add(entry);
 							break;
 						case PRE:
-							preReleaseVersions.add(new IndexFileEntry(build, path, version, branch));
-							preReleaseVersions.sort(Collections.reverseOrder());
-//						System.err.println("loaded files (sorted) " + preReleaseVersions);
+							preReleaseVersions.add(entry);
 							break;
 					}
-				} catch (Exception exception) {
-					exception.printStackTrace();
+					// Sort versions from old to recent
+					releaseVersions.sort(Collections.reverseOrder());
+//						System.err.println("loaded files (sorted) " + releaseVersions);
+					devVersions.sort(Collections.reverseOrder());
+//						System.err.println("loaded files (sorted) " + devVersions);
+					preReleaseVersions.sort(Collections.reverseOrder());
+//						System.err.println("loaded files (sorted) " + preReleaseVersions);
+				} catch (Exception e) {
+					System.out.println("Could not read versions list");
 				}
 			}
 			in.close();

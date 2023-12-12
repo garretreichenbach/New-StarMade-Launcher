@@ -206,12 +206,7 @@ public class Updater extends Observable {
 			BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 			String str;
 			while((str = in.readLine()) != null) {
-				String[] vPath = str.split(" ", 2);
-				String[] vBuild = vPath[0].split("#", 2);
-				String version = vBuild[0];
-				String build = vBuild[1];
-				String path = vPath[1];
-				versions.add(new IndexFileEntry(path, version, build, branch));
+				versions.add(IndexFileEntry.create(str, branch));
 			}
 
 			Collections.sort(versions);

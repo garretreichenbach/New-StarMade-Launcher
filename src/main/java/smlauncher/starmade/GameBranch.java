@@ -10,7 +10,7 @@ public enum GameBranch {
 
 	RELEASE("Release", 0, "http://files.star-made.org/releasebuildindex"),
 	DEV("Development", 1, "http://files.star-made.org/devbuildindex"),
-	PRE("Pre-Release", 2, "http://files.star-made.org/preebuildindex"),
+	PRE("Pre-Release", 2, "http://files.star-made.org/prebuildindex"),
 	ARCHIVE("Archive", -1, "http://files.star-made.org/archivebuildindex");
 
 	public final String name, url; // download location
