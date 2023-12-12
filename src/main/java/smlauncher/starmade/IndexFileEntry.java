@@ -5,13 +5,13 @@ public class IndexFileEntry implements Comparable<IndexFileEntry> {
 	public final String path;
 	public final String version;
 	public final String build;
-	public final Updater.VersionFile v;
+	public final GameBranch branch;
 
-	public IndexFileEntry(String path, String version, String build, Updater.VersionFile v) {
+	public IndexFileEntry(String path, String version, String build, GameBranch branch) {
 		this.path = path;
 		this.version = version;
 		this.build = build;
-		this.v = v;
+		this.branch = branch;
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class IndexFileEntry implements Comparable<IndexFileEntry> {
 	 */
 	@Override
 	public String toString() {
-		return build + " v" + version + " (" + v.name() + ")";
+		return build + " v" + version + " (" + branch.name() + ")";
 	}
 
 }

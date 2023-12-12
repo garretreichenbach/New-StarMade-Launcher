@@ -54,12 +54,12 @@ public class StarMadeLauncher extends JFrame {
 
 	private final OperatingSystem currentOS;
 	public IndexFileEntry gameVersion;
-	public static int lastUsedBranch;
+	public static int lastBranchIndex;
 
 	public static boolean debugMode;
 	public static boolean useSteam;
 
-	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
+	public static GameBranch buildBranch = GameBranch.RELEASE;
 	private static String selectedVersion;
 	private static boolean selectVersion;
 	private static int backup = Updater.BACK_DB;
@@ -120,8 +120,8 @@ public class StarMadeLauncher extends JFrame {
 		setGameVersion(gameVersion);
 
 		// Read game branch
-		lastUsedBranch = getBranchForVersion(gameVersion);
-		launchSettings.put("lastUsedBranch", lastUsedBranch);
+		lastBranchIndex = GameBranch.getForVersion(gameVersion).index;
+		launchSettings.put("lastUsedBranch", lastBranchIndex);
 
 		LaunchSettings.saveLaunchSettings(launchSettings);
 		deleteUpdaterJar();
@@ -168,9 +168,9 @@ public class StarMadeLauncher extends JFrame {
 				if (arg.equals("-debug_mode")) debugMode = true;
 				if (arg.contains("-version")) {
 					selectVersion = true;
-					if (arg.contains("-dev")) buildBranch = Updater.VersionFile.DEV;
-					else if (arg.contains("-pre")) buildBranch = Updater.VersionFile.PRE;
-					else buildBranch = Updater.VersionFile.RELEASE;
+					if (arg.contains("-dev")) buildBranch = GameBranch.DEV;
+					else if (arg.contains("-pre")) buildBranch = GameBranch.PRE;
+					else buildBranch = GameBranch.RELEASE;
 				} else if ("-no_gui".equals(arg) || "-nogui".equals(arg)) {
 					if (GraphicsEnvironment.isHeadless()) {
 						displayHelp();
@@ -788,8 +788,8 @@ public class StarMadeLauncher extends JFrame {
 			repairButton.setFont(new Font("Roboto", Font.BOLD, 12));
 			dialogPanel.add(repairButton);
 			repairButton.addActionListener(e1 -> {
-				Updater.VersionFile branch = getLastUsedBranch();
-				if (branch == null) branch = Updater.VersionFile.RELEASE;
+				GameBranch branch = GameBranch.getForIndex(lastBranchIndex);
+				if (branch == null) branch = GameBranch.RELEASE;
 				IndexFileEntry version = getLatestVersion(branch);
 				if (version != null) {
 					if (updaterThread == null || !updaterThread.updating) {
@@ -1005,11 +1005,11 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		lastUsedBranch = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
-		branchDropdown.setSelectedIndex(lastUsedBranch);
+		lastBranchIndex = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
+		branchDropdown.setSelectedIndex(lastBranchIndex);
 		branchDropdown.addItemListener(e -> {
-			lastUsedBranch = branchDropdown.getSelectedIndex();
-			launchSettings.put("lastUsedBranch", lastUsedBranch);
+			lastBranchIndex = branchDropdown.getSelectedIndex();
+			launchSettings.put("lastUsedBranch", lastBranchIndex);
 			saveLaunchSettings();
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
@@ -1065,8 +1065,8 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.setContentAreaFilled(false);
 			updateButton.setBorderPainted(false);
 			updateButton.addActionListener(e -> {
-				Updater.VersionFile branch = getLastUsedBranch();
-				if (branch == null) branch = Updater.VersionFile.RELEASE;
+				GameBranch branch = GameBranch.getForIndex(lastBranchIndex);
+				if (branch == null) branch = GameBranch.RELEASE;
 				IndexFileEntry version = getLatestVersion(branch);
 				if (version != null) {
 					if (updaterThread == null || !updaterThread.updating) updateGame(version);
@@ -1293,11 +1293,11 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
-		lastUsedBranch = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
-		branchDropdown.setSelectedIndex(lastUsedBranch);
+		lastBranchIndex = Objects.requireNonNull(getLaunchSettings()).getInt("lastUsedBranch");
+		branchDropdown.setSelectedIndex(lastBranchIndex);
 		branchDropdown.addItemListener(e -> {
-			lastUsedBranch = branchDropdown.getSelectedIndex();
-			launchSettings.put("lastUsedBranch", lastUsedBranch);
+			lastBranchIndex = branchDropdown.getSelectedIndex();
+			launchSettings.put("lastUsedBranch", lastBranchIndex);
 			saveLaunchSettings();
 			versionDropdown.removeAllItems();
 			updateVersions(versionDropdown, branchDropdown);
@@ -1401,7 +1401,7 @@ public class StarMadeLauncher extends JFrame {
 				assert gameVersion != null;
 				launchSettings.put("lastUsedVersion", gameVersion.build);
 				selectedVersion = gameVersion.build;
-				launchSettings.put("lastUsedBranch", lastUsedBranch);
+				launchSettings.put("lastUsedBranch", lastBranchIndex);
 				saveLaunchSettings();
 				SwingUtilities.invokeLater(() -> {
 					try {
@@ -1419,29 +1419,6 @@ public class StarMadeLauncher extends JFrame {
 				updateButton.setIcon(getIcon("sprites/update_btn.png"));
 			}
 		}).start();
-	}
-
-	private Updater.VersionFile getLastUsedBranch() {
-		switch (lastUsedBranch) {
-			case 1:
-				return Updater.VersionFile.DEV;
-			case 2:
-				return Updater.VersionFile.PRE;
-			default:
-				return Updater.VersionFile.RELEASE;
-		}
-	}
-
-	private int getBranchForVersion(IndexFileEntry gameVersion) {
-		if (gameVersion == null || gameVersion.build == null) return 0;
-		switch (gameVersion.build) {
-			case "DEV":
-				return 1;
-			case "PRE":
-				return 2;
-			default:
-				return 0;
-		}
 	}
 
 	private void updateVersions(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown) {
@@ -1537,7 +1514,7 @@ public class StarMadeLauncher extends JFrame {
 		});
 	}
 
-	private IndexFileEntry getLatestVersion(Updater.VersionFile branch) {
+	private IndexFileEntry getLatestVersion(GameBranch branch) {
 		IndexFileEntry currentVersion = getCurrentVersion();
 		if (debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1")))
 			return getCurrentVersion();
@@ -1558,8 +1535,8 @@ public class StarMadeLauncher extends JFrame {
 		releaseVersions.clear();
 		devVersions.clear();
 		preReleaseVersions.clear();
-		for (Updater.VersionFile branch : Updater.VersionFile.values()) {
-			url = new URL(branch.location);
+		for (GameBranch branch : GameBranch.values()) {
+			url = new URL(branch.url);
 			URLConnection openConnection = url.openConnection();
 			openConnection.setConnectTimeout(10000);
 			openConnection.setReadTimeout(10000);

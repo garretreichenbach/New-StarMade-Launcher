@@ -19,8 +19,8 @@ public class Updater extends Observable {
 	public static String FILES_URL = "http://files.star-made.org/";
 	public static String LAUNCHER_VERSION_SITE = "http://files.star-made.org/version";
 	public static String MIRROR_SITE = "http://files.star-made.org/mirrors";
-	public final ArrayList<IndexFileEntry> versions = new ArrayList<IndexFileEntry>();
-	private final ArrayList<String> mirrorURLs = new ArrayList<String>();
+	public final ArrayList<IndexFileEntry> versions = new ArrayList<>();
+	private final ArrayList<String> mirrorURLs = new ArrayList<>();
 	boolean loading;
 	boolean versionsLoaded;
 	private final StarMadeBackupTool backup = new StarMadeBackupTool();
@@ -30,15 +30,15 @@ public class Updater extends Observable {
 		reloadVersion(installDir);
 	}
 
-	public static void withoutGUI(boolean force, String installDir, VersionFile f, int backUp, boolean selectVersion) {
+	public static void withoutGUI(boolean force, String installDir, GameBranch branch, int backUp, boolean selectVersion) {
 		Updater u = new Updater(installDir);
 		try {
-			u.startLoadVersionList(f);
+			u.startLoadVersionList(branch);
 			while(u.loading) {
 				Thread.sleep(100);
 			}
 
-			if(selectVersion) selectVersion(true, u, force, installDir, f, backUp, selectVersion);
+			if(selectVersion) selectVersion(true, u, force, installDir, branch, backUp, selectVersion);
 			else {
 				if(u.isNewerVersionAvailable()) {
 					System.err.println("A New Version Is Available!");
@@ -50,7 +50,7 @@ public class Updater extends Observable {
 		}
 	}
 
-	public static void selectVersion(boolean display, Updater u, boolean force, String installDir, VersionFile f, int backUp, boolean selectVersion) {
+	public static void selectVersion(boolean display, Updater u, boolean force, String installDir, GameBranch f, int backUp, boolean selectVersion) {
 		if(display) {
 			for(int i = 0; i < u.versions.size(); i++) {
 				System.out.println("[" + i + "] v" + u.versions.get(i).version + "; " + u.versions.get(i).build);
@@ -141,7 +141,7 @@ public class Updater extends Observable {
 		return versions.size() > 0 && VersionContainer.build.compareTo(versions.get(versions.size() - 1).build) < 0;
 	}
 
-	private void loadVersionList(VersionFile v) throws IOException {
+	private void loadVersionList(GameBranch branch) throws IOException {
 
 		setChanged();
 		notifyObservers("Retrieving Launcher Version");
@@ -196,7 +196,7 @@ public class Updater extends Observable {
 		URL url;
 		try {
 			versions.clear();
-			url = new URL(v.location);
+			url = new URL(branch.url);
 
 			URLConnection openConnection = url.openConnection();
 			openConnection.setConnectTimeout(10000);
@@ -211,7 +211,7 @@ public class Updater extends Observable {
 				String version = vBuild[0];
 				String build = vBuild[1];
 				String path = vPath[1];
-				versions.add(new IndexFileEntry(path, version, build, v));
+				versions.add(new IndexFileEntry(path, version, build, branch));
 			}
 
 			Collections.sort(versions);
@@ -240,11 +240,11 @@ public class Updater extends Observable {
 		}
 	}
 
-	public void startLoadVersionList(VersionFile v) {
+	public void startLoadVersionList(GameBranch branch) {
 		loading = true;
 		new Thread(() -> {
 			try {
-				loadVersionList(v);
+				loadVersionList(branch);
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
@@ -449,16 +449,4 @@ public class Updater extends Observable {
 		return f;
 	}
 
-	public enum VersionFile {
-		PRE("http://files.star-made.org/prebuildindex"),
-		DEV("http://files.star-made.org/devbuildindex"),
-		RELEASE("http://files.star-made.org/releasebuildindex"),
-		ARCHIVE("http://files.star-made.org/archivebuildindex");
-
-		public final String location;
-
-		VersionFile(String location) {
-			this.location = location;
-		}
-	}
 }
