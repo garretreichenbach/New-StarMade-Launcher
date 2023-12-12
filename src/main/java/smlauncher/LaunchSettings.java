@@ -15,10 +15,14 @@ public final class LaunchSettings {
 
 	// TODO store more properties
 
+	private static JSONObject launchSettings = getDefaultLaunchSettings();
+
 	private LaunchSettings() {
 	}
 
 	private static final String SETTINGS_FILENAME = "launcher-settings.json";
+
+	// Settings File Methods
 
 	public static JSONObject getLaunchSettings() {
 		File jsonFile = new File(SETTINGS_FILENAME);
@@ -30,8 +34,9 @@ public final class LaunchSettings {
 		} else {
 			// Read the settings file
 			try {
-				String jsonText = TextFileUtil.readText(jsonFile);
-				return new JSONObject(jsonText);
+				JSONObject jsonObject = new JSONObject(TextFileUtil.readText(jsonFile));
+				LaunchSettings.launchSettings = jsonObject;
+				return jsonObject;
 			} catch (IOException e) {
 				System.out.println("Could not read launch settings from file");
 			}
@@ -57,6 +62,16 @@ public final class LaunchSettings {
 		settings.put("lastUsedVersion", "NONE");
 		settings.put("jvm_args", "");
 		return settings;
+	}
+
+	// Settings Getters and Setters
+
+	public static String getInstallDir() {
+		return launchSettings.getString("installDir");
+	}
+
+	public static void setInstallDir(String installDir) {
+		launchSettings.put("installDir", installDir);
 	}
 
 }

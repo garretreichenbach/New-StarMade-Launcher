@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
+import smlauncher.LaunchSettings;
 import smlauncher.util.OperatingSystem;
 
 import java.io.*;
@@ -17,26 +18,19 @@ import java.util.Objects;
  *
  * @author SlavSquatSuperstar
  */
-// TODO make static?
 public class JavaDownloader {
 
 	private final OperatingSystem currentOS;
 	private final JavaVersion version;
-	private String installDir;
 
 	public JavaDownloader(JavaVersion version) {
 		this(OperatingSystem.getCurrent(), version);
 	}
 
-	public JavaDownloader(OperatingSystem currentOS, JavaVersion version) {
+	// Set OS for testing only
+	JavaDownloader(OperatingSystem currentOS, JavaVersion version) {
 		this.currentOS = currentOS;
 		this.version = version;
-		installDir = ".";
-	}
-
-	public JavaDownloader setInstallDir(String installDir) {
-		this.installDir = installDir;
-		return this;
 	}
 
 	public void downloadAndUnzip() throws IOException {
@@ -110,7 +104,7 @@ public class JavaDownloader {
 	}
 
 	private String getJreFolderName() {
-		return installDir + "/jre" + version.number;
+		return LaunchSettings.getInstallDir() + "/jre" + version.number;
 	}
 
 	void cleanupZip() {
