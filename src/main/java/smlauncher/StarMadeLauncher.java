@@ -6,7 +6,6 @@ import smlauncher.community.LauncherCommunityPanel;
 import smlauncher.content.LauncherContentPanel;
 import smlauncher.downloader.JavaDownloader;
 import smlauncher.downloader.JavaVersion;
-import smlauncher.fileio.TextFileUtil;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
@@ -53,8 +52,8 @@ public class StarMadeLauncher extends JFrame {
 			"--add-opens=java.base/java.util=ALL-UNNAMED"
 	};
 
-	public static String installDir = "StarMade"; // todo make not static
-	private final smlauncher.util.OperatingSystem currentOS;
+	public static String installDir = "StarMade";
+	private final OperatingSystem currentOS;
 	public IndexFileEntry gameVersion;
 	public static int lastUsedBranch;
 
@@ -128,7 +127,7 @@ public class StarMadeLauncher extends JFrame {
 		lastUsedBranch = getBranchForVersion(gameVersion);
 		launchSettings.put("lastUsedBranch", lastUsedBranch);
 
-		saveLaunchSettings();
+		LaunchSettings.saveLaunchSettings(launchSettings);
 		deleteUpdaterJar();
 
 		// Get the current OS
@@ -883,38 +882,11 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private JSONObject getLaunchSettings() {
-		File jsonFile = new File("./launch-settings.json");
-		JSONObject defaultSettings = getDefaultLaunchSettings();
-
-		// Return default if not present
-		if (!jsonFile.exists()) {
-			try {
-				TextFileUtil.writeText(jsonFile, defaultSettings.toString());
-			} catch (IOException e) {
-				System.out.println("Could not create launch settings file");
-			}
-			return defaultSettings;
-		}
-
-		// Read the settings file
-		try {
-			String jsonText = TextFileUtil.readText(jsonFile);
-			return new JSONObject(jsonText);
-		} catch (IOException e) {
-			System.out.println("Could not read launch settings from file");
-		}
-		return defaultSettings;
+		return LaunchSettings.getLaunchSettings();
 	}
 
-	private JSONObject getDefaultLaunchSettings() {
-		JSONObject settings = new JSONObject();
-		settings.put("memory", 4096);
-		settings.put("launchArgs", "");
-		settings.put("installDir", "StarMade");
-		settings.put("lastUsedBranch", 0); // Release
-		settings.put("lastUsedVersion", "NONE");
-		settings.put("jvm_args", "");
-		return settings;
+	private void saveLaunchSettings() {
+		LaunchSettings.saveLaunchSettings(launchSettings);
 	}
 
 	private void setGameVersion(IndexFileEntry gameVersion) {
@@ -926,15 +898,6 @@ public class StarMadeLauncher extends JFrame {
 		} else {
 			launchSettings.put("lastUsedVersion", "NONE");
 			launchSettings.put("jvm_args", "");
-		}
-	}
-
-	private void saveLaunchSettings() {
-		File settingsFile = new File("launch-settings.json");
-		try {
-			TextFileUtil.writeText(settingsFile, launchSettings.toString());
-		} catch (IOException exception) {
-			System.out.println("Could not save launch settings to file");
 		}
 	}
 
