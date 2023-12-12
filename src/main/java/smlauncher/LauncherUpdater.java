@@ -33,6 +33,20 @@ public class LauncherUpdater {
 		return !currentVersion.equals(latestVersion);
 	}
 
+	private static String getLatestVersion() {
+		try {
+			String indexJSON = new String(getBytesFromInputStream(new URL(INDEX_URL).openStream()), StandardCharsets.UTF_8);
+			System.err.println(indexJSON);
+			JSONObject index = new JSONObject(indexJSON);
+			JSONArray versions = index.getJSONArray("versions");
+			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);
+			return latestVersion.getString("version");
+		} catch(IOException exception) {
+			exception.printStackTrace();
+			return "UNKNOWN";
+		}
+	}
+
 	/**
 	 * Updates the launcher to the latest version and restarts it.
 	 */
@@ -113,6 +127,19 @@ public class LauncherUpdater {
 		} catch (Exception exception) {
 			System.out.println("Could not extract updater jar");
 		}
+	}
+
+	/**
+	 * Copy InputStream to byte array
+	 * <a href="https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java">From</a>
+	 */
+	public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		byte[] buffer = new byte[0xFFFF];
+		for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
+			os.write(buffer, 0, len);
+		}
+		return os.toByteArray();
 	}
 
 }

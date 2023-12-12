@@ -369,6 +369,11 @@ public class Updater extends Observable {
 						setChanged();
 						notifyObservers(u);
 					}
+
+					@Override
+					public void done(FileDownloadUpdate u) {
+
+					}
 				});
 
 				setChanged();

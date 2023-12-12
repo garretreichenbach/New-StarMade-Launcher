@@ -56,18 +56,28 @@ public class UpdaterThread extends Thread {
 						onFinished();
 						return;
 					}
-					float progress = (float) u.index / u.total;
+					float progress = (float) u.currentSize / u.totalSize;
 					if(progress < 0) progress = u.total / u.index; //Somehow its negative sometimes
 					onProgress(progress, u.fileName, u.downloaded, u.totalSize, (long) u.downloadSpeed);
-					if(u.index >= u.total - 1 && u.downloaded >= u.totalSize) {
+					System.out.println(u.index + " " + u.total + " " + u.currentSize + " " + u.totalSize);
+					if(u.index >= u.total - 1 && u.currentSize >= u.totalSize) {
 						updating = false;
-						onFinished();
+//						onFinished();
 					}
 				}
 
 				@Override
 				public void update(String u) {
 					if(u.contains("Nothing to download")) onFinished();
+				}
+
+				@Override
+				public void done(FileDownloadUpdate u) {
+					if(u.index == 0 || u.total == 0) return;//idk
+					if(u.index >= u.total - 1){
+						updating = false;
+						onFinished();
+					}
 				}
 			});
 			//onFinished();

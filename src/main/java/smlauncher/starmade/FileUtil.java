@@ -72,7 +72,7 @@ public class FileUtil {
 	}
 
 	public static URL convertToURLEscapingIllegalCharacters(String string) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
-		String decodedURL = URLDecoder.decode(string, StandardCharsets.UTF_8);
+		String decodedURL = URLDecoder.decode(string);
 		URL url = new URL(decodedURL);
 		URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 		return uri.toURL();
@@ -835,6 +835,9 @@ public class FileUtil {
 				cb.downloaded(count, n);
 			}
 		}
+		if(cb != null){
+			cb.doneDownloading();
+		}
 		return count;
 	}
 
@@ -929,7 +932,7 @@ public class FileUtil {
 
 		FileReader s = null;
 		try {
-			s = new FileReader(file, StandardCharsets.UTF_8);
+			s = new FileReader(file);
 			BufferedReader r = new BufferedReader(s);
 			StringBuffer sb = new StringBuffer();
 
