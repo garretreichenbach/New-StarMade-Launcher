@@ -33,8 +33,6 @@ public class UpdaterThread extends Thread {
 
 	@Override
 	public void run() {
-		System.out.println("updating with entry " + entry);
-
 		try {
 			updating = true;
 			boolean dbOnly = backupMode == BACKUP_MODE_DATABASE;
