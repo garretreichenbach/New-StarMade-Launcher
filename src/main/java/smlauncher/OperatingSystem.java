@@ -28,7 +28,7 @@ public enum OperatingSystem {
 
 	@Override
 	public String toString() {
-		return this.name().toLowerCase();
+		return name().toLowerCase();
 	}
 
 }

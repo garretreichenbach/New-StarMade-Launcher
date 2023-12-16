@@ -29,8 +29,6 @@ import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -44,7 +42,7 @@ import java.util.zip.ZipFile;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.10"; //We've had two other launchers before this
+	public static final String LAUNCHER_VERSION = "3.0.11"; //We've had two other launchers before this
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -62,7 +60,7 @@ public class StarMadeLauncher extends JFrame {
 	private final OperatingSystem currentOS;
 	public static boolean debugMode;
 	public static boolean useSteam;
-	public static String installDir = "StarMade";
+	public static String installDir = "./StarMade";
 	public static Updater.VersionFile buildBranch = Updater.VersionFile.RELEASE;
 	public static int lastUsedBranch;
 	private static String selectedVersion;
@@ -132,7 +130,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 		deleteUpdaterJar();
 
-		// Get the current OS
+		//Get the current OS
 		currentOS = OperatingSystem.getCurrent();
 		if(!checkForJREs()) {
 			try {
