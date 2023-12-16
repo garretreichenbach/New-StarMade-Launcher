@@ -331,7 +331,7 @@ public class Updater extends Observable {
 		downloadDiff(instalDir, installDirStr, newest, backupFromMain, forced);
 	}
 
-	private void downloadDiff(File installDir, String installDirStr, IndexFileEntry f, int backup, boolean forced) {
+	private void downloadDiff(File installDir, String installDirStr, IndexFileEntry version, int backup, boolean forced) {
 		updating = true;
 
 		new Thread(() -> {
@@ -346,11 +346,11 @@ public class Updater extends Observable {
 				}
 
 				setChanged();
-				notifyObservers("Retrieving checksums for v" + f.version + "(build " + f.build + ")");
-				ChecksumFile checksums = getChecksums(f.path);
+				notifyObservers("Retrieving checksums for v" + version.version + "(build " + version.build + ")");
+				ChecksumFile checksums = getChecksums(version.path);
 				System.err.println("Downloaded checksums: \n" + checksums);
 
-				String buildDir = FILES_URL + f.path + "/";
+				String buildDir = FILES_URL + version.path + "/";
 
 				checksums.download(forced, buildDir, installDir, installDirStr, new FileDowloadCallback() {
 					@Override
@@ -437,7 +437,7 @@ public class Updater extends Observable {
 		openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + StarMadeLauncher.LAUNCHER_VERSION);
 		openConnection.setConnectTimeout(10000);
 		openConnection.setReadTimeout(10000);
-		// TODO URL is wrong
+		// TODO URL is using wrong build for dev/release
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 		ChecksumFile f = new ChecksumFile();
 		f.parse(in);

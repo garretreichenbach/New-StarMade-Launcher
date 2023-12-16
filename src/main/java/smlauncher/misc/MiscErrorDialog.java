@@ -6,12 +6,13 @@ import java.net.URI;
 
 import static smlauncher.StarMadeLauncher.BUG_REPORT_URL;
 
+// TODO seems like duplicate of starmade.ErrorDialog
 /**
  * Simple dialog for showing error messages.
  *
  * @author TheDerpGamer
  */
-public class ErrorDialog extends JDialog {
+public class MiscErrorDialog extends JDialog {
 
 	public enum ErrorType {
 		INFO(UIManager.getIcon("OptionPane.informationIcon")),
@@ -30,24 +31,24 @@ public class ErrorDialog extends JDialog {
 		void onOk();
 	}
 
-	public ErrorDialog(ErrorType type, String description, ErrorCallback callback) {
+	public MiscErrorDialog(ErrorType type, String description, ErrorCallback callback) {
 		setTitle("Error");
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setResizable(false);
 		setSize(500, 300);
 		setLocationRelativeTo(null);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setAlwaysOnTop(true);
 		setLayout(new BorderLayout());
+		setResizable(false);
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		add(panel, BorderLayout.CENTER);
+		JPanel errorPanel = new JPanel();
+		errorPanel.setLayout(new BorderLayout());
+		errorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		add(errorPanel, BorderLayout.CENTER);
 
-		JLabel label = new JLabel();
-		label.setIcon(type.icon);
-		label.setText("<html><div style='text-align: center;'>" + description + "</div></html>");
-		panel.add(label, BorderLayout.CENTER);
+		JLabel errorLabel = new JLabel();
+		errorLabel.setIcon(type.icon);
+		errorLabel.setText("<html><div style='text-align: center;'>" + description + "</div></html>");
+		errorPanel.add(errorLabel, BorderLayout.CENTER);
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -71,5 +72,6 @@ public class ErrorDialog extends JDialog {
 				}
 			}
 		});
+		buttonPanel.add(reportButton);
 	}
 }

@@ -3,7 +3,7 @@ package smlauncher.starmade;
 import javax.swing.*;
 import java.awt.*;
 
-// TODO seems like duplicate of {misc.ErrorDialog}
+// TODO seems like duplicate of misc.ErrorDialog
 /**
  * Simple dialog for showing error messages.
  *

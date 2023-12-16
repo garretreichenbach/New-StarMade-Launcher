@@ -33,15 +33,17 @@ public class UpdaterThread extends Thread {
 
 	@Override
 	public void run() {
+		System.out.println("updating with entry " + entry);
+
 		try {
 			updating = true;
 			boolean dbOnly = backupMode == BACKUP_MODE_DATABASE;
 			if(backupMode != BACKUP_MODE_NONE && installDir.exists()) (new StarMadeBackupTool()).backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
 
-			String branch = "";
-			if(StarMadeLauncher.lastUsedBranch == GameBranch.DEV) branch = "dev/";
-			else if(StarMadeLauncher.lastUsedBranch == GameBranch.PRE) branch = "pre/";
-			String buildDir = FILES_URL + "build/" + branch + "starmade-build_" + entry.path;
+			String branchDir = "";
+			if(StarMadeLauncher.lastUsedBranch == GameBranch.DEV) branchDir = "dev/";
+			else if(StarMadeLauncher.lastUsedBranch == GameBranch.PRE) branchDir = "pre/";
+			String buildDir = FILES_URL + "build/" + branchDir + "starmade-build_" + entry.build;
 			ChecksumFile checksums = Updater.getChecksums(buildDir);
 			if(!installDir.exists()) installDir.mkdirs();
 			float finalSize = checksums.checksums.size();

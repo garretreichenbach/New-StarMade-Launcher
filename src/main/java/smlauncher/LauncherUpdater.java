@@ -3,7 +3,7 @@ package smlauncher;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import smlauncher.misc.ErrorDialog;
+import smlauncher.misc.MiscErrorDialog;
 import smlauncher.util.OperatingSystem;
 
 import java.awt.*;
@@ -57,7 +57,7 @@ public class LauncherUpdater {
 		} catch (Exception exception) {
 			System.out.println("Could not update launcher");
 			// Open website to launcher download
-			new ErrorDialog(ErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
+			new MiscErrorDialog(MiscErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
 				try {
 					Desktop.getDesktop().browse(new URL(DOWNLOAD_URL).toURI());
 				} catch (Exception exception1) {

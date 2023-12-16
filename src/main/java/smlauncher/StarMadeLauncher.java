@@ -241,6 +241,8 @@ public class StarMadeLauncher extends JFrame {
 					buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 					dialog.add(buttonPanel, BorderLayout.SOUTH);
 
+					// todo not showing on startup
+					// todo saying launch when not updated
 					JButton updateButton = new JButton("Update");
 					updateButton.setDoubleBuffered(true);
 					updateButton.setOpaque(true);
@@ -340,6 +342,7 @@ public class StarMadeLauncher extends JFrame {
 			} else {
 				version = launchSettings.getString("lastUsedVersion");
 			}
+			// todo write to modify version.txt
 			String shortVersion = version.substring(0, version.indexOf('#'));
 
 			for (List<IndexFileEntry> list : versionLists.values()) {
@@ -1013,11 +1016,11 @@ public class StarMadeLauncher extends JFrame {
 		versionDropdown.addItemListener(e -> {
 			if (versionDropdown.getSelectedIndex() == -1) return;
 			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
-			getLaunchSettings().put("lastUsedVersion", selectedVersion);
+			launchSettings.put("lastUsedVersion", selectedVersion);
 			saveLaunchSettings();
 			recreateButtons(playPanel, false);
 		});
-		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
+		String lastUsedVersion = launchSettings.getString("lastUsedVersion");
 		if (lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
 		for (int i = 0; i < versionDropdown.getItemCount(); i++) {
 			if (versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
@@ -1055,7 +1058,9 @@ public class StarMadeLauncher extends JFrame {
 			updateButton.setContentAreaFilled(false);
 			updateButton.setBorderPainted(false);
 			updateButton.addActionListener(e -> {
-				IndexFileEntry version = getLatestVersion(lastUsedBranch);
+//				IndexFileEntry version = getLatestVersion(lastUsedBranch);
+				IndexFileEntry version = gameVersion;
+				System.out.println("found version " + version);
 				if (version != null) {
 					if (updaterThread == null || !updaterThread.updating) updateGame(version);
 				} else
@@ -1292,7 +1297,12 @@ public class StarMadeLauncher extends JFrame {
 		versionDropdown.addItemListener(e -> {
 			if (versionDropdown.getSelectedIndex() == -1) return;
 			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
-			getLaunchSettings().put("lastUsedVersion", selectedVersion);
+			// Update game version
+			List<IndexFileEntry> versions = versionLists.get(lastUsedBranch);
+			gameVersion = versions.stream().filter(v -> v.version.equals(selectedVersion)).findFirst().get();
+			System.out.println("selected " + selectedVersion);
+			System.out.println("version = " + gameVersion);
+			launchSettings.put("lastUsedVersion", selectedVersion);
 			saveLaunchSettings();
 			recreateButtons(playPanel, false);
 		});
@@ -1490,6 +1500,7 @@ public class StarMadeLauncher extends JFrame {
 		});
 	}
 
+	// todo fixme
 	private IndexFileEntry getLatestVersion(GameBranch branch) {
 		IndexFileEntry currentVersion = getLastUsedVersion();
 		if (debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1")))
@@ -1523,6 +1534,7 @@ public class StarMadeLauncher extends JFrame {
 				while ((line = in.readLine()) != null) {
 					IndexFileEntry entry = IndexFileEntry.create(line, branch);
 					versions.add(entry);
+
 					// Sort versions from old to recent
 					versions.sort(Collections.reverseOrder());
 				}
@@ -1531,7 +1543,7 @@ public class StarMadeLauncher extends JFrame {
 			}
 
 			if (branch == GameBranch.DEV) { // Remove old dev versions
-				versions.removeIf(v -> !v.build.startsWith("2017"));
+				versions.removeIf(v -> v.build.startsWith("2017"));
 			}
 			openConnection.getInputStream().close();
 		}
