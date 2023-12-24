@@ -72,7 +72,6 @@ public class LauncherUpdater {
 	private static String getLatestVersion() {
 		try (InputStream stream = new URL(INDEX_URL).openStream()) {
 			String indexJSON = new String(getBytesFromInputStream(stream), StandardCharsets.UTF_8);
-//			System.err.println(indexJSON);
 			JSONObject index = new JSONObject(indexJSON);
 			JSONArray versions = index.getJSONArray("versions");
 			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);

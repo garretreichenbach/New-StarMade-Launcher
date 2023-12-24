@@ -1,4 +1,4 @@
-# StarMade Launcher Version 3.0.8
+# StarMade Launcher Version 3.0.11
 
 This is the launcher for [StarMade](https://www.star-made.org/). It is a Java application that will download and install
 StarMade for you. It will also keep StarMade up to date and can be used to switch branches.
