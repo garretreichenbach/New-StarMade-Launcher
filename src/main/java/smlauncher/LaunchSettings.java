@@ -24,31 +24,28 @@ public final class LaunchSettings {
 
 	// Settings File Methods
 
-	public static JSONObject getLaunchSettings() {
+	public static void readSettings() {
 		File jsonFile = new File(SETTINGS_FILENAME);
 		JSONObject defaultSettings = getDefaultLaunchSettings();
 
 		// Create file if not present
 		if (!jsonFile.exists()) {
 			launchSettings = defaultSettings;
-			saveLaunchSettings(defaultSettings);
+			saveSettings();
 		} else {
 			// Read the settings file
 			try {
-				JSONObject jsonObject = new JSONObject(TextFileUtil.readText(jsonFile));
-				LaunchSettings.launchSettings = jsonObject;
-				return jsonObject;
+				LaunchSettings.launchSettings = new JSONObject(TextFileUtil.readText(jsonFile));
 			} catch (IOException e) {
 				System.out.println("Could not read launch settings from file");
 			}
 		}
-		return defaultSettings;
 	}
 
-	public static void saveLaunchSettings(JSONObject settings) {
+	public static void saveSettings() {
 		File settingsFile = new File(SETTINGS_FILENAME);
 		try {
-			TextFileUtil.writeText(settingsFile, settings.toString());
+			TextFileUtil.writeText(settingsFile, launchSettings.toString());
 		} catch (IOException exception) {
 			System.out.println("Could not save launch settings to file");
 		}
@@ -56,12 +53,12 @@ public final class LaunchSettings {
 
 	private static JSONObject getDefaultLaunchSettings() {
 		JSONObject settings = new JSONObject();
-		settings.put("memory", 4096);
-		settings.put("launchArgs", "");
 		settings.put("installDir", "./StarMade");
+		settings.put("jvm_args", "");
 		settings.put("lastUsedBranch", 0); // Release
 		settings.put("lastUsedVersion", "NONE");
-		settings.put("jvm_args", "");
+		settings.put("launchArgs", "");
+		settings.put("memory", 4096);
 		return settings;
 	}
 
@@ -73,6 +70,46 @@ public final class LaunchSettings {
 
 	public static void setInstallDir(String installDir) {
 		launchSettings.put("installDir", installDir);
+	}
+
+	public static String getJvmArgs() {
+		return launchSettings.getString("jvm_args");
+	}
+
+	public static void setJvmArgs(String jvmArgs) {
+		launchSettings.put("jvm_args", jvmArgs);
+	}
+
+	public static String getLaunchArgs() {
+		return launchSettings.getString("launchArgs");
+	}
+
+	public static void setLaunchArgs(String launchArgs) {
+		launchSettings.put("launchArgs", launchArgs);
+	}
+
+	public static int getLastUsedBranch() {
+		return launchSettings.getInt("lastUsedBranch");
+	}
+
+	public static void setLastUsedBranch(int lastUsedBranch) {
+		launchSettings.put("lastUsedBranch", lastUsedBranch);
+	}
+
+	public static String getLastUsedVersion() {
+		return launchSettings.getString("lastUsedVersion");
+	}
+
+	public static void setLastUsedVersion(String lastUsedVersion) {
+		launchSettings.put("lastUsedVersion", lastUsedVersion);
+	}
+
+	public static int getMemory() {
+		return launchSettings.getInt("memory");
+	}
+
+	public static void setMemory(int memory) {
+		launchSettings.put("memory", memory);
 	}
 
 }
