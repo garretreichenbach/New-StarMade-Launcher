@@ -14,13 +14,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
- *
  * Updates the game to a given version.
  *
  * @author TheDerpGamer
  */
-// todo rename and move to new package
-public class Updater extends Observable {
+// todo move to new package
+public class GameUpdater extends Observable {
 	public static final int BACK_NONE = 0;
 	public static final int BACK_DB = 1;
 	public static final int BACK_ALL = 2;
@@ -34,12 +33,12 @@ public class Updater extends Observable {
 	private final StarMadeBackupTool backup = new StarMadeBackupTool();
 	private boolean updating;
 
-	public Updater(String installDir) {
+	public GameUpdater(String installDir) {
 		reloadVersion(installDir);
 	}
 
 	public static void withoutGUI(boolean force, String installDir, GameBranch branch, int backUp, boolean selectVersion) {
-		Updater u = new Updater(installDir);
+		GameUpdater u = new GameUpdater(installDir);
 		try {
 			u.startLoadVersionList(branch);
 			while (u.loading) {
@@ -58,7 +57,7 @@ public class Updater extends Observable {
 		}
 	}
 
-	public static void selectVersion(boolean display, Updater u, boolean force, String installDir, GameBranch f, int backUp, boolean selectVersion) {
+	public static void selectVersion(boolean display, GameUpdater u, boolean force, String installDir, GameBranch f, int backUp, boolean selectVersion) {
 		if (display) {
 			for (int i = 0; i < u.versions.size(); i++) {
 				System.out.println("[" + i + "] v" + u.versions.get(i).version + "; " + u.versions.get(i).build);

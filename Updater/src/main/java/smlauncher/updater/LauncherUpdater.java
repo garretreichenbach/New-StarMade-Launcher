@@ -13,8 +13,7 @@ import java.util.zip.ZipFile;
  *
  * @author TheDerpGamer
  */
-// todo rename
-public class Updater {
+public class LauncherUpdater {
 
 	public static void main(String[] args) {
 		try {

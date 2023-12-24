@@ -12,11 +12,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Updater for updating the launcher itself, not the game.
+ * Checks whether the launcher needs to be updated and runs the launcher updater.
  *
  * @author TheDerpGamer
  */
-public class LauncherUpdater {
+public class LauncherUpdaterHelper {
 
 	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
 	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v"; //Temp link for testing

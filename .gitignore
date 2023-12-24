@@ -12,6 +12,7 @@ MANIFEST.MF
 # Executables
 [Ss]tar[Mm]ade[ -][Ll]auncher.jar
 [Ss]tar[Mm]ade[ -][Ll]auncher.exe
+Updater.jar
 
 # Extracted folders
 /jdk*

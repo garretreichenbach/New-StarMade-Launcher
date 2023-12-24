@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import static smlauncher.starmade.Updater.FILES_URL;
-
 /**
  * Thread for updating the game.
  *
@@ -43,16 +41,9 @@ public class UpdaterThread extends Thread {
 						.backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
 			}
 
-			// Get the download url
-//			String branchDir;
-//			if (version.branch == GameBranch.DEV) branchDir = "dev/";
-//			else if (version.branch == GameBranch.PRE) branchDir = "pre/";
-//			else branchDir = "";
-
 			// Get checksums
-//			String buildDir = String.format("%sbuild/%sstarmade-build_%s", FILES_URL, branchDir, version.build);
-			String buildDir = FILES_URL + version.path; // build dir is same as path
-			ChecksumFile checksums = Updater.getChecksums(buildDir);
+			String buildDir = GameUpdater.FILES_URL + version.path; // build dir is same as path
+			ChecksumFile checksums = GameUpdater.getChecksums(buildDir);
 
 			if (!installDir.exists()) installDir.mkdirs();
 			float finalSize = checksums.checksums.size();

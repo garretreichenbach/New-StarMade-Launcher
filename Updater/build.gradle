@@ -21,7 +21,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'smlauncher.updater.Updater'
+        attributes 'Main-Class': 'smlauncher.updater.LauncherUpdater'
     }
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     destinationDirectory.set(file("../src/main/resources/"))

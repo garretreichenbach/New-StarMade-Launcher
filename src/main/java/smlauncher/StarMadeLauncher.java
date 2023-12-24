@@ -111,7 +111,7 @@ public class StarMadeLauncher extends JFrame {
 		setBranch(gameVersion.branch);
 
 		LaunchSettings.saveSettings();
-//		deleteUpdaterJar();
+		deleteUpdaterJar();
 
 		// Get the current OS
 		currentOS = OperatingSystem.getCurrent();
@@ -148,7 +148,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public static void main(String[] args) {
 		boolean headless = false;
-		int backupMode = Updater.BACK_DB;
+		int backupMode = GameUpdater.BACK_DB;
 		boolean selectVersion = false;
 
 		if (args == null || args.length == 0) startup();
@@ -177,10 +177,10 @@ public class StarMadeLauncher extends JFrame {
 							return;
 						case "-backup":
 						case "-backup_all":
-							backupMode = Updater.BACK_ALL;
+							backupMode = GameUpdater.BACK_ALL;
 							break;
 						case "-no_backup":
-							backupMode = Updater.BACK_NONE;
+							backupMode = GameUpdater.BACK_NONE;
 							break;
 						case "-server":
 							serverMode = true;
@@ -192,7 +192,7 @@ public class StarMadeLauncher extends JFrame {
 						} catch (NumberFormatException ignored) {
 						}
 					}
-					Updater.withoutGUI((args.length > 1 && "-force".equals(args[1])),
+					GameUpdater.withoutGUI((args.length > 1 && "-force".equals(args[1])),
 							LaunchSettings.getInstallDir(), buildBranch, backupMode, selectVersion);
 				} else startup();
 				startup();
@@ -204,7 +204,7 @@ public class StarMadeLauncher extends JFrame {
 		EventQueue.invokeLater(() -> {
 			try {
 				FlatDarkLaf.setup();
-				if (LauncherUpdater.checkForUpdate()) {
+				if (LauncherUpdaterHelper.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog updateDialog = createLauncherUpdateDialog();
 					updateDialog.setVisible(true);
@@ -251,7 +251,7 @@ public class StarMadeLauncher extends JFrame {
 		updateButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		updateButton.addActionListener(e -> {
 			dialog.dispose();
-			LauncherUpdater.updateLauncher();
+			LauncherUpdaterHelper.updateLauncher();
 		});
 		buttonPanel.add(updateButton);
 

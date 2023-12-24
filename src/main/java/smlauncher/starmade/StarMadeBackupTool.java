@@ -5,6 +5,11 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Observable;
 
+/**
+ * Backs up the game directory.
+ *
+ * @author TheDerpGamer
+ */
 // TODO replace deprecated API
 public class StarMadeBackupTool extends Observable {
 
