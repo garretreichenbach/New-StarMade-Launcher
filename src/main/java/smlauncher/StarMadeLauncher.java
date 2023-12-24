@@ -77,7 +77,6 @@ public class StarMadeLauncher extends JFrame {
 	private static boolean serverMode;
 	private static int port;
 
-	// TODO running in server mode
 	public StarMadeLauncher() {
 		// Set window properties
 		super("StarMade Launcher [" + LAUNCHER_VERSION + "]");
@@ -816,6 +815,7 @@ public class StarMadeLauncher extends JFrame {
 		});
 		if (serverPanel != null) serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
+
 		normalPlayButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -827,12 +827,8 @@ public class StarMadeLauncher extends JFrame {
 				normalPlayButton.setForeground(Palette.textColor);
 			}
 		});
-		normalPlayButton.addActionListener(e -> {
-			footerLabel.setIcon(getIcon("sprites/footer_normalplay_bg.jpg"));
-			serverPanel.setVisible(false);
-			versionPanel.setVisible(true);
-			createPlayPanel(footerPanel);
-		});
+		normalPlayButton.addActionListener(e -> switchToClientMode(footerLabel));
+
 		dedicatedServerButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -846,14 +842,10 @@ public class StarMadeLauncher extends JFrame {
 		});
 		dedicatedServerButton.addActionListener(e -> {
 			if (updaterThread == null || !updaterThread.updating) { //Don't allow this while the game is updating
-				footerLabel.setIcon(getIcon("sprites/footer_dedicated_bg.jpg"));
-				versionPanel.setVisible(false);
-				playPanelButtons.removeAll();
-				versionPanel.removeAll();
-				createServerPanel(footerPanel);
-				serverPanel.setVisible(true);
+				switchToServerMode(footerLabel);
 			}
 		});
+
 		centerPanel = new JPanel();
 		centerPanel.setDoubleBuffered(true);
 		centerPanel.setOpaque(false);
@@ -870,6 +862,26 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
+
+		switchToClientMode(footerLabel); // make sure right components are visible
+	}
+
+	private void switchToClientMode(JLabel footerLabel) {
+		System.out.println("switch to client");
+		footerLabel.setIcon(getIcon("sprites/footer_normalplay_bg.jpg"));
+		serverPanel.setVisible(false);
+		versionPanel.setVisible(true);
+		createPlayPanel(footerPanel);
+	}
+
+	private void switchToServerMode(JLabel footerLabel) {
+		System.out.println("switch to server");
+		footerLabel.setIcon(getIcon("sprites/footer_dedicated_bg.jpg"));
+		versionPanel.setVisible(false);
+		playPanelButtons.removeAll();
+		versionPanel.removeAll();
+		createServerPanel(footerPanel);
+		serverPanel.setVisible(true);
 	}
 
 	private static void setGameVersion(IndexFileEntry gameVersion) {
@@ -914,7 +926,6 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
 
-		// todo not showing on startup
 		if ((repair || !gameJarExists(LaunchSettings.getInstallDir())
 				|| gameVersion == null
 				|| !Objects.equals(gameVersion.version, selectedVersion)) && !debugMode) {
