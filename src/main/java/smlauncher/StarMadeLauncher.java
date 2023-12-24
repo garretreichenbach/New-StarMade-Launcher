@@ -25,6 +25,10 @@ import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
@@ -37,7 +41,7 @@ import java.util.List;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.10";
+	public static final String LAUNCHER_VERSION = "3.0.11";
 	private static final String[] J18ARGS = {
 			"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
 			"--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -56,6 +60,7 @@ public class StarMadeLauncher extends JFrame {
 	private static GameBranch lastUsedBranch = GameBranch.RELEASE;
 	public static boolean debugMode;
 	public static boolean useSteam;
+	public static String installDir = "./StarMade";
 	private static String selectedVersion;
 	private static boolean selectVersion;
 	private final VersionRegistry versionRegistry;
@@ -97,7 +102,6 @@ public class StarMadeLauncher extends JFrame {
 		}
 
 		// Fetch game versions
-
 		versionRegistry = new VersionRegistry();
 		try {
 			versionRegistry.createRegistry();
@@ -117,7 +121,7 @@ public class StarMadeLauncher extends JFrame {
 		LaunchSettings.saveSettings();
 		deleteUpdaterJar();
 
-		// Get the current OS
+		//Get the current OS
 		currentOS = OperatingSystem.getCurrent();
 
 		// Download JREs
