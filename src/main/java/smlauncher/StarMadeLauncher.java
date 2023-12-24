@@ -111,7 +111,10 @@ public class StarMadeLauncher extends JFrame {
 		setBranch(gameVersion.branch);
 
 		LaunchSettings.saveSettings();
-		deleteUpdaterJar();
+
+		// Delete updater jar (in case launcher was updated)
+		File updaterJar = new File("Updater.jar");
+		if (updaterJar.exists()) updaterJar.delete();
 
 		// Get the current OS
 		currentOS = OperatingSystem.getCurrent();
@@ -139,11 +142,6 @@ public class StarMadeLauncher extends JFrame {
 	private void downloadJRE(JavaVersion version) throws Exception {
 		if (new File(getJavaPath(version)).exists()) return;
 		new JavaDownloader(version).downloadAndUnzip();
-	}
-
-	private static void deleteUpdaterJar() {
-		File updaterJar = new File("Updater.jar");
-		if (updaterJar.exists()) updaterJar.delete();
 	}
 
 	public static void main(String[] args) {
@@ -867,7 +865,6 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void switchToClientMode(JLabel footerLabel) {
-		System.out.println("switch to client");
 		footerLabel.setIcon(getIcon("sprites/footer_normalplay_bg.jpg"));
 		serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
@@ -875,7 +872,6 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void switchToServerMode(JLabel footerLabel) {
-		System.out.println("switch to server");
 		footerLabel.setIcon(getIcon("sprites/footer_dedicated_bg.jpg"));
 		versionPanel.setVisible(false);
 		playPanelButtons.removeAll();

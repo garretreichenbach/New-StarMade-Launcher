@@ -42,7 +42,7 @@ public class LauncherUpdaterHelper {
 		try {
 			// Copy updater jar
 			File updaterJar = new File("Updater.jar");
-//			if (updaterJar.exists()) updaterJar.delete();
+			if (updaterJar.exists()) updaterJar.delete();
 			extractUpdater(updaterJar);
 
 			// Run updater jar
