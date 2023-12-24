@@ -54,11 +54,9 @@ public class StarMadeLauncher extends JFrame {
 	private final OperatingSystem currentOS;
 	private static IndexFileEntry gameVersion;
 	private static GameBranch lastUsedBranch = GameBranch.RELEASE;
-	public static boolean debugMode;
-	public static boolean useSteam;
-	public static String installDir = "./StarMade";
+	private static boolean debugMode;
+	private static boolean useSteam;
 	private static String selectedVersion;
-	private static boolean selectVersion;
 	private final VersionRegistry versionRegistry;
 	private final DownloadStatus dlStatus = new DownloadStatus();
 	private UpdaterThread updaterThread;
@@ -75,12 +73,13 @@ public class StarMadeLauncher extends JFrame {
 	private JPanel playPanelButtons;
 	private JScrollPane centerScrollPane;
 	private LauncherNewsPanel newsPanel;
-	private LauncherForumsPanel forumsPanel;
-	private LauncherContentPanel contentPanel;
+//	private LauncherForumsPanel forumsPanel;
+//	private LauncherContentPanel contentPanel;
 	private LauncherCommunityPanel communityPanel;
 	private static boolean serverMode;
 	private static int port;
 
+	// TODO running in server mode
 	public StarMadeLauncher() {
 		// Set window properties
 		super("StarMade Launcher [" + LAUNCHER_VERSION + "]");
@@ -117,7 +116,7 @@ public class StarMadeLauncher extends JFrame {
 		LaunchSettings.saveSettings();
 		deleteUpdaterJar();
 
-		//Get the current OS
+		// Get the current OS
 		currentOS = OperatingSystem.getCurrent();
 
 		// Download JREs
@@ -153,6 +152,7 @@ public class StarMadeLauncher extends JFrame {
 	public static void main(String[] args) {
 		boolean headless = false;
 		int backupMode = Updater.BACK_DB;
+		boolean selectVersion = false;
 
 		if (args == null || args.length == 0) startup();
 		else {
@@ -208,6 +208,7 @@ public class StarMadeLauncher extends JFrame {
 			try {
 				FlatDarkLaf.setup();
 				if (LauncherUpdater.checkForUpdate()) {
+//				if (false) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog dialog = new JDialog();
 					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -238,7 +239,6 @@ public class StarMadeLauncher extends JFrame {
 					buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 					dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-					// todo not showing on startup
 					JButton updateButton = new JButton("Update");
 					updateButton.setDoubleBuffered(true);
 					updateButton.setOpaque(true);
@@ -267,7 +267,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private static void startFrame() {
-		StarMadeLauncher frame = new StarMadeLauncher();
+		JFrame frame = new StarMadeLauncher();
 		(new Thread(() -> {
 			//For steam: keep it repainting so the damn overlays go away
 			try {
@@ -897,139 +897,8 @@ public class StarMadeLauncher extends JFrame {
 		return (int) (os.getTotalPhysicalMemorySize() / (1024 * 1024));
 	}
 
-	private void createPlayPanel(JPanel footerPanel) {
-		if (playPanel != null) {
-			playPanel.removeAll();
-			playPanel.revalidate();
-			playPanel.repaint();
-		}
-		serverMode = false;
-		if (portField != null) portField.setVisible(false);
-		playPanel = new JPanel();
-		playPanel.setDoubleBuffered(true);
-		playPanel.setOpaque(false);
-		playPanel.setLayout(new BorderLayout());
-		footerPanel.add(playPanel);
-		versionPanel = new JPanel();
-		versionPanel.setDoubleBuffered(true);
-		versionPanel.setOpaque(false);
-		versionPanel.setLayout(new BorderLayout());
-		footerPanel.add(versionPanel, BorderLayout.WEST);
-		JPanel versionSubPanel = new JPanel();
-		versionSubPanel.setDoubleBuffered(true);
-		versionSubPanel.setOpaque(false);
-		versionSubPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		versionPanel.add(versionSubPanel, BorderLayout.SOUTH);
-
-		//Change color of arrow
-		UIDefaults defaults = new UIDefaults();
-		defaults.put("ComboBox:\"ComboBox.arrowButton\"[Enabled].backgroundPainter", Palette.buttonColor);
-
-		//Version dropdown
-		JComboBox<String> versionDropdown = new JComboBox<>();
-		versionDropdown.setDoubleBuffered(true);
-		versionDropdown.setOpaque(true);
-		versionDropdown.setBackground(Palette.paneColor);
-		versionDropdown.setForeground(Palette.textColor);
-		versionDropdown.setUI(new BasicComboBoxUI() {
-			@Override
-			protected JButton createArrowButton() {
-				JButton button = super.createArrowButton();
-				button.setDoubleBuffered(true);
-				button.setOpaque(false);
-				button.setBackground(Palette.paneColor);
-				button.setForeground(Palette.textColor);
-				button.setContentAreaFilled(false);
-				button.setRolloverEnabled(false);
-				button.setBorder(BorderFactory.createEmptyBorder());
-				button.setFocusable(false);
-				return button;
-			}
-		});
-		versionDropdown.setRenderer(new DefaultListCellRenderer() {
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if (isSelected) setBackground(Palette.selectedColor);
-				else setBackground(Palette.deselectedColor);
-				return this;
-			}
-		});
-		versionDropdown.putClientProperty("Nimbus.Overrides", defaults);
-		versionDropdown.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
-
-		//Branch dropdown
-		JComboBox<String> branchDropdown = new JComboBox<>();
-		branchDropdown.setDoubleBuffered(true);
-		branchDropdown.setOpaque(true);
-		branchDropdown.setBackground(Palette.paneColor);
-		branchDropdown.setForeground(Palette.textColor);
-		branchDropdown.setUI(new BasicComboBoxUI() {
-			@Override
-			protected JButton createArrowButton() {
-				JButton button = super.createArrowButton();
-				button.setDoubleBuffered(true);
-				button.setOpaque(false);
-				button.setBackground(Palette.paneColor);
-				button.setForeground(Palette.textColor);
-				button.setContentAreaFilled(false);
-				button.setRolloverEnabled(false);
-				button.setBorder(BorderFactory.createEmptyBorder());
-				button.setFocusable(false);
-				return button;
-			}
-		});
-		branchDropdown.setRenderer(new DefaultListCellRenderer() {
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if (isSelected) setBackground(Palette.selectedColor);
-				else setBackground(Palette.deselectedColor);
-				return this;
-			}
-		});
-		// TODO need to set branch/version drop down to correct index on start
-		branchDropdown.addItem("Release");
-		branchDropdown.addItem("Dev");
-		branchDropdown.addItem("Pre-Release");
-		branchDropdown.setSelectedIndex(lastUsedBranch.index);
-		branchDropdown.addItemListener(e -> {
-			// TODO repeated code
-			int branchIndex = branchDropdown.getSelectedIndex();
-			setBranch(GameBranch.getForIndex(branchIndex));
-			LaunchSettings.saveSettings();
-			versionDropdown.removeAllItems();
-			updateVersionDropdown(versionDropdown, branchDropdown);
-			recreateButtons(playPanel, false);
-		});
-		branchDropdown.putClientProperty("Nimbus.Overrides", defaults);
-		branchDropdown.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
-
-		versionDropdown.removeAllItems();
-		updateVersionDropdown(versionDropdown, branchDropdown);
-		versionDropdown.addItemListener(e -> {
-			if (versionDropdown.getSelectedIndex() == -1) return;
-			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
-			LaunchSettings.setLastUsedVersion(selectedVersion);
-			LaunchSettings.saveSettings();
-			recreateButtons(playPanel, false);
-		});
-		String lastUsedVersion = LaunchSettings.getLastUsedVersion();
-		if (lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
-		for (int i = 0; i < versionDropdown.getItemCount(); i++) {
-			if (versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
-				versionDropdown.setSelectedIndex(i);
-				break;
-			}
-		}
-		versionSubPanel.add(branchDropdown);
-		versionSubPanel.add(versionDropdown);
-		recreateButtons(playPanel, false);
-		footerPanel.revalidate();
-		footerPanel.repaint();
-	}
-
 	private void recreateButtons(JPanel playPanel, boolean repair) {
+		System.out.println("recreating buttons");
 		if (playPanelButtons != null) {
 			playPanelButtons.removeAll();
 			playPanel.remove(playPanelButtons);
@@ -1045,6 +914,8 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
+
+		// todo not showing on startup
 		if ((repair || !gameJarExists(LaunchSettings.getInstallDir())
 				|| gameVersion == null
 				|| !Objects.equals(gameVersion.version, selectedVersion)) && !debugMode) {
@@ -1183,23 +1054,51 @@ public class StarMadeLauncher extends JFrame {
 		return LaunchSettings.getInstallDir() + "/" + String.format(currentOS.javaPath, version.number);
 	}
 
+	// Panel Methods
+
+	private void createPlayPanel(JPanel footerPanel) {
+		clearPanel(playPanel);
+		serverMode = false;
+		playPanel = createPanel(footerPanel, false);
+	}
+
 	private void createServerPanel(JPanel footerPanel) {
-		if (serverPanel != null) {
-			serverPanel.removeAll();
-			serverPanel.revalidate();
-			serverPanel.repaint();
-		}
+		clearPanel(serverPanel);
 		serverMode = true;
-		serverPanel = new JPanel();
-		serverPanel.setDoubleBuffered(true);
-		serverPanel.setOpaque(false);
-		serverPanel.setLayout(new BorderLayout());
-		footerPanel.add(serverPanel);
-		versionPanel = new JPanel();
+		serverPanel = createPanel(footerPanel, true);
+	}
+
+	private JPanel createPanel(JPanel footerPanel, boolean serverMode) {
+		JPanel panel = new JPanel();
+		panel.setDoubleBuffered(true);
+		panel.setOpaque(false);
+		panel.setLayout(new BorderLayout());
+		footerPanel.add(panel);
+
+		versionPanel = createVersionPanel(serverMode);
+		footerPanel.add(versionPanel, BorderLayout.WEST);
+
+		recreateButtons(panel, false);
+
+		footerPanel.revalidate();
+		footerPanel.repaint();
+		return panel;
+	}
+
+	private static void clearPanel(JPanel panel) {
+		if (panel != null) {
+			panel.removeAll();
+			panel.revalidate();
+			panel.repaint();
+		}
+	}
+
+	private JPanel createVersionPanel(boolean serverMode) {
+		JPanel versionPanel = new JPanel();
 		versionPanel.setDoubleBuffered(true);
 		versionPanel.setOpaque(false);
 		versionPanel.setLayout(new BorderLayout());
-		footerPanel.add(versionPanel, BorderLayout.WEST);
+
 		JPanel versionSubPanel = new JPanel();
 		versionSubPanel.setDoubleBuffered(true);
 		versionSubPanel.setOpaque(false);
@@ -1211,104 +1110,36 @@ public class StarMadeLauncher extends JFrame {
 		defaults.put("ComboBox:\"ComboBox.arrowButton\"[Enabled].backgroundPainter", Palette.buttonColor);
 
 		//Version dropdown
-		JComboBox<String> versionDropdown = new JComboBox<>();
-		versionDropdown.setDoubleBuffered(true);
-		versionDropdown.setOpaque(true);
-		versionDropdown.setBackground(Palette.paneColor);
-		versionDropdown.setForeground(Palette.textColor);
-		versionDropdown.setUI(new BasicComboBoxUI() {
-			@Override
-			protected JButton createArrowButton() {
-				JButton button = super.createArrowButton();
-				button.setDoubleBuffered(true);
-				button.setOpaque(false);
-				button.setBackground(Palette.paneColor);
-				button.setForeground(Palette.textColor);
-				button.setContentAreaFilled(false);
-				button.setRolloverEnabled(false);
-				button.setBorder(BorderFactory.createEmptyBorder());
-				button.setFocusable(false);
-				return button;
-			}
-		});
-		versionDropdown.setRenderer(new DefaultListCellRenderer() {
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if (isSelected) setBackground(Palette.selectedColor);
-				else setBackground(Palette.deselectedColor);
-				return this;
-			}
-		});
-		versionDropdown.putClientProperty("Nimbus.Overrides", defaults);
-		versionDropdown.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
+		JComboBox<String> versionDropdown = createDropdown();
+		setClientProperties(versionDropdown, defaults);
 
 		//Branch dropdown
-		JComboBox<String> branchDropdown = new JComboBox<>();
-		branchDropdown.setDoubleBuffered(true);
-		branchDropdown.setOpaque(true);
-		branchDropdown.setBackground(Palette.paneColor);
-		branchDropdown.setForeground(Palette.textColor);
-		branchDropdown.setUI(new BasicComboBoxUI() {
-			@Override
-			protected JButton createArrowButton() {
-				JButton button = super.createArrowButton();
-				button.setDoubleBuffered(true);
-				button.setOpaque(false);
-				button.setBackground(Palette.paneColor);
-				button.setForeground(Palette.textColor);
-				button.setContentAreaFilled(false);
-				button.setRolloverEnabled(false);
-				button.setBorder(BorderFactory.createEmptyBorder());
-				button.setFocusable(false);
-				return button;
-			}
-		});
-		branchDropdown.setRenderer(new DefaultListCellRenderer() {
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if (isSelected) setBackground(Palette.selectedColor);
-				else setBackground(Palette.deselectedColor);
-				return this;
-			}
-		});
-		branchDropdown.addItem("Release");
-		branchDropdown.addItem("Dev");
-		branchDropdown.addItem("Pre-Release");
-		branchDropdown.setSelectedIndex(lastUsedBranch.index);
-		branchDropdown.addItemListener(e -> {
-			// TODO repeated code
-			int branchIndex = branchDropdown.getSelectedIndex();
-			setBranch(GameBranch.getForIndex(branchIndex));
-			LaunchSettings.saveSettings();
-			versionDropdown.removeAllItems();
-			updateVersionDropdown(versionDropdown, branchDropdown);
-			recreateButtons(playPanel, false);
-		});
-		branchDropdown.putClientProperty("Nimbus.Overrides", defaults);
-		branchDropdown.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
+		JComboBox<String> branchDropdown = createBranchDropdown(versionDropdown, lastUsedBranch.index);
+		setClientProperties(branchDropdown, defaults);
 
 		versionDropdown.removeAllItems();
-		updateVersionDropdown(versionDropdown, branchDropdown);
-		versionDropdown.addItemListener(e -> {
-			if (versionDropdown.getSelectedIndex() == -1) return;
-			selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
-			// Update game version
-			LaunchSettings.setLastUsedVersion(selectedVersion);
-			LaunchSettings.saveSettings();
-			recreateButtons(playPanel, false);
-		});
-		String lastUsedVersion = LaunchSettings.getLastUsedVersion();
-		if (lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
-		for (int i = 0; i < versionDropdown.getItemCount(); i++) {
-			if (versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
-				versionDropdown.setSelectedIndex(i);
-				break;
+		updateVersionDropdown(versionDropdown, branchDropdown, versionRegistry);
+		versionDropdown.addItemListener(e -> onSelectVersion(versionDropdown));
+		setInitialVersion(versionDropdown);
+
+		versionSubPanel.add(branchDropdown);
+		versionSubPanel.add(versionDropdown);
+
+		//Port field
+		if (serverMode) {
+			portField = createPortField();
+			versionSubPanel.add(portField);
+		} else {
+			if (portField != null) {
+				portField.setVisible(false);
+				versionSubPanel.remove(portField);
 			}
 		}
+		return versionPanel;
+	}
 
-		portField = new JTextField("4242");
+	private static JTextField createPortField() {
+		JTextField portField = new JTextField("4242");
 		portField.setDoubleBuffered(true);
 		portField.setOpaque(true);
 		portField.setBackground(Palette.paneColor);
@@ -1340,13 +1171,98 @@ public class StarMadeLauncher extends JFrame {
 				}
 			}
 		});
+		return portField;
+	}
 
-		versionSubPanel.add(branchDropdown);
-		versionSubPanel.add(versionDropdown);
-		versionSubPanel.add(portField);
-		recreateButtons(serverPanel, false);
-		footerPanel.revalidate();
-		footerPanel.repaint();
+	// Dropdown Methods
+
+	private static JComboBox<String> createDropdown() {
+		JComboBox<String> dropDown = new JComboBox<>();
+		dropDown.setDoubleBuffered(true);
+		dropDown.setOpaque(true);
+		dropDown.setBackground(Palette.paneColor);
+		dropDown.setForeground(Palette.textColor);
+		dropDown.setUI(new BasicComboBoxUI() {
+			@Override
+			protected JButton createArrowButton() {
+				JButton button = super.createArrowButton();
+				button.setDoubleBuffered(true);
+				button.setOpaque(false);
+				button.setBackground(Palette.paneColor);
+				button.setForeground(Palette.textColor);
+				button.setContentAreaFilled(false);
+				button.setRolloverEnabled(false);
+				button.setBorder(BorderFactory.createEmptyBorder());
+				button.setFocusable(false);
+				return button;
+			}
+		});
+		dropDown.setRenderer(new DefaultListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (isSelected) setBackground(Palette.selectedColor);
+				else setBackground(Palette.deselectedColor);
+				return this;
+			}
+		});
+		return dropDown;
+	}
+
+	private JComboBox<String> createBranchDropdown(JComboBox<String> versionDropdown, int startIndex) {
+		JComboBox<String> branchDropdown = createDropdown();
+		branchDropdown.addItem("Release");
+		branchDropdown.addItem("Dev");
+		branchDropdown.addItem("Pre-Release");
+		branchDropdown.setSelectedIndex(startIndex);
+		branchDropdown.addItemListener(e -> onSelectBranch(branchDropdown, versionDropdown));
+		return branchDropdown;
+	}
+
+	private void onSelectBranch(JComboBox<String> branchDropdown, JComboBox<String> versionDropdown) {
+		int branchIndex = branchDropdown.getSelectedIndex();
+		setBranch(GameBranch.getForIndex(branchIndex));
+		LaunchSettings.saveSettings();
+		versionDropdown.removeAllItems();
+		updateVersionDropdown(versionDropdown, branchDropdown, versionRegistry);
+		recreateButtons(playPanel, false);
+	}
+
+	private void onSelectVersion(JComboBox<String> versionDropdown) {
+		if (versionDropdown.getSelectedIndex() == -1) return;
+		selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
+		LaunchSettings.setLastUsedVersion(selectedVersion);
+		LaunchSettings.saveSettings();
+		recreateButtons(playPanel, false);
+	}
+
+	private static void setInitialVersion(JComboBox<String> versionDropdown) {
+		String lastUsedVersion = LaunchSettings.getLastUsedVersion();
+		if (lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
+		for (int i = 0; i < versionDropdown.getItemCount(); i++) {
+			if (versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
+				versionDropdown.setSelectedIndex(i);
+				break;
+			}
+		}
+	}
+
+	private static void setClientProperties(JComboBox<String> dropdown, UIDefaults defaults) {
+		dropdown.putClientProperty("Nimbus.Overrides", defaults);
+		dropdown.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
+	}
+
+	// TODO maybe save and don't re-add every time
+	private static void updateVersionDropdown(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown, VersionRegistry versionRegistry) {
+		GameBranch branch = GameBranch.getForIndex(branchDropdown.getSelectedIndex());
+		List<IndexFileEntry> versions = versionRegistry.getVersions(branch);
+		if (versions == null) return;
+
+		// Add versions to dropdown
+		for (IndexFileEntry version : versions) {
+			if (version.equals(versions.get(0))) versionDropdown.addItem(version.version + " (Latest)");
+			else versionDropdown.addItem(version.version);
+		}
 	}
 
 	private void updateGame(IndexFileEntry version) {
@@ -1403,22 +1319,6 @@ public class StarMadeLauncher extends JFrame {
 				updateButton.setIcon(getIcon("sprites/update_btn.png"));
 			}
 		}).start();
-	}
-
-	// TODO maybe don't re-add every time
-	private void updateVersionDropdown(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown) {
-		GameBranch branch = GameBranch.getForIndex(branchDropdown.getSelectedIndex());
-		List<IndexFileEntry> versions = versionRegistry.getVersions(branch);
-		if (versions != null) {
-			addVersionsToDropdown(versionDropdown, versions);
-		}
-	}
-
-	private void addVersionsToDropdown(JComboBox<String> versionDropdown, List<IndexFileEntry> versions) {
-		for (IndexFileEntry version : versions) {
-			if (version.equals(versions.get(0))) versionDropdown.addItem(version.version + " (Latest)");
-			else versionDropdown.addItem(version.version);
-		}
 	}
 
 	private void createScroller(JPanel currentPanel) {

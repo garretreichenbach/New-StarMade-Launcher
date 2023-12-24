@@ -13,6 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+/**
+ *
+ * Updates the game to a given version.
+ *
+ * @author TheDerpGamer
+ */
+// todo rename and move to new package
 public class Updater extends Observable {
 	public static final int BACK_NONE = 0;
 	public static final int BACK_DB = 1;

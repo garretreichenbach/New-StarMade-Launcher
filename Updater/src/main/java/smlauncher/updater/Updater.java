@@ -9,10 +9,11 @@ import java.net.URL;
 import java.util.zip.ZipFile;
 
 /**
- * Updater for updating the launcher itself, not the game. Exported in a separate jar file within the launcher jar file.
+ * Updates the launcher itself, not the game. Exported in a separate jar file within the launcher jar file.
  *
  * @author TheDerpGamer
  */
+// todo rename
 public class Updater {
 
 	public static void main(String[] args) {
