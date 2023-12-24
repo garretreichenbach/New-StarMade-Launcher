@@ -1,6 +1,7 @@
 package smlauncher.starmade;
 
 import smlauncher.StarMadeLauncher;
+import smlauncher.util.OperatingSystem;
 
 import javax.swing.*;
 import java.awt.*;

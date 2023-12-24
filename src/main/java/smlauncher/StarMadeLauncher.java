@@ -207,7 +207,6 @@ public class StarMadeLauncher extends JFrame {
 		EventQueue.invokeLater(() -> {
 			try {
 				FlatDarkLaf.setup();
-//				if (false) { // for debug only
 				if (LauncherUpdater.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog dialog = new JDialog();

@@ -2,6 +2,7 @@ package smlauncher.starmade;
 
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.jasypt.util.text.BasicTextEncryptor;
+import smlauncher.util.OperatingSystem;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -18,9 +19,6 @@ public class StarMadeCredentials {
 	}
 
 	public static File getPath() throws IOException {
-
-		//		return new File("L:\\git\\StarMade");
-
 		return OperatingSystem.getAppDir();
 	}
 

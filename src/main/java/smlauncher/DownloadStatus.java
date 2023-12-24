@@ -5,7 +5,8 @@ package smlauncher;
  *
  * @author SlavSquatSuperstar
  */
-class DownloadStatus {
+// TODO merge with FileDownloadUpdate
+public class DownloadStatus {
 	private float installProgress;
 	private String filename = "None";
 	private long downloadedMb, totalMb, speedMb;
