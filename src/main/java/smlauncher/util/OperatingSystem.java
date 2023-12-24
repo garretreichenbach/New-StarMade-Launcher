@@ -5,6 +5,7 @@ package smlauncher.util;
  *
  * @author SlavSquatSuperstar
  */
+// TODO merge with starmade.OperatingSystem
 public enum OperatingSystem {
 
 	WINDOWS("zip", "jre%d/bin/java.exe"),

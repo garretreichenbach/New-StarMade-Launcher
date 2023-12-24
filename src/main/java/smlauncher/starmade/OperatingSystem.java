@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
+// TODO merge with util.OperatingSystem
 public enum OperatingSystem {
 	LINUX("linux", "unix"), SOLARIS("sunos", "solaris"), WINDOWS("win"), MAC("mac"), UNKNOWN;
 

@@ -52,8 +52,8 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	private final OperatingSystem currentOS;
-	public static IndexFileEntry gameVersion;
-	public static GameBranch lastUsedBranch = GameBranch.RELEASE;
+	private static IndexFileEntry gameVersion;
+	private static GameBranch lastUsedBranch = GameBranch.RELEASE;
 	public static boolean debugMode;
 	public static boolean useSteam;
 	private static String selectedVersion;
@@ -112,8 +112,7 @@ public class StarMadeLauncher extends JFrame {
 		// Read game version and branch
 		gameVersion = getLastUsedVersion();
 		setGameVersion(gameVersion);
-		lastUsedBranch = gameVersion.branch;
-		LaunchSettings.setLastUsedBranch(lastUsedBranch.index);
+		setBranch(gameVersion.branch);
 
 		LaunchSettings.saveSettings();
 		deleteUpdaterJar();
@@ -208,8 +207,8 @@ public class StarMadeLauncher extends JFrame {
 		EventQueue.invokeLater(() -> {
 			try {
 				FlatDarkLaf.setup();
-				if (false) { // for debug only
-//				if (LauncherUpdater.checkForUpdate()) {
+//				if (false) { // for debug only
+				if (LauncherUpdater.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog dialog = new JDialog();
 					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -885,6 +884,11 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
+	private void setBranch(GameBranch branch) {
+		lastUsedBranch = branch;
+		LaunchSettings.setLastUsedBranch(lastUsedBranch.index);
+	}
+
 	private boolean usingOldVersion() {
 		return gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
 	}
@@ -991,9 +995,9 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Pre-Release");
 		branchDropdown.setSelectedIndex(lastUsedBranch.index);
 		branchDropdown.addItemListener(e -> {
+			// TODO repeated code
 			int branchIndex = branchDropdown.getSelectedIndex();
-			lastUsedBranch = GameBranch.getForIndex(branchIndex);
-			LaunchSettings.setLastUsedBranch(branchIndex);
+			setBranch(GameBranch.getForIndex(branchIndex));
 			LaunchSettings.saveSettings();
 			versionDropdown.removeAllItems();
 			updateVersionDropdown(versionDropdown, branchDropdown);
@@ -1275,9 +1279,9 @@ public class StarMadeLauncher extends JFrame {
 		branchDropdown.addItem("Pre-Release");
 		branchDropdown.setSelectedIndex(lastUsedBranch.index);
 		branchDropdown.addItemListener(e -> {
+			// TODO repeated code
 			int branchIndex = branchDropdown.getSelectedIndex();
-			lastUsedBranch = GameBranch.getForIndex(branchIndex);
-			LaunchSettings.setLastUsedBranch(branchIndex);
+			setBranch(GameBranch.getForIndex(branchIndex));
 			LaunchSettings.saveSettings();
 			versionDropdown.removeAllItems();
 			updateVersionDropdown(versionDropdown, branchDropdown);
@@ -1382,7 +1386,7 @@ public class StarMadeLauncher extends JFrame {
 				assert gameVersion != null;
 				LaunchSettings.setLastUsedVersion(gameVersion.version);
 				selectedVersion = gameVersion.version;
-				LaunchSettings.setLastUsedBranch(lastUsedBranch.index);
+				setBranch(gameVersion.branch);
 				LaunchSettings.saveSettings();
 				SwingUtilities.invokeLater(() -> {
 					try {
