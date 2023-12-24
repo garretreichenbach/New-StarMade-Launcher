@@ -15,12 +15,12 @@ public final class LaunchSettings {
 
 	// TODO store more properties
 
-	private static JSONObject launchSettings = getDefaultLaunchSettings();
+	private static JSONObject launchSettings;
 
 	private LaunchSettings() {
 	}
 
-	private static final String SETTINGS_FILENAME = "launcher-settings.json";
+	private static final String SETTINGS_FILENAME = "launch-settings.json";
 
 	// Settings File Methods
 
@@ -30,6 +30,7 @@ public final class LaunchSettings {
 
 		// Create file if not present
 		if (!jsonFile.exists()) {
+			launchSettings = defaultSettings;
 			saveLaunchSettings(defaultSettings);
 		} else {
 			// Read the settings file
@@ -45,7 +46,7 @@ public final class LaunchSettings {
 	}
 
 	public static void saveLaunchSettings(JSONObject settings) {
-		File settingsFile = new File("launch-settings.json");
+		File settingsFile = new File(SETTINGS_FILENAME);
 		try {
 			TextFileUtil.writeText(settingsFile, settings.toString());
 		} catch (IOException exception) {
@@ -57,7 +58,7 @@ public final class LaunchSettings {
 		JSONObject settings = new JSONObject();
 		settings.put("memory", 4096);
 		settings.put("launchArgs", "");
-		settings.put("installDir", "StarMade");
+		settings.put("installDir", "./StarMade");
 		settings.put("lastUsedBranch", 0); // Release
 		settings.put("lastUsedVersion", "NONE");
 		settings.put("jvm_args", "");

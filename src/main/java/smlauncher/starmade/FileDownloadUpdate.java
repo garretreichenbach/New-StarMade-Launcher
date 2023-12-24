@@ -1,5 +1,6 @@
 package smlauncher.starmade;
 
+// TODO merge with DownloadStatus
 public class FileDownloadUpdate {
 	public long downloaded;
 	public long size;

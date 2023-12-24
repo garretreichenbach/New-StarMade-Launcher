@@ -138,11 +138,10 @@ public class Updater extends Observable {
 			return true;
 		}
 		System.out.println("checking your version " + VersionContainer.build + " against latest " + versions.get(versions.size() - 1).build + " = " + VersionContainer.build.compareTo(versions.get(versions.size() - 1).build));
-		return versions.size() > 0 && VersionContainer.build.compareTo(versions.get(versions.size() - 1).build) < 0;
+		return !versions.isEmpty() && VersionContainer.build.compareTo(versions.get(versions.size() - 1).build) < 0;
 	}
 
 	private void loadVersionList(GameBranch branch) throws IOException {
-
 		setChanged();
 		notifyObservers("Retrieving Launcher Version");
 

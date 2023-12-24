@@ -26,8 +26,6 @@ import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
@@ -55,16 +53,15 @@ public class StarMadeLauncher extends JFrame {
 	};
 
 	private final OperatingSystem currentOS;
-	public IndexFileEntry gameVersion;
+	public static IndexFileEntry gameVersion;
 	public static GameBranch lastUsedBranch = GameBranch.RELEASE;
 	public static boolean debugMode;
 	public static boolean useSteam;
 	private static String selectedVersion;
 	private static boolean selectVersion;
-	private static int backup = Updater.BACK_DB;
 	private final VersionRegistry versionRegistry;
 	private final DownloadStatus dlStatus = new DownloadStatus();
-	private final JSONObject launchSettings;
+	private final JSONObject launchSettings; // reference to launch settings json object
 	private UpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
@@ -112,7 +109,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 
 		// Read launch settings and game directory
-		launchSettings = getLaunchSettings();
+		launchSettings = LaunchSettings.getLaunchSettings();
 
 		// Read game version and branch
 		gameVersion = getLastUsedVersion();
@@ -158,6 +155,8 @@ public class StarMadeLauncher extends JFrame {
 
 	public static void main(String[] args) {
 		boolean headless = false;
+		int backupMode = Updater.BACK_DB;
+
 		if (args == null || args.length == 0) startup();
 		else {
 			GameBranch buildBranch = GameBranch.RELEASE;
@@ -184,10 +183,10 @@ public class StarMadeLauncher extends JFrame {
 							return;
 						case "-backup":
 						case "-backup_all":
-							backup = Updater.BACK_ALL;
+							backupMode = Updater.BACK_ALL;
 							break;
 						case "-no_backup":
-							backup = Updater.BACK_NONE;
+							backupMode = Updater.BACK_NONE;
 							break;
 						case "-server":
 							serverMode = true;
@@ -200,7 +199,7 @@ public class StarMadeLauncher extends JFrame {
 						}
 					}
 					Updater.withoutGUI((args.length > 1 && "-force".equals(args[1])),
-							LaunchSettings.getInstallDir(), buildBranch, backup, selectVersion);
+							LaunchSettings.getInstallDir(), buildBranch, backupMode, selectVersion);
 				} else startup();
 				startup();
 			}
@@ -211,7 +210,8 @@ public class StarMadeLauncher extends JFrame {
 		EventQueue.invokeLater(() -> {
 			try {
 				FlatDarkLaf.setup();
-				if (LauncherUpdater.checkForUpdate()) {
+				if (false) { // for debug only
+//				if (LauncherUpdater.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog dialog = new JDialog();
 					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -243,7 +243,6 @@ public class StarMadeLauncher extends JFrame {
 					dialog.add(buttonPanel, BorderLayout.SOUTH);
 
 					// todo not showing on startup
-					// todo saying launch when not updated
 					JButton updateButton = new JButton("Update");
 					updateButton.setDoubleBuffered(true);
 					updateButton.setOpaque(true);
@@ -343,7 +342,7 @@ public class StarMadeLauncher extends JFrame {
 			} else {
 				version = launchSettings.getString("lastUsedVersion");
 			}
-			// TODO write to modify version.txt
+			// TODO write to version.txt
 			String shortVersion = version.substring(0, version.indexOf('#'));
 
 			IndexFileEntry entry = versionRegistry.searchForVersion(
@@ -619,7 +618,7 @@ public class StarMadeLauncher extends JFrame {
 //			northPanel.setBackground(Palette.paneColor);
 //			northPanel.setForeground(Palette.foregroundColor);
 			dialogPanel.add(northPanel, BorderLayout.NORTH);
-			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 2048, getSystemMemory(), Objects.requireNonNull(getLaunchSettings()).getInt("memory"));
+			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 2048, getSystemMemory(), this.launchSettings.getInt("memory"));
 //			slider.setBackground(Palette.paneColor);
 			JLabel sliderLabel = new JLabel("Memory: " + slider.getValue() + " MB");
 //			sliderLabel.setBackground(Palette.paneColor);
@@ -659,7 +658,7 @@ public class StarMadeLauncher extends JFrame {
 //			launchArgs.setBackground(Palette.paneColor);
 			launchArgs.setDoubleBuffered(true);
 			launchArgs.setOpaque(true);
-			launchArgs.setText(getLaunchSettings().getString("launchArgs"));
+			launchArgs.setText(this.launchSettings.getString("launchArgs"));
 			launchArgs.setLineWrap(true);
 			launchArgs.setWrapStyleWord(true);
 			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -750,6 +749,7 @@ public class StarMadeLauncher extends JFrame {
 				String path = installLabelPath.getText();
 				if (path == null || path.isEmpty()) return;
 				File file = new File(path);
+				// TODO maybe create the folder
 				if (!file.exists()) return;
 				if (!file.isDirectory()) file = file.getParentFile();
 				tempInstallDir[0] = file.getAbsolutePath();
@@ -808,9 +808,12 @@ public class StarMadeLauncher extends JFrame {
 			cancelButton.setDoubleBuffered(true);
 			buttonPanel.add(cancelButton);
 			saveButton.addActionListener(e1 -> {
-				LaunchSettings.setInstallDir(tempInstallDir[0]);
-				this.launchSettings.put("installDir", tempInstallDir[0]);
-				saveLaunchSettings();
+				String installDir = tempInstallDir[0];
+				if (installDir != null) {
+					this.launchSettings.put("installDir", installDir);
+					LaunchSettings.setInstallDir(installDir);
+					saveLaunchSettings();
+				}
 				dialog[0].dispose();
 			});
 			cancelButton.addActionListener(e1 -> dialog[0].dispose());
@@ -872,10 +875,6 @@ public class StarMadeLauncher extends JFrame {
 			exception.printStackTrace();
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
-	}
-
-	private JSONObject getLaunchSettings() {
-		return LaunchSettings.getLaunchSettings();
 	}
 
 	private void saveLaunchSettings() {
@@ -1051,7 +1050,9 @@ public class StarMadeLauncher extends JFrame {
 		playPanelButtonsSub.setOpaque(false);
 		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-		if ((repair || !gameJarExists(LaunchSettings.getInstallDir()) || gameVersion == null || (!Objects.equals(gameVersion.version, selectedVersion))) && !debugMode) {
+		if ((repair || !gameJarExists(LaunchSettings.getInstallDir())
+				|| gameVersion == null
+				|| !Objects.equals(gameVersion.version, selectedVersion)) && !debugMode) {
 			updateButton = new JButton(getIcon("sprites/update_btn.png"));
 			updateButton.setDoubleBuffered(true);
 			updateButton.setOpaque(false);
@@ -1157,19 +1158,21 @@ public class StarMadeLauncher extends JFrame {
 			// Needs to be added before "-jar"
 			commandComponents.add("-XstartOnFirstThread");
 		}
+//		commandComponents.add("-Dfml.earlyprogresswindow=false");
+
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
 
 		// Memory Arguments
-		if (!Objects.requireNonNull(getLaunchSettings()).getString("jvm_args").isEmpty()) {
-			String[] launchArgs = Objects.requireNonNull(getLaunchSettings()).getString("launchArgs").split(" ");
+		if (!this.launchSettings.getString("jvm_args").isEmpty()) {
+			String[] launchArgs = this.launchSettings.getString("launchArgs").split(" ");
 			for (String arg : launchArgs) {
 				if (arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
 				commandComponents.add(arg.trim());
 			}
 		}
 		commandComponents.add("-Xms1024m");
-		commandComponents.add("-Xmx" + getLaunchSettings().getInt("memory") + "m");
+		commandComponents.add("-Xmx" + this.launchSettings.getInt("memory") + "m");
 
 		// Game arguments
 		commandComponents.add("-force");
@@ -1301,7 +1304,7 @@ public class StarMadeLauncher extends JFrame {
 			saveLaunchSettings();
 			recreateButtons(playPanel, false);
 		});
-		String lastUsedVersion = Objects.requireNonNull(getLaunchSettings()).getString("lastUsedVersion");
+		String lastUsedVersion = this.launchSettings.getString("lastUsedVersion");
 		if (lastUsedVersion == null || lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
 		for (int i = 0; i < versionDropdown.getItemCount(); i++) {
 			if (versionDropdown.getItemAt(i).equals(lastUsedVersion)) {

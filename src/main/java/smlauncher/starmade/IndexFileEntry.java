@@ -1,11 +1,30 @@
 package smlauncher.starmade;
 
+/**
+ * Represents a specific release of StarMade.
+ *
+ * @author TheDerpGamer
+ */
 public class IndexFileEntry implements Comparable<IndexFileEntry> {
 
-	public final String build; // date
-	public final String version; // semantic versioning
-	public final String path; // download path
+	/**
+	 * The date this release was created.
+	 */
+	public final String build;
+
+	/**
+	 * The semantic versioning of this release.
+	 */
+	public final String version;
+
+	/**
+	 * The branch this release belongs to.
+	 */
 	public final GameBranch branch;
+	/**
+	 * The download path of this release.
+	 */
+	public final String path;
 
 	// TODO build and version are swapped in usage
 	public IndexFileEntry(String version, String build, GameBranch branch, String path) {
@@ -25,8 +44,8 @@ public class IndexFileEntry implements Comparable<IndexFileEntry> {
 	}
 
 	@Override
-	public int compareTo(IndexFileEntry arg0) {
-		return build.compareToIgnoreCase(arg0.build);
+	public int compareTo(IndexFileEntry other) {
+		return build.compareToIgnoreCase(other.build);
 	}
 
 	/* (non-Javadoc)
@@ -34,7 +53,7 @@ public class IndexFileEntry implements Comparable<IndexFileEntry> {
 	 */
 	@Override
 	public String toString() {
-		return build + " v" + version + " (" + branch.name() + ")";
+		return String.format("%s v%s (%s)", build, version, branch.name());
 	}
 
 }
