@@ -2,11 +2,9 @@ package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import smlauncher.community.LauncherCommunityPanel;
-import smlauncher.content.LauncherContentPanel;
 import smlauncher.downloader.JavaDownloader;
 import smlauncher.downloader.JavaVersion;
 import smlauncher.fileio.TextFileUtil;
-import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
 import smlauncher.util.OperatingSystem;
@@ -114,7 +112,7 @@ public class StarMadeLauncher extends JFrame {
 		setBranch(gameVersion.branch);
 
 		LaunchSettings.saveSettings();
-		deleteUpdaterJar();
+//		deleteUpdaterJar();
 
 		// Get the current OS
 		currentOS = OperatingSystem.getCurrent();
@@ -208,65 +206,69 @@ public class StarMadeLauncher extends JFrame {
 			try {
 				FlatDarkLaf.setup();
 				if (LauncherUpdater.checkForUpdate()) {
-//				if (false) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
-					JDialog dialog = new JDialog();
-					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-					dialog.setModal(true);
-					dialog.setResizable(false);
-					dialog.setTitle("Launcher Update Available");
-					dialog.setSize(500, 350);
-					dialog.setLocationRelativeTo(null);
-					dialog.setLayout(new BorderLayout());
-					dialog.setAlwaysOnTop(true);
-					dialog.setLayout(new BorderLayout());
-
-					JPanel descPanel = new JPanel();
-					descPanel.setDoubleBuffered(true);
-					descPanel.setOpaque(true);
-					descPanel.setLayout(new BoxLayout(descPanel, BoxLayout.Y_AXIS));
-					dialog.add(descPanel);
-
-					JLabel descLabel = new JLabel("A new launcher update is available, please update to continue.");
-					descLabel.setDoubleBuffered(true);
-					descLabel.setOpaque(true);
-					descLabel.setFont(new Font("Roboto", Font.BOLD, 16));
-					descPanel.add(descLabel);
-
-					JPanel buttonPanel = new JPanel();
-					buttonPanel.setDoubleBuffered(true);
-					buttonPanel.setOpaque(true);
-					buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-					dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-					JButton updateButton = new JButton("Update");
-					updateButton.setDoubleBuffered(true);
-					updateButton.setOpaque(true);
-					updateButton.setFont(new Font("Roboto", Font.BOLD, 12));
-					updateButton.addActionListener(e -> {
-						dialog.dispose();
-						LauncherUpdater.updateLauncher();
-					});
-					buttonPanel.add(updateButton);
-
-					JButton cancelButton = new JButton("Cancel");
-					cancelButton.setDoubleBuffered(true);
-					cancelButton.setOpaque(true);
-					cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
-					cancelButton.addActionListener(e -> {
-						dialog.dispose();
-						startFrame();
-					});
-					buttonPanel.add(cancelButton);
-					dialog.setVisible(true);
-				} else startFrame();
+					JDialog updateDialog = createLauncherUpdateDialog();
+					updateDialog.setVisible(true);
+				} else startLauncherFrame();
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.out.println("Error occurred while running launcher");
 			}
 		});
 	}
 
-	private static void startFrame() {
+	private static JDialog createLauncherUpdateDialog() {
+		JDialog dialog = new JDialog();
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dialog.setModal(true);
+		dialog.setResizable(false);
+		dialog.setTitle("Launcher Update Available");
+		dialog.setSize(500, 350);
+		dialog.setLocationRelativeTo(null);
+		dialog.setLayout(new BorderLayout());
+		dialog.setAlwaysOnTop(true);
+		dialog.setLayout(new BorderLayout());
+
+		JPanel descPanel = new JPanel();
+		descPanel.setDoubleBuffered(true);
+		descPanel.setOpaque(true);
+		descPanel.setLayout(new BoxLayout(descPanel, BoxLayout.Y_AXIS));
+		dialog.add(descPanel);
+
+		JLabel descLabel = new JLabel("A new launcher update is available, please update to continue.");
+		descLabel.setDoubleBuffered(true);
+		descLabel.setOpaque(true);
+		descLabel.setFont(new Font("Roboto", Font.BOLD, 16));
+		descPanel.add(descLabel);
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setDoubleBuffered(true);
+		buttonPanel.setOpaque(true);
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+		JButton updateButton = new JButton("Update");
+		updateButton.setDoubleBuffered(true);
+		updateButton.setOpaque(true);
+		updateButton.setFont(new Font("Roboto", Font.BOLD, 12));
+		updateButton.addActionListener(e -> {
+			dialog.dispose();
+			LauncherUpdater.updateLauncher();
+		});
+		buttonPanel.add(updateButton);
+
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.setDoubleBuffered(true);
+		cancelButton.setOpaque(true);
+		cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
+		cancelButton.addActionListener(e -> {
+			dialog.dispose();
+			startLauncherFrame();
+		});
+		buttonPanel.add(cancelButton);
+		return dialog;
+	}
+
+	private static void startLauncherFrame() {
 		JFrame frame = new StarMadeLauncher();
 		(new Thread(() -> {
 			//For steam: keep it repainting so the damn overlays go away
@@ -338,7 +340,6 @@ public class StarMadeLauncher extends JFrame {
 			} else {
 				version = LaunchSettings.getLastUsedVersion();
 			}
-			// TODO write to version.txt
 			String shortVersion = version.substring(0, version.indexOf('#'));
 
 			IndexFileEntry entry = versionRegistry.searchForVersion(
@@ -745,7 +746,6 @@ public class StarMadeLauncher extends JFrame {
 				String path = installLabelPath.getText();
 				if (path == null || path.isEmpty()) return;
 				File file = new File(path);
-				// TODO maybe create the folder
 				if (!file.exists()) return;
 				if (!file.isDirectory()) file = file.getParentFile();
 				tempInstallDir[0] = file.getAbsolutePath();
@@ -872,7 +872,7 @@ public class StarMadeLauncher extends JFrame {
 		centerPanel.add(background, BorderLayout.CENTER);
 	}
 
-	private void setGameVersion(IndexFileEntry gameVersion) {
+	private static void setGameVersion(IndexFileEntry gameVersion) {
 		if (gameVersion != null) {
 			LaunchSettings.setLastUsedVersion(gameVersion.version);
 			if (usingOldVersion()) LaunchSettings.setJvmArgs("--illegal-access=permit");
@@ -883,12 +883,12 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	private void setBranch(GameBranch branch) {
+	private static void setBranch(GameBranch branch) {
 		lastUsedBranch = branch;
 		LaunchSettings.setLastUsedBranch(lastUsedBranch.index);
 	}
 
-	private boolean usingOldVersion() {
+	private static boolean usingOldVersion() {
 		return gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
 	}
 
@@ -898,7 +898,6 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void recreateButtons(JPanel playPanel, boolean repair) {
-		System.out.println("recreating buttons");
 		if (playPanelButtons != null) {
 			playPanelButtons.removeAll();
 			playPanel.remove(playPanelButtons);
@@ -987,7 +986,7 @@ public class StarMadeLauncher extends JFrame {
 		playPanel.repaint();
 	}
 
-	public void runStarMade(boolean server) {
+	private void runStarMade(boolean server) {
 		ArrayList<String> commandComponents = getCommandComponents(server);
 
 		// Run game
