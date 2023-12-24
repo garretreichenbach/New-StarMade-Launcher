@@ -7,6 +7,7 @@
 /launcher-test/
 /node_modules/
 /release-builds/
+src/main/resources/Updater.jar
 MANIFEST.MF
 
 # Executables

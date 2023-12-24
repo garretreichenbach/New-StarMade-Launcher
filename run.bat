@@ -7,6 +7,7 @@ cd %SCRIPT_DIR% || exit /b 1
 
 rem Compile the Gradle project
 echo Compiling StarMade launcher...
+call .\gradlew.bat Updater:jar
 call .\gradlew.bat win_jar
 
 rem Run the launcher jar file
