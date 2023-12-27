@@ -1249,7 +1249,7 @@ public class StarMadeLauncher extends JFrame {
 
 	public void runStarMade(boolean server) {
 		boolean useJava8 = GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1");
-		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getPath();
+		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getAbsolutePath();
 
 		ArrayList<String> commandComponents = new ArrayList<>();
 		commandComponents.add(bundledJavaPath);
@@ -1259,6 +1259,11 @@ public class StarMadeLauncher extends JFrame {
 			// Run OpenGL on main thread on macOS
 			// Needs to be added before "-jar"
 			commandComponents.add("-XstartOnFirstThread");
+		}
+
+		if(currentOS == OperatingSystem.LINUX) {
+			// Override (meaningless?) default library path
+			commandComponents.add("-Djava.library.path=lib:native/linux");
 		}
 
 		commandComponents.add("-jar");
