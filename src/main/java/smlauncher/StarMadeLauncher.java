@@ -1261,6 +1261,11 @@ public class StarMadeLauncher extends JFrame {
 			commandComponents.add("-XstartOnFirstThread");
 		}
 
+		if(currentOS == OperatingSystem.LINUX) {
+			// Override (meaningless?) default library path
+			commandComponents.add("-Djava.library.path=lib:native/linux");
+		}
+
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
 
