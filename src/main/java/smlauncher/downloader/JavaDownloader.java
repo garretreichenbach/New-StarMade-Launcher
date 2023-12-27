@@ -1,23 +1,17 @@
 package smlauncher.downloader;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.tar.TGZUnArchiver;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
-import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import smlauncher.JavaVersion;
-import smlauncher.OperatingSystem;
+import smlauncher.LaunchSettings;
+import smlauncher.util.OperatingSystem;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Enumeration;
 import java.util.Objects;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Downloads a JDK from the web and unzips it.
@@ -33,7 +27,8 @@ public class JavaDownloader {
 		this(OperatingSystem.getCurrent(), version);
 	}
 
-	public JavaDownloader(OperatingSystem currentOS, JavaVersion version) {
+	// Set OS for testing only
+	JavaDownloader(OperatingSystem currentOS, JavaVersion version) {
 		this.currentOS = currentOS;
 		this.version = version;
 	}
@@ -73,31 +68,7 @@ public class JavaDownloader {
 		unzipper.extract();
 
 		cleanupZip(); // Delete the zip file
-
 		moveExtractedFolder();
-	}
-
-	// Doesn't work for tar.gz
-	private void unzipFile(ZipFile zipFile, File destinationFile) {
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-		while (entries.hasMoreElements()) {
-			ZipEntry entry = entries.nextElement();
-			File entryDestination = new File(destinationFile, entry.getName());
-			entryDestination.getParentFile().mkdirs();
-			if (entry.isDirectory()) continue;
-
-			try (InputStream in = zipFile.getInputStream(entry);
-				 OutputStream out = new FileOutputStream(entryDestination)) {
-				byte[] buffer = new byte[1024];
-				int len;
-				while ((len = in.read(buffer)) > 0) {
-					out.write(buffer, 0, len);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	private void moveExtractedFolder() throws IOException {
@@ -133,7 +104,7 @@ public class JavaDownloader {
 	}
 
 	private String getJreFolderName() {
-		return "./jre" + version.number;
+		return LaunchSettings.getInstallDir() + "/jre" + version.number;
 	}
 
 	void cleanupZip() {

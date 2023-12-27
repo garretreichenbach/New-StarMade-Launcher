@@ -5,7 +5,7 @@ import smlauncher.util.Palette;
 import javax.swing.*;
 
 /**
- * [Description]
+ * Panel for displaying forums in the launcher.
  *
  * @author TheDerpGamer
  */

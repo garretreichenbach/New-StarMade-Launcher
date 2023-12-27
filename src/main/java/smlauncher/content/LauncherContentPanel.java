@@ -5,7 +5,7 @@ import smlauncher.util.Palette;
 import javax.swing.*;
 
 /**
- * [Description]
+ * Panel for displaying community content in the launcher.
  *
  * @author TheDerpGamer
  */

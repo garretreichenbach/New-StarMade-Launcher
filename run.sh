@@ -24,6 +24,7 @@ esac
 
 # Compile the Gradle project
 echo "Compiling StarMade launcher..."
+./gradlew Updater:jar
 if $is_mac; then
   ./gradlew mac_jar
 else
