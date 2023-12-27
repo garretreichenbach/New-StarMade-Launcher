@@ -1024,6 +1024,15 @@ public class StarMadeLauncher extends JFrame {
 			commandComponents.add(bundledJavaPath);
 			commandComponents.addAll(Arrays.asList(J18ARGS));
 		}
+	}
+
+	public void runStarMade(boolean server) {
+		boolean useJava8 = GAME_VERSION.build.startsWith("0.2") || GAME_VERSION.build.startsWith("0.1");
+		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getAbsolutePath();
+
+		ArrayList<String> commandComponents = new ArrayList<>();
+		commandComponents.add(bundledJavaPath);
+		if(!useJava8) commandComponents.addAll(Arrays.asList(J18ARGS));
 
 		if (currentOS == OperatingSystem.MAC) {
 			// Run OpenGL on main thread on macOS
@@ -1031,6 +1040,11 @@ public class StarMadeLauncher extends JFrame {
 			commandComponents.add("-XstartOnFirstThread");
 		}
 //		commandComponents.add("-Dfml.earlyprogresswindow=false");
+
+		if(currentOS == OperatingSystem.LINUX) {
+			// Override (meaningless?) default library path
+			commandComponents.add("-Djava.library.path=lib:native/linux");
+		}
 
 		commandComponents.add("-jar");
 		commandComponents.add("StarMade.jar");
