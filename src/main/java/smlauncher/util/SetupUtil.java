@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * [Description]
+ * Reads HTML files from the .jar.
  *
  * @author TheDerpGamer
  */

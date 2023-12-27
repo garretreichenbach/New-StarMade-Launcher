@@ -3,7 +3,7 @@ package smlauncher.util;
 import java.awt.*;
 
 /**
- * [Description]
+ * Standard color palette for the launcher.
  *
  * @author TheDerpGamer
  */

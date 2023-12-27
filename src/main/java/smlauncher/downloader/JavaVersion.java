@@ -1,4 +1,4 @@
-package smlauncher;
+package smlauncher.downloader;
 
 /**
  * A version of the Java Runtime Environment (JRE).

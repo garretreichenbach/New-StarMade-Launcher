@@ -7,11 +7,13 @@
 /launcher-test/
 /node_modules/
 /release-builds/
+src/main/resources/Updater.jar
 MANIFEST.MF
 
 # Executables
 [Ss]tar[Mm]ade[ -][Ll]auncher.jar
 [Ss]tar[Mm]ade[ -][Ll]auncher.exe
+Updater.jar
 
 # Extracted folders
 /jdk*
