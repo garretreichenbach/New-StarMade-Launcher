@@ -85,7 +85,7 @@ public class JavaDownloader {
 		if (extractedFolder == null) throw new IOException("Could not find extracted folder");
 
 		// Rename the extracted folder to jre<#>/
-		extractedFolder.renameTo(jreFolder);
+		FileUtils.moveDirectory(extractedFolder, jreFolder);
 	}
 
 	// Helper Methods

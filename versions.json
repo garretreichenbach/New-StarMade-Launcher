@@ -6,47 +6,51 @@
     },
     {
       "version": "3.0.1",
-      "versionDate": "2022-12-8"
+      "versionDate": "2023-12-8"
     },
     {
       "version": "3.0.2",
-      "versionDate": "2022-12-8"
+      "versionDate": "2023-12-8"
     },
     {
       "version": "3.0.3",
-      "versionDate": "2022-12-8"
+      "versionDate": "2023-12-8"
     },
     {
       "version": "3.0.4",
-      "versionDate": "2022-12-8"
+      "versionDate": "2023-12-8"
     },
     {
       "version": "3.0.5",
-      "versionDate": "2022-12-8"
+      "versionDate": "2023-12-8"
     },
     {
       "version": "3.0.6",
-      "versionDate": "2022-12-9"
+      "versionDate": "2023-12-9"
     },
     {
       "version": "3.0.7",
-      "versionDate": "2022-12-9"
+      "versionDate": "2023-12-9"
     },
     {
       "version": "3.0.8",
-      "versionDate": "2022-12-9"
+      "versionDate": "2023-12-9"
     },
     {
       "version": "3.0.9",
-      "versionDate": "2022-12-10"
+      "versionDate": "2023-12-10"
     },
     {
       "version": "3.0.10",
-      "versionDate": "2022-12-11"
+      "versionDate": "2023-12-11"
     },
     {
       "version": "3.0.11",
-      "versionDate": "2022-12-27"
+      "versionDate": "2023-12-27"
+    },
+    {
+      "version": "3.0.12",
+      "versionDate": "2024-3-31"
     }
   ]
 }
