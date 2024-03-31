@@ -20,7 +20,7 @@ public final class TextFileUtil {
 	}
 
 	public static String readText(File file) throws IOException {
-		try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
+		try (FileReader reader = new FileReader(file)) {
 			return IOUtils.toString(reader);
 		} catch (IOException e) {
 			throw new IOException("Could not read text from file");
@@ -28,7 +28,7 @@ public final class TextFileUtil {
 	}
 
 	public static List<String> readLines(File file) throws IOException {
-		try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
+		try (FileReader reader = new FileReader(file)) {
 			return IOUtils.readLines(reader);
 		} catch (IOException e) {
 			throw new IOException("Could not read lines from file");
@@ -36,7 +36,7 @@ public final class TextFileUtil {
 	}
 
 	public static void writeText(File file, String text) throws IOException {
-		try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
+		try (FileWriter writer = new FileWriter(file)) {
 			IOUtils.write(text, writer);
 			writer.flush();
 		} catch (IOException exception) {
@@ -45,7 +45,7 @@ public final class TextFileUtil {
 	}
 
 	public static void writeLines(File file, List<String> lines) throws IOException {
-		try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
+		try (FileWriter writer = new FileWriter(file)) {
 			IOUtils.writeLines(lines, "\n", writer);
 			writer.flush();
 		} catch (IOException exception) {
