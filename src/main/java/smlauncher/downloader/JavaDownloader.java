@@ -51,6 +51,7 @@ public class JavaDownloader {
 		FileOutputStream fos = new FileOutputStream(destination);
 		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 		fos.close();
+		System.out.println("Downloaded " + destination);
 	}
 
 	public void unzip() throws IOException {
@@ -69,6 +70,7 @@ public class JavaDownloader {
 
 		cleanupZip(); // Delete the zip file
 		moveExtractedFolder();
+		System.out.println("Unzipped " + zipFilename);
 	}
 
 	private void moveExtractedFolder() throws IOException {

@@ -18,13 +18,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Main class for the StarMade Launcher.
@@ -35,7 +38,7 @@ import java.util.List;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.12";
+	public static final String LAUNCHER_VERSION = "3.0.13";
 	private static final String[] J18ARGS = {"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED", "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED", "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED", "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED", "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED", "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED", "--add-opens=java.base/java.io=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"};
 	private static IndexFileEntry gameVersion;
 	private static GameBranch lastUsedBranch = GameBranch.RELEASE;
@@ -71,7 +74,7 @@ public class StarMadeLauncher extends JFrame {
 		setBounds(100, 100, 800, 550);
 		setMinimumSize(new Dimension(800, 550));
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		// Set window icon
 		try {
@@ -437,8 +440,12 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void downloadJRE(JavaVersion version) throws Exception {
-		if(new File(getJavaPath(version)).exists()) return;
-		new JavaDownloader(version).downloadAndUnzip();
+		if(new File(getJavaPath(version)).exists()) {
+			System.out.println("JRE " + version + " already downloaded");
+			return;
+		}
+		System.out.println("Downloading JRE " + version);
+		(new JavaDownloader(version)).downloadAndUnzip();
 	}
 
 	private IndexFileEntry getLastUsedVersion() {
@@ -1041,7 +1048,7 @@ public class StarMadeLauncher extends JFrame {
 				@Override
 				public void mouseExited(MouseEvent e) {
 					if(updaterThread == null || !updaterThread.updating) updateButton.setIcon(getIcon("sprites/update_btn.png"));
-					else updateButton.setToolTipText("");
+					else updateButton.setToolTipText(dlStatus.toString());
 				}
 			});
 			playPanelButtonsSub.add(updateButton);
@@ -1085,8 +1092,7 @@ public class StarMadeLauncher extends JFrame {
 
 	private void runStarMade(boolean server) {
 		ArrayList<String> commandComponents = getCommandComponents(server);
-
-		// Run game
+		//Run game
 		ProcessBuilder process = new ProcessBuilder(commandComponents);
 		process.directory(new File(LaunchSettings.getInstallDir()));
 		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
@@ -1101,7 +1107,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	public ArrayList<String> getCommandComponents(boolean server) {
-		boolean useJava8 = gameVersion.build.startsWith("0.2") || gameVersion.build.startsWith("0.1");
+		boolean useJava8 = gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
 		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getAbsolutePath();
 
 		ArrayList<String> commandComponents = new ArrayList<>();
@@ -1278,6 +1284,7 @@ public class StarMadeLauncher extends JFrame {
 				g.drawImage(updateButtonFilled.getImage(), 0, 0, filledWidth, updateButtonFilled.getIconHeight(), 0, 0, filledWidth, updateButtonFilled.getIconHeight(), null);
 				g.dispose();
 				updateButton.setIcon(new ImageIcon(image));
+				updateButton.setToolTipText(dlStatus.toString());
 				updateButton.repaint();
 			}
 
@@ -1291,7 +1298,7 @@ public class StarMadeLauncher extends JFrame {
 				LaunchSettings.saveSettings();
 				SwingUtilities.invokeLater(() -> {
 					try {
-						Thread.sleep(1);
+						sleep(1);
 						recreateButtons(playPanel, false);
 					} catch(InterruptedException e) {
 						throw new RuntimeException(e);
