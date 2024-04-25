@@ -25,5 +25,4 @@ public enum JavaVersion {
 		else if (number == 18) return JAVA_18;
 		else return null;
 	}
-
 }
