@@ -6,6 +6,8 @@ import smlauncher.downloader.JavaDownloader;
 import smlauncher.downloader.JavaVersion;
 import smlauncher.fileio.ImageFileUtil;
 import smlauncher.fileio.TextFileUtil;
+import smlauncher.mainui.LauncherUpdateDialog;
+import smlauncher.mainui.PortField;
 import smlauncher.mainui.WindowControlsPanel;
 import smlauncher.mainui.WindowDragPanel;
 import smlauncher.news.LauncherNewsPanel;
@@ -191,8 +193,7 @@ public class StarMadeLauncher extends JFrame {
 				FlatDarkLaf.setup();
 				if(LauncherUpdaterHelper.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
-					JDialog updateDialog = createLauncherUpdateDialog();
-					updateDialog.setVisible(true);
+					showLauncherUpdateDialog();
 				} else startLauncherWindow();
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -201,56 +202,13 @@ public class StarMadeLauncher extends JFrame {
 		});
 	}
 
-	private static JDialog createLauncherUpdateDialog() {
-		JDialog dialog = new JDialog();
-		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dialog.setModal(true);
-		dialog.setResizable(false);
-		dialog.setTitle("Launcher Update Available");
-		dialog.setSize(500, 350);
-		dialog.setLocationRelativeTo(null);
-		dialog.setLayout(new BorderLayout());
-		dialog.setAlwaysOnTop(true);
-		dialog.setLayout(new BorderLayout());
-
-		JPanel descPanel = new JPanel();
-		descPanel.setDoubleBuffered(true);
-		descPanel.setOpaque(true);
-		descPanel.setLayout(new BoxLayout(descPanel, BoxLayout.Y_AXIS));
-		dialog.add(descPanel);
-
-		JLabel descLabel = new JLabel("A new launcher update is available, please update to continue.");
-		descLabel.setDoubleBuffered(true);
-		descLabel.setOpaque(true);
-		descLabel.setFont(new Font("Roboto", Font.BOLD, 16));
-		descPanel.add(descLabel);
-
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setDoubleBuffered(true);
-		buttonPanel.setOpaque(true);
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-		JButton updateButton = new JButton("Update");
-		updateButton.setDoubleBuffered(true);
-		updateButton.setOpaque(true);
-		updateButton.setFont(new Font("Roboto", Font.BOLD, 12));
-		updateButton.addActionListener(e -> {
-			dialog.dispose();
-			LauncherUpdaterHelper.updateLauncher();
-		});
-		buttonPanel.add(updateButton);
-
-		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setDoubleBuffered(true);
-		cancelButton.setOpaque(true);
-		cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
-		cancelButton.addActionListener(e -> {
-			dialog.dispose();
-			startLauncherWindow();
-		});
-		buttonPanel.add(cancelButton);
-		return dialog;
+	private static void showLauncherUpdateDialog() {
+		JDialog updateDialog = new LauncherUpdateDialog(
+				"Launcher Update Available", 500, 350,
+				e -> LauncherUpdaterHelper.updateLauncher(),
+				e -> startLauncherWindow()
+		);
+		updateDialog.setVisible(true);
 	}
 
 	private static void startLauncherWindow() {
@@ -273,7 +231,7 @@ public class StarMadeLauncher extends JFrame {
 		})).start();
 	}
 
-	public static void displayHelp() {
+	private static void displayHelp() {
 		System.out.println("StarMade Launcher " + LAUNCHER_VERSION + " Help:");
 		System.out.println("-version : Version selection prompt");
 		System.out.println("-no_gui : Don't start gui (needed for linux dedicated servers)");
@@ -841,6 +799,7 @@ public class StarMadeLauncher extends JFrame {
 
 	private JPanel createTopPanel() {
 		JPanel topPanel = new WindowDragPanel(
+				ImageFileUtil.getIcon("sprites/header_top.png"),
 				new MouseAdapter() {
 					@Override
 					public void mousePressed(MouseEvent e) {
@@ -865,12 +824,6 @@ public class StarMadeLauncher extends JFrame {
 				}
 		);
 
-		//Give the top panel a sprite
-		JLabel topLabel = new JLabel();
-		topLabel.setDoubleBuffered(true);
-		topLabel.setIcon(ImageFileUtil.getIcon("sprites/header_top.png"));
-		topPanel.add(topLabel);
-
 		//Buttons to minimize/close window
 		JPanel windowControlsPanel = new WindowControlsPanel(
 				ImageFileUtil.getIcon("sprites/minimize_icon.png"),
@@ -881,8 +834,10 @@ public class StarMadeLauncher extends JFrame {
 					System.exit(0);
 				}
 		);
-		topLabel.add(windowControlsPanel);
 
+		//Was previously topLabel.add(windowControlsPanel)
+		//Changing it doesn't seem to make a difference
+		topPanel.add(windowControlsPanel);
 		return topPanel;
 	}
 
