@@ -64,7 +64,7 @@ public class StarMadeLauncher extends JFrame {
 	private JPanel playPanelButtons;
 	private JScrollPane centerScrollPane;
 	private LauncherNewsPanel newsPanel;
-	//	private LauncherForumsPanel forumsPanel;
+//	private LauncherForumsPanel forumsPanel;
 //	private LauncherContentPanel contentPanel;
 	private LauncherCommunityPanel communityPanel;
 
@@ -191,7 +191,7 @@ public class StarMadeLauncher extends JFrame {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog updateDialog = createLauncherUpdateDialog();
 					updateDialog.setVisible(true);
-				} else startLauncherFrame();
+				} else startLauncherWindow();
 			} catch(Exception e) {
 				e.printStackTrace();
 				System.out.println("Error occurred while running launcher");
@@ -245,13 +245,13 @@ public class StarMadeLauncher extends JFrame {
 		cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		cancelButton.addActionListener(e -> {
 			dialog.dispose();
-			startLauncherFrame();
+			startLauncherWindow();
 		});
 		buttonPanel.add(cancelButton);
 		return dialog;
 	}
 
-	private static void startLauncherFrame() {
+	private static void startLauncherWindow() {
 		JFrame frame = new StarMadeLauncher();
 		(new Thread(() -> {
 			//For steam: keep it repainting so the damn overlays go away
@@ -332,14 +332,6 @@ public class StarMadeLauncher extends JFrame {
 
 	private static boolean usingOldVersion() {
 		return gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
-	}
-
-	private static void clearPanel(JPanel panel) {
-		if(panel != null) {
-			panel.removeAll();
-			panel.revalidate();
-			panel.repaint();
-		}
 	}
 
 	private static JTextField createPortField() {
@@ -1037,7 +1029,9 @@ public class StarMadeLauncher extends JFrame {
 				System.out.println("selected version " + version);
 				if(version != null) {
 					if(updaterThread == null || !updaterThread.updating) updateGame(version);
-				} else JOptionPane.showMessageDialog(null, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(null, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
 			});
 			updateButton.addMouseListener(new MouseAdapter() {
 				@Override
@@ -1184,6 +1178,14 @@ public class StarMadeLauncher extends JFrame {
 		footerPanel.revalidate();
 		footerPanel.repaint();
 		return panel;
+	}
+
+	private static void clearPanel(JPanel panel) {
+		if (panel != null) {
+			panel.removeAll();
+			panel.revalidate();
+			panel.repaint();
+		}
 	}
 
 	private JPanel createVersionPanel(boolean serverMode) {
