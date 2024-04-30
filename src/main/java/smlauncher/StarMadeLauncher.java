@@ -393,153 +393,22 @@ public class StarMadeLauncher extends JFrame {
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		footerPanel.add(bottomPanel, BorderLayout.SOUTH);
 
-		JButton launchSettings = new JButton("Launch Settings");
-		launchSettings.setIcon(ImageFileUtil.getIcon("sprites/memory_options_gear.png"));
-		launchSettings.setFont(new Font("Roboto", Font.BOLD, 12));
-		launchSettings.setDoubleBuffered(true);
-		launchSettings.setOpaque(false);
-		launchSettings.setContentAreaFilled(false);
-		launchSettings.setForeground(Palette.textColor);
-		launchSettings.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				launchSettings.setForeground(Palette.selectedColor);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				launchSettings.setForeground(Palette.textColor);
-			}
-		});
-		launchSettings.addActionListener(e -> {
-			JDialog settingsDialog = new LaunchSettingsDialog("Launch Settings", 500, 350);
-			settingsDialog.setVisible(true);
-		});
+		JButton launchSettings = new SettingsDialogButton(
+				"Launch Settings",
+				ImageFileUtil.getIcon("sprites/memory_options_gear.png"),
+				e -> {
+					JDialog settingsDialog = new LaunchSettingsDialog("Launch Settings", 500, 350);
+					settingsDialog.setVisible(true);
+				}
+		);
 		bottomPanel.add(launchSettings);
 
-		JButton installSettings = new JButton("Installation Settings");
-		installSettings.setIcon(ImageFileUtil.getIcon("sprites/launch_options_gear.png"));
-		installSettings.setFont(new Font("Roboto", Font.BOLD, 12));
-		installSettings.setDoubleBuffered(true);
-		installSettings.setOpaque(false);
-		installSettings.setContentAreaFilled(false);
-		installSettings.setForeground(Palette.textColor);
-		installSettings.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				installSettings.setForeground(Palette.selectedColor);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				installSettings.setForeground(Palette.textColor);
-			}
-		});
-		installSettings.addActionListener(e -> {
-			final String[] tempInstallDir = {null};
-
-			final JDialog[] dialog = {new JDialog()};
-			dialog[0].setModal(true);
-			dialog[0].setResizable(false);
-			dialog[0].setTitle("Installation Settings");
-			dialog[0].setSize(450, 150);
-			dialog[0].setLocationRelativeTo(null);
-			dialog[0].setLayout(new BorderLayout());
-			dialog[0].setAlwaysOnTop(true);
-			dialog[0].setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			JPanel dialogPanel = new JPanel();
-			dialogPanel.setDoubleBuffered(true);
-			dialogPanel.setOpaque(false);
-			dialog[0].add(dialogPanel, BorderLayout.CENTER);
-			JPanel installLabelPanel = new JPanel();
-			installLabelPanel.setDoubleBuffered(true);
-			installLabelPanel.setOpaque(false);
-			installLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-			dialogPanel.add(installLabelPanel);
-			JLabel installLabel = new JLabel("Install Directory: ");
-			installLabel.setDoubleBuffered(true);
-			installLabel.setOpaque(false);
-			installLabel.setFont(new Font("Roboto", Font.BOLD, 12));
-			installLabelPanel.add(installLabel);
-			JTextField installLabelPath = new JTextField(LaunchSettings.getInstallDir());
-			installLabelPath.setDoubleBuffered(true);
-			installLabelPath.setOpaque(false);
-			installLabelPath.setFont(new Font("Roboto", Font.PLAIN, 12));
-			installLabelPath.setMinimumSize(new Dimension(200, 20));
-			installLabelPath.setPreferredSize(new Dimension(200, 20));
-			installLabelPath.setMaximumSize(new Dimension(200, 20));
-			installLabelPanel.add(installLabelPath);
-			installLabelPath.addActionListener(e1 -> {
-				String path = installLabelPath.getText();
-				if(path == null || path.isEmpty()) return;
-				File file = new File(path);
-				if(!file.exists()) return;
-				if(!file.isDirectory()) file = file.getParentFile();
-				tempInstallDir[0] = file.getAbsolutePath();
-				installLabelPath.setText(tempInstallDir[0]);
-			});
-
-			JButton installButton = new JButton("Change");
-			installButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
-			installButton.setDoubleBuffered(true);
-			installButton.setOpaque(false);
-			installButton.setContentAreaFilled(false);
-			installButton.setBorderPainted(false);
-			installButton.setFont(new Font("Roboto", Font.BOLD, 12));
-			dialogPanel.add(installButton);
-			installButton.addActionListener(e1 -> {
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int result = fileChooser.showOpenDialog(dialog[0]);
-				if(result == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
-					if(!file.isDirectory()) file = file.getParentFile();
-					tempInstallDir[0] = file.getAbsolutePath();
-					installLabelPath.setText(tempInstallDir[0]);
+		JButton installSettings = new SettingsDialogButton(
+				"Installation Settings",
+				ImageFileUtil.getIcon("sprites/launch_options_gear.png"),
+				e -> {
+					createInstallSettingsDialog();
 				}
-			});
-
-			JButton repairButton = new JButton("Repair");
-			repairButton.setIcon(UIManager.getIcon("FileView.checkIcon"));
-			repairButton.setDoubleBuffered(true);
-			repairButton.setOpaque(false);
-			repairButton.setFont(new Font("Roboto", Font.BOLD, 12));
-			dialogPanel.add(repairButton);
-			repairButton.addActionListener(e1 -> {
-				IndexFileEntry version = getLatestVersion(lastUsedBranch);
-				if(version != null) {
-					if(updaterThread == null || !updaterThread.updating) {
-						dialog[0].dispose();
-						recreateButtons(playPanel, true);
-						updateGame(version);
-					}
-				} else JOptionPane.showMessageDialog(dialog[0], "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
-			});
-
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setDoubleBuffered(true);
-			buttonPanel.setOpaque(false);
-			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			dialog[0].add(buttonPanel, BorderLayout.SOUTH);
-			JButton saveButton = new JButton("Save");
-			saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
-			saveButton.setDoubleBuffered(true);
-			buttonPanel.add(saveButton);
-			JButton cancelButton = new JButton("Cancel");
-			cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
-			cancelButton.setDoubleBuffered(true);
-			buttonPanel.add(cancelButton);
-			saveButton.addActionListener(e1 -> {
-				String installDir = tempInstallDir[0];
-				if(installDir != null) {
-					LaunchSettings.setInstallDir(installDir);
-					LaunchSettings.saveSettings();
-				}
-				dialog[0].dispose();
-			});
-			cancelButton.addActionListener(e1 -> dialog[0].dispose());
-			dialog[0].setVisible(true);
-		});
 		bottomPanel.add(installSettings);
 
 		if(serverPanel != null) serverPanel.setVisible(false);
@@ -586,6 +455,117 @@ public class StarMadeLauncher extends JFrame {
 		centerPanel.add(background, BorderLayout.CENTER);
 
 		switchToClientMode(footerLabel); // make sure right components are visible
+	}
+
+	private void createInstallSettingsDialog() {
+		final String[] tempInstallDir = {null};
+
+		final JDialog[] dialog = {new JDialog()};
+		dialog[0].setModal(true);
+		dialog[0].setResizable(false);
+		dialog[0].setTitle("Installation Settings");
+		dialog[0].setSize(450, 150);
+		dialog[0].setLocationRelativeTo(null);
+		dialog[0].setLayout(new BorderLayout());
+		dialog[0].setAlwaysOnTop(true);
+		dialog[0].setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+		JPanel dialogPanel = new JPanel();
+		dialogPanel.setDoubleBuffered(true);
+		dialogPanel.setOpaque(false);
+		dialog[0].add(dialogPanel, BorderLayout.CENTER);
+
+		JPanel installLabelPanel = new JPanel();
+		installLabelPanel.setDoubleBuffered(true);
+		installLabelPanel.setOpaque(false);
+		installLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		dialogPanel.add(installLabelPanel);
+		JLabel installLabel = new JLabel("Install Directory: ");
+		installLabel.setDoubleBuffered(true);
+		installLabel.setOpaque(false);
+		installLabel.setFont(new Font("Roboto", Font.BOLD, 12));
+		installLabelPanel.add(installLabel);
+
+		JTextField installLabelPath = new JTextField(LaunchSettings.getInstallDir());
+		installLabelPath.setDoubleBuffered(true);
+		installLabelPath.setOpaque(false);
+		installLabelPath.setFont(new Font("Roboto", Font.PLAIN, 12));
+		installLabelPath.setMinimumSize(new Dimension(200, 20));
+		installLabelPath.setPreferredSize(new Dimension(200, 20));
+		installLabelPath.setMaximumSize(new Dimension(200, 20));
+		installLabelPanel.add(installLabelPath);
+		installLabelPath.addActionListener(e1 -> {
+			String path = installLabelPath.getText();
+			if(path == null || path.isEmpty()) return;
+			File file = new File(path);
+			if(!file.exists()) return;
+			if(!file.isDirectory()) file = file.getParentFile();
+			tempInstallDir[0] = file.getAbsolutePath();
+			installLabelPath.setText(tempInstallDir[0]);
+		});
+
+		JButton installButton = new JButton("Change");
+		installButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
+		installButton.setDoubleBuffered(true);
+		installButton.setOpaque(false);
+		installButton.setContentAreaFilled(false);
+		installButton.setBorderPainted(false);
+		installButton.setFont(new Font("Roboto", Font.BOLD, 12));
+		dialogPanel.add(installButton);
+		installButton.addActionListener(e1 -> {
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int result = fileChooser.showOpenDialog(dialog[0]);
+			if(result == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				if(!file.isDirectory()) file = file.getParentFile();
+				tempInstallDir[0] = file.getAbsolutePath();
+				installLabelPath.setText(tempInstallDir[0]);
+			}
+		});
+
+		JButton repairButton = new JButton("Repair");
+		repairButton.setIcon(UIManager.getIcon("FileView.checkIcon"));
+		repairButton.setDoubleBuffered(true);
+		repairButton.setOpaque(false);
+		repairButton.setFont(new Font("Roboto", Font.BOLD, 12));
+		dialogPanel.add(repairButton);
+		repairButton.addActionListener(e1 -> {
+			IndexFileEntry version = getLatestVersion(lastUsedBranch);
+			if(version != null) {
+				if(updaterThread == null || !updaterThread.updating) {
+					dialog[0].dispose();
+					recreateButtons(playPanel, true);
+					updateGame(version);
+				}
+			} else JOptionPane.showMessageDialog(dialog[0], "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
+		});
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setDoubleBuffered(true);
+		buttonPanel.setOpaque(false);
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		dialog[0].add(buttonPanel, BorderLayout.SOUTH);
+
+		JButton saveButton = new JButton("Save");
+		saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
+		saveButton.setDoubleBuffered(true);
+		buttonPanel.add(saveButton);
+
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
+		cancelButton.setDoubleBuffered(true);
+		buttonPanel.add(cancelButton);
+		saveButton.addActionListener(e1 -> {
+			String installDir = tempInstallDir[0];
+			if(installDir != null) {
+				LaunchSettings.setInstallDir(installDir);
+				LaunchSettings.saveSettings();
+			}
+			dialog[0].dispose();
+		});
+		cancelButton.addActionListener(e1 -> dialog[0].dispose());
+		dialog[0].setVisible(true);
 	}
 
 	private JPanel createTopPanel() {
