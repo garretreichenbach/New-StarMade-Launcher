@@ -20,7 +20,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -401,7 +400,6 @@ public class StarMadeLauncher extends JFrame {
 		launchSettings.setOpaque(false);
 		launchSettings.setContentAreaFilled(false);
 		launchSettings.setForeground(Palette.textColor);
-		bottomPanel.add(launchSettings);
 		launchSettings.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -414,105 +412,11 @@ public class StarMadeLauncher extends JFrame {
 			}
 		});
 		launchSettings.addActionListener(e -> {
-			JDialog dialog = new JDialog();
-			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			dialog.setModal(true);
-			dialog.setResizable(false);
-			dialog.setTitle("Launch Settings");
-			dialog.setSize(500, 350);
-			dialog.setLocationRelativeTo(null);
-			dialog.setLayout(new BorderLayout());
-			dialog.setAlwaysOnTop(true);
-//			dialog.setBackground(Palette.paneColor);
-//			dialog.setForeground(Palette.foregroundColor);
-			JPanel dialogPanel = new JPanel();
-			dialogPanel.setDoubleBuffered(true);
-			dialogPanel.setOpaque(true);
-//			dialogPanel.setBackground(Palette.paneColor);
-//			dialogPanel.setForeground(Palette.foregroundColor);
-			dialogPanel.setLayout(new BorderLayout());
-			dialog.add(dialogPanel);
-			JPanel northPanel = new JPanel();
-			northPanel.setDoubleBuffered(true);
-			northPanel.setOpaque(true);
-			northPanel.setLayout(new BorderLayout());
-//			northPanel.setBackground(Palette.paneColor);
-//			northPanel.setForeground(Palette.foregroundColor);
-			dialogPanel.add(northPanel, BorderLayout.NORTH);
-			JSlider slider = new JSlider(SwingConstants.HORIZONTAL, 2048, getSystemMemory(), LaunchSettings.getMemory());
-//			slider.setBackground(Palette.paneColor);
-			JLabel sliderLabel = new JLabel("Memory: " + slider.getValue() + " MB");
-//			sliderLabel.setBackground(Palette.paneColor);
-			sliderLabel.setDoubleBuffered(true);
-			sliderLabel.setOpaque(true);
-			sliderLabel.setFont(new Font("Roboto", Font.BOLD, 12));
-			sliderLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			northPanel.add(sliderLabel, BorderLayout.NORTH);
-			slider.setDoubleBuffered(true);
-			slider.setOpaque(true);
-			if(getSystemMemory() > 16384) { //Make sure the slider is not too squished for people that have a really epic gamer pc
-				slider.setMajorTickSpacing(2048);
-				slider.setMajorTickSpacing(1024);
-				slider.setLabelTable(slider.createStandardLabels(4096));
-			} else if(getSystemMemory() > 8192) {
-				slider.setMajorTickSpacing(1024);
-				slider.setMinorTickSpacing(512);
-				slider.setLabelTable(slider.createStandardLabels(2048));
-			} else {
-				slider.setMajorTickSpacing(1024);
-				slider.setMinorTickSpacing(256);
-				slider.setLabelTable(slider.createStandardLabels(1024));
-			}
-			slider.setPaintTicks(true);
-			slider.setPaintLabels(true);
-			slider.setSnapToTicks(true);
-			northPanel.add(slider, BorderLayout.CENTER);
-			slider.addChangeListener(e1 -> sliderLabel.setText("Memory: " + slider.getValue() + " MB"));
-			JPanel centerPanel = new JPanel();
-			centerPanel.setDoubleBuffered(true);
-			centerPanel.setOpaque(false);
-			centerPanel.setLayout(new BorderLayout());
-//			centerPanel.setBackground(Palette.backgroundColor);
-//			centerPanel.setForeground(Palette.foregroundColor);
-			dialogPanel.add(centerPanel, BorderLayout.CENTER);
-			JTextArea launchArgs = new JTextArea();
-//			launchArgs.setBackground(Palette.paneColor);
-			launchArgs.setDoubleBuffered(true);
-			launchArgs.setOpaque(true);
-			launchArgs.setText(LaunchSettings.getLaunchArgs());
-			launchArgs.setLineWrap(true);
-			launchArgs.setWrapStyleWord(true);
-			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			centerPanel.add(launchArgs, BorderLayout.CENTER);
-			JLabel launchArgsLabel = new JLabel("Launch Arguments");
-//			launchArgsLabel.setBackground(Palette.paneColor);
-			launchArgsLabel.setDoubleBuffered(true);
-			launchArgsLabel.setOpaque(true);
-			launchArgsLabel.setFont(new Font("Roboto", Font.BOLD, 12));
-			launchArgsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			centerPanel.add(launchArgsLabel, BorderLayout.NORTH);
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setDoubleBuffered(true);
-			buttonPanel.setOpaque(true);
-			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			dialogPanel.add(buttonPanel, BorderLayout.SOUTH);
-			JButton saveButton = new JButton("Save");
-			saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
-			saveButton.setDoubleBuffered(true);
-			buttonPanel.add(saveButton);
-			JButton cancelButton = new JButton("Cancel");
-			cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
-			cancelButton.setDoubleBuffered(true);
-			buttonPanel.add(cancelButton);
-			saveButton.addActionListener(e1 -> {
-				LaunchSettings.setMemory(slider.getValue());
-				LaunchSettings.setLaunchArgs(launchArgs.getText());
-				LaunchSettings.saveSettings();
-				dialog.dispose();
-			});
-			cancelButton.addActionListener(e1 -> dialog.dispose());
-			dialog.setVisible(true);
+			JDialog settingsDialog = new LaunchSettingsDialog("Launch Settings", 500, 350);
+			settingsDialog.setVisible(true);
 		});
+		bottomPanel.add(launchSettings);
+
 		JButton installSettings = new JButton("Installation Settings");
 		installSettings.setIcon(ImageFileUtil.getIcon("sprites/launch_options_gear.png"));
 		installSettings.setFont(new Font("Roboto", Font.BOLD, 12));
@@ -520,7 +424,6 @@ public class StarMadeLauncher extends JFrame {
 		installSettings.setOpaque(false);
 		installSettings.setContentAreaFilled(false);
 		installSettings.setForeground(Palette.textColor);
-		bottomPanel.add(installSettings);
 		installSettings.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -637,6 +540,8 @@ public class StarMadeLauncher extends JFrame {
 			cancelButton.addActionListener(e1 -> dialog[0].dispose());
 			dialog[0].setVisible(true);
 		});
+		bottomPanel.add(installSettings);
+
 		if(serverPanel != null) serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
 
@@ -740,6 +645,51 @@ public class StarMadeLauncher extends JFrame {
 		return topPanel;
 	}
 
+	private JPanel createLeftPanel() {
+		JPanel leftPanel = new JPanel();
+		leftPanel.setDoubleBuffered(true);
+		leftPanel.setOpaque(false);
+		leftPanel.setLayout(new StackLayout());
+
+		JLabel leftLabel = new JLabel();
+		leftLabel.setDoubleBuffered(true);
+		//Resize the image to the left panel
+		leftLabel.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 150, 500));
+		//Stretch the image to the left panel
+		leftPanel.add(leftLabel, StackLayout.BOTTOM);
+
+		JPanel topLeftPanel = new JPanel();
+		topLeftPanel.setDoubleBuffered(true);
+		topLeftPanel.setOpaque(false);
+		topLeftPanel.setLayout(new BorderLayout());
+		leftPanel.add(topLeftPanel, StackLayout.TOP);
+
+		//Add list to display links to game website
+		JList<JLabel> list = createPanelSelectList();
+		topLeftPanel.add(list);
+
+		//Display game logo
+		JPanel topLeftLogoPanel = new JPanel();
+		topLeftLogoPanel.setDoubleBuffered(true);
+		topLeftLogoPanel.setOpaque(false);
+		topLeftLogoPanel.setLayout(new BorderLayout());
+		topLeftPanel.add(topLeftLogoPanel, BorderLayout.NORTH);
+
+		//Add a left inset
+		JPanel leftInset = new JPanel();
+		leftInset.setDoubleBuffered(true);
+		leftInset.setOpaque(false);
+		topLeftLogoPanel.add(leftInset, BorderLayout.CENTER);
+
+		//Add logo at top left
+		JLabel logo = new JLabel();
+		logo.setDoubleBuffered(true);
+		logo.setOpaque(false);
+		logo.setIcon(ImageFileUtil.getIcon("sprites/logo.png"));
+		leftInset.add(logo);
+		return leftPanel;
+	}
+
 	private JList<JLabel> createPanelSelectList() {
 		JList<JLabel> list = new PanelSelectList(
 				new String[] {"NEWS", "FORUMS", "CONTENT", "COMMUNITY"}
@@ -788,16 +738,6 @@ public class StarMadeLauncher extends JFrame {
 		versionPanel.removeAll();
 		createServerPanel(footerPanel);
 		serverPanel.setVisible(true);
-	}
-
-	private int getSystemMemory() {
-		try {
-			com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-			return (int) (os.getTotalPhysicalMemorySize() / (1024 * 1024));
-		} catch(Exception exception) {
-			exception.printStackTrace();
-		}
-		return 8192;
 	}
 
 	private void recreateButtons(JPanel playPanel, boolean repair) {
