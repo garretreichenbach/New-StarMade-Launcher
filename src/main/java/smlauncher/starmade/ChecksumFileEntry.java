@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * A checksum entry for an individual game file, used to compare changes between
+ * releases.
+ *
+ * @author TheDerpGamer
+ */
 public class ChecksumFileEntry {
 	public final long size;
 	public final String checksum;
@@ -17,36 +23,12 @@ public class ChecksumFileEntry {
 		this.relativePath = relativePath.replaceFirst("\\.", "");
 	}
 
-	public boolean needsDownload(String buildPath, String installDirStr) throws NoSuchAlgorithmException, IOException {
-		String sourceFilePath = buildPath + relativePath;
-
-		File dst = new File(installDirStr, relativePath);
-
-		boolean replace = false;
-		if (dst.exists()) {
-			String localChecksum = FileUtil.getSha1Checksum(dst.getAbsolutePath());
-			replace = !localChecksum.equals(checksum);
-			if (replace) {
-				System.err.println("[UPDATER] Checksum Differs for " + relativePath + ": " + localChecksum + " :: " + checksum);
-			} else {
-				System.err.println("[UPDATER] Not downloading " + relativePath + ": remote file same as local");
-			}
-		} else {
-			System.err.println("[UPDATER] Does Not Exist " + dst.getAbsolutePath() + ": Downloading");
-			replace = true;
-		}
-		return replace;
-	}
-
-	public void download(boolean force, String buildPath, File installDir, String installDirStr, FileDowloadCallback cb, FileUpdateTotal o) throws NoSuchAlgorithmException, IOException {
+	public void download(boolean force, String buildPath, String installDirStr, FileDownloadCallback cb, FileUpdateTotal o) throws NoSuchAlgorithmException, IOException {
 		String sourceFilePath = buildPath + relativePath;
 		File dst = new File(installDirStr, relativePath);
 
-//		File dst = destFilePath;//new File(destFilePath);
-
-		System.err.println("Downloading " + sourceFilePath + " -> " + dst.getAbsolutePath());
-
-		boolean replace = needsDownload(buildPath, installDirStr) || force;
+		printUpdaterMessage(String.format("Downloading %s -> %s", sourceFilePath, dst.getAbsolutePath()));
+		boolean replace = needsDownload(installDirStr) || force;
 
 		if (dst.exists() && replace) {
 			if (!dst.delete()) {
@@ -64,7 +46,7 @@ public class ChecksumFileEntry {
 		File file = new File(dst.getAbsolutePath() + ".filepart");
 		//remove file part
 		file.delete();
-		//		final long[] update = new long[2];
+//		final long[] update = new long[2];
 		FileDownloadUpdate e = new FileDownloadUpdate();
 		try {
 			FileUtil.copyURLToFile(FileUtil.convertToURLEscapingIllegalCharacters(sourceFilePath), file, 50000, 50000, new DownloadCallback() {
@@ -132,6 +114,24 @@ public class ChecksumFileEntry {
 		}
 	}
 
+	public boolean needsDownload(String installDirStr) throws IOException {
+		File dst = new File(installDirStr, relativePath);
+		if (dst.exists()) {
+			String localChecksum = FileUtil.getSha1Checksum(dst.getAbsolutePath());
+
+			if (localChecksum.equals(checksum)) {
+				printUpdaterMessage(String.format("Not downloading %s; remote file same as local", relativePath));
+				return false;
+			} else {
+				printUpdaterMessage(String.format("Downloading %s; checksum differs %s :: %s", relativePath, localChecksum, checksum));
+				return true;
+			}
+		} else {
+			printUpdaterMessage(String.format("Downloading %s; local does not exist", dst.getAbsolutePath()));
+			return true;
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -155,6 +155,12 @@ public class ChecksumFileEntry {
 	public String toString() {
 		return "ChecksumFileEntry [size=" + size + ", checksum=" + checksum
 				+ ", relativePath=" + relativePath + ", index " + index + "]";
+	}
+
+	private static void printUpdaterMessage(String message) {
+		if (GameUpdater.PRINT_DOWNLOAD_LOGS) {
+			System.err.println("[UPDATER] " + message);
+		}
 	}
 
 }

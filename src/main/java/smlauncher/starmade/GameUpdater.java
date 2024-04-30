@@ -18,14 +18,18 @@ import java.util.*;
  *
  * @author TheDerpGamer
  */
-// todo move to new package
+// TODO move to new package
+// TODO replace deprecated observable
 public class GameUpdater extends Observable {
+
 	public static final int BACK_NONE = 0;
 	public static final int BACK_DB = 1;
 	public static final int BACK_ALL = 2;
 	public static String FILES_URL = "http://files.star-made.org/";
 	public static String LAUNCHER_VERSION_SITE = "http://files.star-made.org/version";
 	public static String MIRROR_SITE = "http://files.star-made.org/mirrors";
+	public static final boolean PRINT_DOWNLOAD_LOGS = false;
+
 	public final ArrayList<IndexFileEntry> versions = new ArrayList<>();
 	private final ArrayList<String> mirrorURLs = new ArrayList<>();
 	boolean loading;
@@ -100,7 +104,6 @@ public class GameUpdater extends Observable {
 	}
 
 	public static int askBackup(JFrame f) {
-
 		String[] options = {"Yes (Only Database)", "Yes (Everything)", "No"};
 		int n = JOptionPane.showOptionDialog(f, "Create Backup of current game data? (recommended)", "Backup?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		switch (n) {
@@ -115,7 +118,7 @@ public class GameUpdater extends Observable {
 	}
 
 	private static String getJavaExec() {
-		if (smlauncher.util.OperatingSystem.getCurrent() == smlauncher.util.OperatingSystem.WINDOWS) {
+		if (OperatingSystem.getCurrent() == OperatingSystem.WINDOWS) {
 			return "javaw";
 		} else {
 			return "java";
@@ -335,10 +338,10 @@ public class GameUpdater extends Observable {
 		notifyObservers("updating");
 
 		File instalDir = new File(installDirStr);
-		downloadDiff(instalDir, installDirStr, newest, backupFromMain, forced);
+		downloadDiff(installDirStr, newest, backupFromMain, forced);
 	}
 
-	private void downloadDiff(File installDir, String installDirStr, IndexFileEntry version, int backup, boolean forced) {
+	private void downloadDiff(String installDirStr, IndexFileEntry version, int backup, boolean forced) {
 		updating = true;
 
 		new Thread(() -> {
@@ -360,7 +363,7 @@ public class GameUpdater extends Observable {
 				ChecksumFile checksums = getChecksums(buildDir);
 				System.err.println("Downloaded checksums: \n" + checksums);
 
-				checksums.download(forced, buildDir, installDir, installDirStr, new FileDowloadCallback() {
+				checksums.download(forced, buildDir, installDirStr, new FileDownloadCallback() {
 					@Override
 					public void update(FileDownloadUpdate u) {
 						setChanged();

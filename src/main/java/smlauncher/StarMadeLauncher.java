@@ -54,7 +54,7 @@ public class StarMadeLauncher extends JFrame {
 	private final OperatingSystem currentOS;
 	private final VersionRegistry versionRegistry;
 	private final DownloadStatus dlStatus = new DownloadStatus();
-	private UpdaterThread updaterThread;
+	private GameUpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
 	private JButton updateButton;
@@ -1167,14 +1167,14 @@ public class StarMadeLauncher extends JFrame {
 	private void updateGame(IndexFileEntry version) {
 		String[] options = {"Backup Database", "Backup Everything", "Don't Backup"};
 		int choice = JOptionPane.showOptionDialog(this, "Would you like to backup your database, everything, or nothing?", "Backup", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-		int backupMode = UpdaterThread.BACKUP_MODE_NONE;
-		if(choice == 0) backupMode = UpdaterThread.BACKUP_MODE_DATABASE;
-		else if(choice == 1) backupMode = UpdaterThread.BACKUP_MODE_EVERYTHING;
+		int backupMode = GameUpdaterThread.BACKUP_MODE_NONE;
+		if(choice == 0) backupMode = GameUpdaterThread.BACKUP_MODE_DATABASE;
+		else if(choice == 1) backupMode = GameUpdaterThread.BACKUP_MODE_EVERYTHING;
 		ImageIcon updateButtonEmpty = ImageFileUtil.getIcon("sprites/update_load_empty.png");
 		ImageIcon updateButtonFilled = ImageFileUtil.getIcon("sprites/update_load_full.png");
 		updateButton.setIcon(updateButtonEmpty);
 		//Start update process and update progress bar
-		(updaterThread = new UpdaterThread(version, backupMode, new File(LaunchSettings.getInstallDir())) {
+		(updaterThread = new GameUpdaterThread(version, backupMode, new File(LaunchSettings.getInstallDir())) {
 			@Override
 			public void onProgress(float progress, String file, long mbDownloaded, long mbTotal, long mbSpeed) {
 				dlStatus.setInstallProgress(progress);

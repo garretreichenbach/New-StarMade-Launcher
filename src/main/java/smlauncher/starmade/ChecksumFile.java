@@ -1,26 +1,31 @@
 package smlauncher.starmade;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * A list of checksum entries for a game release, used to determine which game
+ * files should be updated.
+ *
+ * @author TheDerpGamer
+ */
 public class ChecksumFile {
-	public static Set<ChecksumFileEntry> running = new HashSet<ChecksumFileEntry>();
-	public ArrayList<ChecksumFileEntry> checksums = new ArrayList<ChecksumFileEntry>();
+
+	public static Set<ChecksumFileEntry> running = new HashSet<>();
+	public List<ChecksumFileEntry> checksums = new ArrayList<>();
 	int toExecute;
 	private int failed;
 
 	public void parse(BufferedReader in) throws IOException {
 		String line;
-
 		while ((line = in.readLine()) != null) {
-
 			//			./data/audio-resource/Gameplay/0022_gameplay - cockpit warning beep.ogg 14722 90b34870b3e9df9c5892d23f94f9df710716685a
 
 			line = line.trim();
@@ -51,9 +56,7 @@ public class ChecksumFile {
 			line = line.substring(0, sizeIndex).trim();
 
 			String relativePath = line.trim();
-
 			ChecksumFileEntry e = new ChecksumFileEntry(size, checksum, relativePath);
-
 			checksums.add(e);
 		}
 
@@ -82,17 +85,15 @@ public class ChecksumFile {
 		return sb.toString();
 	}
 
-	public void download(boolean force, String buildPath, File installDir, String installDirStr, FileDowloadCallback cb) throws NoSuchAlgorithmException, IOException {
-
-		ArrayList<ChecksumFileEntry> checksumsToDownload = new ArrayList<ChecksumFileEntry>();
-
+	public void download(boolean force, String buildPath, String installDirStr, FileDownloadCallback cb) throws NoSuchAlgorithmException, IOException {
+		List<ChecksumFileEntry> checksumsToDownload = new ArrayList<>();
 		cb.update("Determining files to download... ");
 
 		FileUpdateTotal o = new FileUpdateTotal();
 		float p = 1.0f / checksums.size();
 		float g = 0;
 		for (ChecksumFileEntry e : checksums) {
-			if (force || e.needsDownload(buildPath, installDirStr)) {
+			if (force || e.needsDownload(installDirStr)) {
 				checksumsToDownload.add(e);
 				o.totalSize += e.size;
 			}
@@ -119,26 +120,21 @@ public class ChecksumFile {
 //				System.err.println("STARTED: "+e+"; "+running);
 				assert (add);
 			}
-			pool.execute(new Runnable() {
-
-				@Override
-				public void run() {
-
-					try {
-						o.index = e.index;
-						o.total = checksumsToDownload.size();
-						e.download(force, buildPath, installDir, installDirStr, cb, o);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						failed++;
-					}
-					synchronized (running) {
-						boolean remove = running.remove(e);
-//						System.err.println("FINISHED: "+e);
-						assert (remove);
-					}
-					toExecute--;
+			pool.execute(() -> {
+				try {
+					o.index = e.index;
+					o.total = checksumsToDownload.size();
+					e.download(force, buildPath, installDirStr, cb, o);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					failed++;
 				}
+				synchronized (running) {
+					boolean remove = running.remove(e);
+//						System.err.println("FINISHED: "+e);
+					assert (remove);
+				}
+				toExecute--;
 			});
 
 		}
