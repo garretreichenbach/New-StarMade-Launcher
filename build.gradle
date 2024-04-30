@@ -17,15 +17,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.formdev:flatlaf:3.0'
-    implementation 'commons-io:commons-io:2.11.0'
-    implementation 'org.codehaus.plexus:plexus-archiver:4.9.0'
+    implementation 'com.formdev:flatlaf:3.4.1'
+    implementation 'commons-io:commons-io:2.16.1'
+    implementation 'org.codehaus.plexus:plexus-archiver:4.9.2'
     implementation 'org.jasypt:jasypt:1.9.3'
-    implementation 'org.json:json:20230227'
-    implementation 'it.unimi.dsi:fastutil:8.5.12'
+    implementation 'org.json:json:20231013'
+    implementation 'it.unimi.dsi:fastutil:8.5.13'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 }
 
 /*
@@ -48,6 +48,11 @@ publishing {
 
 test {
     useJUnitPlatform()
+}
+
+wrapper {
+    gradleVersion = "8.7"
+    distributionType = Wrapper.DistributionType.BIN
 }
 
 tasks.register('all_jar', Jar) {
