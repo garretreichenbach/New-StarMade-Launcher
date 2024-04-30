@@ -1,6 +1,6 @@
 package smlauncher.community;
 
-import smlauncher.StarMadeLauncher;
+import smlauncher.fileio.ImageFileUtil;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
@@ -56,7 +56,7 @@ public class LauncherCommunityPanel extends JPanel {
 				}
 			}
 		});
-		mainDiscordButton.setIcon(StarMadeLauncher.getIcon("sprites/icon.png", 32, 32));
+		mainDiscordButton.setIcon(ImageFileUtil.getIcon("sprites/icon.png", 32, 32));
 		mainDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, mainDiscordButton.getMinimumSize().height));
 		mainDiscordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		mainDiscordButton.setBackground(Palette.buttonColor);
@@ -81,7 +81,7 @@ public class LauncherCommunityPanel extends JPanel {
 				}
 			}
 		});
-		starLoaderDiscordButton.setIcon(StarMadeLauncher.getIcon("sprites/starloader.png", 32, 32));
+		starLoaderDiscordButton.setIcon(ImageFileUtil.getIcon("sprites/starloader.png", 32, 32));
 		starLoaderDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, starLoaderDiscordButton.getMinimumSize().height));
 		starLoaderDiscordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		starLoaderDiscordButton.setBackground(Palette.buttonColor);
