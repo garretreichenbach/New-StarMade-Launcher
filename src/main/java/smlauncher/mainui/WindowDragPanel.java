@@ -4,7 +4,9 @@ import smlauncher.starmade.StackLayout;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 
 /**
  * A panel for the main window that can be used to drag the window.
@@ -15,7 +17,7 @@ import java.awt.event.MouseMotionAdapter;
 public class WindowDragPanel extends JPanel {
 
 	public WindowDragPanel(
-			ImageIcon icon, MouseAdapter clickAction, MouseMotionAdapter dragAction
+			ImageIcon icon, MouseListener clickAction, MouseMotionListener dragAction
 	) {
 		setDoubleBuffered(true);
 		setOpaque(false);

@@ -6,10 +6,7 @@ import smlauncher.downloader.JavaDownloader;
 import smlauncher.downloader.JavaVersion;
 import smlauncher.fileio.ImageFileUtil;
 import smlauncher.fileio.TextFileUtil;
-import smlauncher.mainui.LauncherUpdateDialog;
-import smlauncher.mainui.PortField;
-import smlauncher.mainui.WindowControlsPanel;
-import smlauncher.mainui.WindowDragPanel;
+import smlauncher.mainui.*;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
 import smlauncher.util.OperatingSystem;
@@ -17,7 +14,6 @@ import smlauncher.util.Palette;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicComboBoxUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
@@ -278,65 +274,28 @@ public class StarMadeLauncher extends JFrame {
 		return gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
 	}
 
-	private static JComboBox<String> createDropdown() {
-		JComboBox<String> dropDown = new JComboBox<>();
-		dropDown.setDoubleBuffered(true);
-		dropDown.setOpaque(true);
-		dropDown.setBackground(Palette.paneColor);
-		dropDown.setForeground(Palette.textColor);
-		dropDown.setUI(new BasicComboBoxUI() {
-			@Override
-			protected JButton createArrowButton() {
-				JButton button = super.createArrowButton();
-				button.setDoubleBuffered(true);
-				button.setOpaque(false);
-				button.setBackground(Palette.paneColor);
-				button.setForeground(Palette.textColor);
-				button.setContentAreaFilled(false);
-				button.setRolloverEnabled(false);
-				button.setBorder(BorderFactory.createEmptyBorder());
-				button.setFocusable(false);
-				return button;
-			}
-		});
-		dropDown.setRenderer(new DefaultListCellRenderer() {
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if(isSelected) setBackground(Palette.selectedColor);
-				else setBackground(Palette.deselectedColor);
-				return this;
-			}
-		});
-		return dropDown;
+	// TODO maybe save and don't re-add every time
+	private static void setDropdownVersionsList(JComboBox<String> versionDropdown, GameBranch branch, VersionRegistry versionRegistry) {
+		List<IndexFileEntry> versions = versionRegistry.getVersions(branch);
+		if(versions == null) return;
+
+		// Add versions to dropdown
+		versionDropdown.removeAllItems();
+		for(IndexFileEntry version : versions) {
+			if(version.equals(versions.get(0))) versionDropdown.addItem(version.version + " (Latest)");
+			else versionDropdown.addItem(version.version);
+		}
 	}
 
-	private static void setInitialVersion(JComboBox<String> versionDropdown) {
+	private static void selectLastUsedVersion(JComboBox<String> versionDropdown) {
 		String lastUsedVersion = LaunchSettings.getLastUsedVersion();
 		if(lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
+		//Select last used version in dropdown if it exists
 		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
 			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
 				versionDropdown.setSelectedIndex(i);
 				break;
 			}
-		}
-	}
-
-	private static void setClientProperties(JComboBox<String> dropdown, UIDefaults defaults) {
-		dropdown.putClientProperty("Nimbus.Overrides", defaults);
-		dropdown.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
-	}
-
-	// TODO maybe save and don't re-add every time
-	private static void updateVersionDropdown(JComboBox<String> versionDropdown, JComboBox<String> branchDropdown, VersionRegistry versionRegistry) {
-		GameBranch branch = GameBranch.getForIndex(branchDropdown.getSelectedIndex());
-		List<IndexFileEntry> versions = versionRegistry.getVersions(branch);
-		if(versions == null) return;
-
-		// Add versions to dropdown
-		for(IndexFileEntry version : versions) {
-			if(version.equals(versions.get(0))) versionDropdown.addItem(version.version + " (Latest)");
-			else versionDropdown.addItem(version.version);
 		}
 	}
 
@@ -377,68 +336,26 @@ public class StarMadeLauncher extends JFrame {
 		setContentPane(mainPanel);
 		mainPanel.setLayout(new BorderLayout(0, 0));
 
-		//Use top panel to drag the window
+		//Drag and control the window with the top panel
 		JPanel topPanel = createTopPanel();
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 
-		JPanel leftPanel = new JPanel();
-		leftPanel.setDoubleBuffered(true);
-		leftPanel.setOpaque(false);
-		leftPanel.setLayout(new StackLayout());
+		//Select the center panel with the left panel
+		JPanel leftPanel = createLeftPanel();
 		mainPanel.add(leftPanel, BorderLayout.WEST);
 
-		JLabel leftLabel = new JLabel();
-		leftLabel.setDoubleBuffered(true);
-		//Resize the image to the left panel
-		leftLabel.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 150, 500));
-		//Stretch the image to the left panel
-		leftPanel.add(leftLabel, StackLayout.BOTTOM);
-
-		JPanel topLeftPanel = new JPanel();
-		topLeftPanel.setDoubleBuffered(true);
-		topLeftPanel.setOpaque(false);
-		topLeftPanel.setLayout(new BorderLayout());
-		leftPanel.add(topLeftPanel, StackLayout.TOP);
-
-		//Add list to display links to game website
-		JList<JLabel> list = createList();
-		topLeftPanel.add(list);
-
-		JPanel topLeftLogoPanel = new JPanel();
-		topLeftLogoPanel.setDoubleBuffered(true);
-		topLeftLogoPanel.setOpaque(false);
-		topLeftLogoPanel.setLayout(new BorderLayout());
-		topLeftPanel.add(topLeftLogoPanel, BorderLayout.NORTH);
-		//Add a left inset
-		JPanel leftInset = new JPanel();
-		leftInset.setDoubleBuffered(true);
-		leftInset.setOpaque(false);
-		topLeftLogoPanel.add(leftInset, BorderLayout.CENTER);
-		//Add logo at top left
-		JLabel logo = new JLabel();
-		logo.setDoubleBuffered(true);
-		logo.setOpaque(false);
-		logo.setIcon(ImageFileUtil.getIcon("sprites/logo.png"));
-		leftInset.add(logo);
+		//Update and play the game with the footer panel
 		footerPanel = new JPanel();
 		footerPanel.setDoubleBuffered(true);
 		footerPanel.setOpaque(false);
 		footerPanel.setLayout(new StackLayout());
 		mainPanel.add(footerPanel, BorderLayout.SOUTH);
+
 		JLabel footerLabel = new JLabel();
 		footerLabel.setDoubleBuffered(true);
 		footerLabel.setIcon(ImageFileUtil.getIcon("sprites/footer_normalplay_bg.jpg"));
 		footerPanel.add(footerLabel);
-		JPanel topRightPanel = new JPanel();
-		topRightPanel.setDoubleBuffered(true);
-		topRightPanel.setOpaque(false);
-		topRightPanel.setLayout(new BorderLayout());
-		topPanel.add(topRightPanel, BorderLayout.EAST);
-		JLabel logoLabel = new JLabel();
-		logoLabel.setDoubleBuffered(true);
-		logoLabel.setOpaque(false);
-		logoLabel.setIcon(ImageFileUtil.getIcon("sprites/launcher_schine_logo.png"));
-		topRightPanel.add(logoLabel, BorderLayout.EAST);
+
 		JButton normalPlayButton = new JButton("Play");
 		normalPlayButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		normalPlayButton.setDoubleBuffered(true);
@@ -446,6 +363,7 @@ public class StarMadeLauncher extends JFrame {
 		normalPlayButton.setContentAreaFilled(false);
 		normalPlayButton.setBorderPainted(false);
 		normalPlayButton.setForeground(Palette.textColor);
+
 		JButton dedicatedServerButton = new JButton("Dedicated Server");
 		dedicatedServerButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		dedicatedServerButton.setDoubleBuffered(true);
@@ -453,6 +371,7 @@ public class StarMadeLauncher extends JFrame {
 		dedicatedServerButton.setContentAreaFilled(false);
 		dedicatedServerButton.setBorderPainted(false);
 		dedicatedServerButton.setForeground(Palette.textColor);
+
 		JPanel footerPanelButtons = new JPanel();
 		footerPanelButtons.setDoubleBuffered(true);
 		footerPanelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -463,15 +382,18 @@ public class StarMadeLauncher extends JFrame {
 		footerPanelButtons.add(dedicatedServerButton);
 		footerLabel.add(footerPanelButtons);
 		footerPanelButtons.setBounds(0, 0, 800, 30);
+
 		if(getLastUsedVersion() == null) selectedVersion = null;
 		else selectedVersion = gameVersion.version;
 		createPlayPanel(footerPanel);
 		createServerPanel(footerPanel);
+
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setDoubleBuffered(true);
 		bottomPanel.setOpaque(false);
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		footerPanel.add(bottomPanel, BorderLayout.SOUTH);
+
 		JButton launchSettings = new JButton("Launch Settings");
 		launchSettings.setIcon(ImageFileUtil.getIcon("sprites/memory_options_gear.png"));
 		launchSettings.setFont(new Font("Roboto", Font.BOLD, 12));
@@ -802,35 +724,27 @@ public class StarMadeLauncher extends JFrame {
 		//Was previously topLabel.add(windowControlsPanel)
 		//Changing it doesn't seem to make a difference
 		topPanel.add(windowControlsPanel);
+
+		// Display Schine logo
+		JPanel topRightPanel = new JPanel();
+		topRightPanel.setDoubleBuffered(true);
+		topRightPanel.setOpaque(false);
+		topRightPanel.setLayout(new BorderLayout());
+		topPanel.add(topRightPanel, BorderLayout.EAST);
+
+		JLabel logoLabel = new JLabel();
+		logoLabel.setDoubleBuffered(true);
+		logoLabel.setOpaque(false);
+		logoLabel.setIcon(ImageFileUtil.getIcon("sprites/launcher_schine_logo.png"));
+		topRightPanel.add(logoLabel, BorderLayout.EAST);
 		return topPanel;
 	}
 
-	private JList<JLabel> createList() {
-		JList<JLabel> list = new JList<>();
-		list.setDoubleBuffered(true);
-		list.setOpaque(false);
-		list.setLayoutOrientation(JList.VERTICAL);
-		list.setVisibleRowCount(-1);
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setCellRenderer((list1, value, index, isSelected, cellHasFocus) -> {
-			if(isSelected) {
-				value.setForeground(Palette.selectedColor);
-				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.selectedColor));
-			} else {
-				value.setForeground(Palette.deselectedColor);
-				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.deselectedColor));
-			}
-			return value;
-		});
-		//Highlight on mouse hover
-		list.addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				int index = list.locationToIndex(e.getPoint());
-				if(index != -1) list.setSelectedIndex(index);
-				else list.clearSelection();
-			}
-		});
+	private JList<JLabel> createPanelSelectList() {
+		JList<JLabel> list = new PanelSelectList(
+				new String[] {"NEWS", "FORUMS", "CONTENT", "COMMUNITY"}
+		);
+		//Select panels on click
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -855,24 +769,6 @@ public class StarMadeLauncher extends JFrame {
 				}
 			}
 		});
-		list.setFixedCellHeight(48);
-
-		//Give the list a model
-		DefaultListModel<JLabel> listModel = new DefaultListModel<>();
-		listModel.addElement(new JLabel("NEWS"));
-		listModel.addElement(new JLabel("FORUMS"));
-		listModel.addElement(new JLabel("CONTENT"));
-		listModel.addElement(new JLabel("COMMUNITY"));
-		for(int i = 0; i < listModel.size(); i++) {
-			JLabel label = listModel.get(i);
-			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setFont(new Font("Roboto", Font.BOLD, 18));
-			label.setForeground(Palette.selectedColor);
-			label.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.selectedColor));
-			label.setDoubleBuffered(true);
-			label.setOpaque(false);
-		}
-		list.setModel(listModel);
 		return list;
 	}
 
@@ -1052,7 +948,7 @@ public class StarMadeLauncher extends JFrame {
 		return LaunchSettings.getInstallDir() + "/" + String.format(currentOS.javaPath, version.number);
 	}
 
-	// Dropdown Methods
+	// Panel Methods
 
 	private void createPlayPanel(JPanel footerPanel) {
 		clearPanel(playPanel);
@@ -1107,21 +1003,19 @@ public class StarMadeLauncher extends JFrame {
 		UIDefaults defaults = new UIDefaults();
 		defaults.put("ComboBox:\"ComboBox.arrowButton\"[Enabled].backgroundPainter", Palette.buttonColor);
 
-		//Version dropdown
-		JComboBox<String> versionDropdown = createDropdown();
-		setClientProperties(versionDropdown, defaults);
-
 		//Branch dropdown
-		JComboBox<String> branchDropdown = createBranchDropdown(versionDropdown, lastUsedBranch.index);
-		setClientProperties(branchDropdown, defaults);
-
-		versionDropdown.removeAllItems();
-		updateVersionDropdown(versionDropdown, branchDropdown, versionRegistry);
-		versionDropdown.addItemListener(e -> onSelectVersion(versionDropdown));
-		setInitialVersion(versionDropdown);
-
+		JComboBox<String> branchDropdown = createBranchDropdown(lastUsedBranch.index, defaults);
 		versionSubPanel.add(branchDropdown);
+
+		//Version dropdown
+		JComboBox<String> versionDropdown = new DropdownMenu(defaults);
 		versionSubPanel.add(versionDropdown);
+
+		branchDropdown.addItemListener(e -> onSelectBranch(branchDropdown, versionDropdown));
+
+		versionDropdown.addItemListener(e -> onSelectVersion(versionDropdown));
+		setDropdownVersionsList(versionDropdown, lastUsedBranch, versionRegistry);
+		selectLastUsedVersion(versionDropdown);
 
 		//Port field
 		if(serverMode) {
@@ -1137,22 +1031,24 @@ public class StarMadeLauncher extends JFrame {
 		return versionPanel;
 	}
 
-	private JComboBox<String> createBranchDropdown(JComboBox<String> versionDropdown, int startIndex) {
-		JComboBox<String> branchDropdown = createDropdown();
+	private JComboBox<String> createBranchDropdown(int startIndex, UIDefaults defaults) {
+		JComboBox<String> branchDropdown = new DropdownMenu(defaults);
 		branchDropdown.addItem("Release");
 		branchDropdown.addItem("Dev");
 		branchDropdown.addItem("Pre-Release");
 		branchDropdown.setSelectedIndex(startIndex);
-		branchDropdown.addItemListener(e -> onSelectBranch(branchDropdown, versionDropdown));
 		return branchDropdown;
 	}
 
 	private void onSelectBranch(JComboBox<String> branchDropdown, JComboBox<String> versionDropdown) {
+		//Change settings
 		int branchIndex = branchDropdown.getSelectedIndex();
 		setBranch(GameBranch.getForIndex(branchIndex));
 		LaunchSettings.saveSettings();
-		versionDropdown.removeAllItems();
-		updateVersionDropdown(versionDropdown, branchDropdown, versionRegistry);
+
+		//Update UI components
+		GameBranch branch = GameBranch.getForIndex(branchDropdown.getSelectedIndex());
+		setDropdownVersionsList(versionDropdown, branch, versionRegistry);
 		recreateButtons(playPanel, false);
 	}
 
@@ -1222,6 +1118,7 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private void createScroller(JPanel currentPanel) {
+		//Display selected content in the scroll pane
 		if(centerScrollPane == null) {
 			centerScrollPane = new JScrollPane(currentPanel);
 			centerScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
