@@ -12,6 +12,8 @@ jobs:
           distribution: 'temurin'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Run JUnit tests
+        run: ./gradlew test
       - name: Export jar for all platforms
         uses: gradle/gradle-build-action@v1
         with:
