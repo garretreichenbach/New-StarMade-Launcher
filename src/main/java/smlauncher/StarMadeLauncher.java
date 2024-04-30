@@ -278,42 +278,6 @@ public class StarMadeLauncher extends JFrame {
 		return gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
 	}
 
-	private static JTextField createPortField() {
-		JTextField portField = new JTextField("4242");
-		portField.setDoubleBuffered(true);
-		portField.setOpaque(true);
-		portField.setBackground(Palette.paneColor);
-		portField.setForeground(Palette.textColor);
-		portField.setFont(new Font("Roboto", Font.PLAIN, 12));
-		portField.setMinimumSize(new Dimension(50, 20));
-		portField.setPreferredSize(new Dimension(50, 20));
-		portField.setMaximumSize(new Dimension(50, 20));
-		portField.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				portField.setToolTipText("Port");
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				portField.setToolTipText("");
-			}
-		});
-		portField.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				char c = e.getKeyChar();
-				try {
-					int port = Integer.parseInt(portField.getText() + c);
-					if(port > 65535 || port < 1 || !Character.isDigit(c)) e.consume();
-				} catch(Exception ignored) {
-					e.consume();
-				}
-			}
-		});
-		return portField;
-	}
-
 	private static JComboBox<String> createDropdown() {
 		JComboBox<String> dropDown = new JComboBox<>();
 		dropDown.setDoubleBuffered(true);
@@ -1161,7 +1125,8 @@ public class StarMadeLauncher extends JFrame {
 
 		//Port field
 		if(serverMode) {
-			portField = createPortField();
+			if (portField == null) portField = new PortField("4242");
+			else portField.setVisible(true);
 			versionSubPanel.add(portField);
 		} else {
 			if(portField != null) {

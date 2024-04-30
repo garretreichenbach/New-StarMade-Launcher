@@ -14,12 +14,21 @@ import java.awt.event.MouseMotionAdapter;
  */
 public class WindowDragPanel extends JPanel {
 
-	public WindowDragPanel(MouseAdapter clickAction, MouseMotionAdapter dragAction) {
+	public WindowDragPanel(
+			ImageIcon icon, MouseAdapter clickAction, MouseMotionAdapter dragAction
+	) {
 		setDoubleBuffered(true);
 		setOpaque(false);
 		setLayout(new StackLayout());
 
 		addMouseListener(clickAction);
 		addMouseMotionListener(dragAction);
+
+		//Give the panel a sprite
+		JLabel topLabel = new JLabel();
+		topLabel.setDoubleBuffered(true);
+		topLabel.setIcon(icon);
+		add(topLabel);
 	}
+
 }
