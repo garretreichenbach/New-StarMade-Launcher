@@ -54,9 +54,7 @@ public class StarMadeLauncher extends JFrame {
 	private int mouseY;
 	private JButton updateButton;
 	private JTextField portField;
-	private JPanel mainPanel;
 	private JPanel centerPanel;
-	private JPanel footerPanel;
 	private JPanel versionPanel;
 	private JPanel playPanel;
 	private JPanel serverPanel;
@@ -119,8 +117,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 
 		// Create launcher UI
-		createMainPanel();
-		createNewsPanel();
+		createLauncherUI();
 		dispose();
 		setUndecorated(true);
 		setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
@@ -128,6 +125,8 @@ public class StarMadeLauncher extends JFrame {
 		getRootPane().setDoubleBuffered(true);
 		setVisible(true);
 	}
+
+	// Main Method
 
 	public static void main(String[] args) {
 		boolean headless = false;
@@ -153,7 +152,7 @@ public class StarMadeLauncher extends JFrame {
 					} else headless = true;
 				}
 				if(headless) {
-					switch(arg) {
+					switch (arg) {
 						case "-h":
 						case "-help":
 							displayHelp();
@@ -181,6 +180,8 @@ public class StarMadeLauncher extends JFrame {
 			}
 		}
 	}
+
+	// Run StarMade methods
 
 	private static void startup() {
 		EventQueue.invokeLater(() -> {
@@ -215,7 +216,7 @@ public class StarMadeLauncher extends JFrame {
 			} catch(InterruptedException e) {
 				e.printStackTrace();
 			}
-			while(frame.isVisible()) {
+			while (frame.isVisible()) {
 				try {
 					Thread.sleep(500);
 				} catch(InterruptedException exception) {
@@ -235,477 +236,6 @@ public class StarMadeLauncher extends JFrame {
 		System.out.println("-pre : Use pre branch (default is release)");
 		System.out.println("-dev : Use dev branch (default is release)");
 		System.out.println("-server -port:<port> : Start in server mode");
-	}
-
-	private static String getCurrentUser() {
-		try {
-			return StarMadeCredentials.read().getUser();
-		} catch(Exception ignored) {
-			return null;
-		}
-	}
-
-	private static void removeCurrentUser() {
-		try {
-			StarMadeCredentials.removeFile();
-		} catch(IOException exception) {
-			exception.printStackTrace();
-		}
-	}
-
-	private static void setGameVersion(IndexFileEntry gameVersion) {
-		if(gameVersion != null) {
-			LaunchSettings.setLastUsedVersion(gameVersion.version);
-			if(usingOldVersion()) LaunchSettings.setJvmArgs("--illegal-access=permit");
-			else LaunchSettings.setJvmArgs("");
-		} else {
-			LaunchSettings.setLastUsedVersion("NONE");
-			LaunchSettings.setJvmArgs("");
-		}
-	}
-
-	private static void setBranch(GameBranch branch) {
-		lastUsedBranch = branch;
-		LaunchSettings.setLastUsedBranch(lastUsedBranch.index);
-	}
-
-	private static boolean usingOldVersion() {
-		return gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
-	}
-
-	// TODO maybe save and don't re-add every time
-	private static void setDropdownVersionsList(JComboBox<String> versionDropdown, GameBranch branch, VersionRegistry versionRegistry) {
-		List<IndexFileEntry> versions = versionRegistry.getVersions(branch);
-		if(versions == null) return;
-
-		// Add versions to dropdown
-		versionDropdown.removeAllItems();
-		for(IndexFileEntry version : versions) {
-			if(version.equals(versions.get(0))) versionDropdown.addItem(version.version + " (Latest)");
-			else versionDropdown.addItem(version.version);
-		}
-	}
-
-	private static void selectLastUsedVersion(JComboBox<String> versionDropdown) {
-		String lastUsedVersion = LaunchSettings.getLastUsedVersion();
-		if(lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
-		//Select last used version in dropdown if it exists
-		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
-			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
-				versionDropdown.setSelectedIndex(i);
-				break;
-			}
-		}
-	}
-
-	private void downloadJRE(JavaVersion version) throws Exception {
-		if(new File(getJavaPath(version)).exists()) {
-			System.out.println("JRE " + version + " already downloaded");
-			return;
-		}
-		System.out.println("Downloading JRE " + version);
-		(new JavaDownloader(version)).downloadAndUnzip();
-	}
-
-	private IndexFileEntry getLastUsedVersion() {
-		try {
-			String version;
-			File versionFile = new File(LaunchSettings.getInstallDir(), "version.txt");
-			if(versionFile.exists()) {
-				version = TextFileUtil.readText(versionFile);
-			} else {
-				version = LaunchSettings.getLastUsedVersion();
-			}
-			String shortVersion = version.substring(0, version.indexOf('#'));
-
-			IndexFileEntry entry = versionRegistry.searchForVersion(e -> shortVersion.equals(e.version));
-			if(entry != null) return entry;
-		} catch(Exception e) {
-			System.out.println("Could not read game version from file");
-		}
-		// Return latest release if nothing found
-		return versionRegistry.getLatestVersion(GameBranch.RELEASE);
-	}
-
-	// Main Panel Methods
-	private void createMainPanel() {
-		mainPanel = new JPanel();
-		mainPanel.setDoubleBuffered(true);
-		mainPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-		setContentPane(mainPanel);
-		mainPanel.setLayout(new BorderLayout(0, 0));
-
-		//Drag and control the window with the top panel
-		JPanel topPanel = createTopPanel();
-		mainPanel.add(topPanel, BorderLayout.NORTH);
-
-		//Select the center panel with the left panel
-		JPanel leftPanel = createLeftPanel();
-		mainPanel.add(leftPanel, BorderLayout.WEST);
-
-		//Update and play the game with the footer panel
-		footerPanel = new JPanel();
-		footerPanel.setDoubleBuffered(true);
-		footerPanel.setOpaque(false);
-		footerPanel.setLayout(new StackLayout());
-		mainPanel.add(footerPanel, BorderLayout.SOUTH);
-
-		JLabel footerLabel = new JLabel();
-		footerLabel.setDoubleBuffered(true);
-		footerLabel.setIcon(ImageFileUtil.getIcon("sprites/footer_normalplay_bg.jpg"));
-		footerPanel.add(footerLabel);
-
-		JButton normalPlayButton = new JButton("Play");
-		normalPlayButton.setFont(new Font("Roboto", Font.BOLD, 12));
-		normalPlayButton.setDoubleBuffered(true);
-		normalPlayButton.setOpaque(false);
-		normalPlayButton.setContentAreaFilled(false);
-		normalPlayButton.setBorderPainted(false);
-		normalPlayButton.setForeground(Palette.textColor);
-
-		JButton dedicatedServerButton = new JButton("Dedicated Server");
-		dedicatedServerButton.setFont(new Font("Roboto", Font.BOLD, 12));
-		dedicatedServerButton.setDoubleBuffered(true);
-		dedicatedServerButton.setOpaque(false);
-		dedicatedServerButton.setContentAreaFilled(false);
-		dedicatedServerButton.setBorderPainted(false);
-		dedicatedServerButton.setForeground(Palette.textColor);
-
-		JPanel footerPanelButtons = new JPanel();
-		footerPanelButtons.setDoubleBuffered(true);
-		footerPanelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
-		footerPanelButtons.setOpaque(false);
-		footerPanelButtons.add(Box.createRigidArea(new Dimension(10, 0)));
-		footerPanelButtons.add(normalPlayButton);
-		footerPanelButtons.add(Box.createRigidArea(new Dimension(30, 0)));
-		footerPanelButtons.add(dedicatedServerButton);
-		footerLabel.add(footerPanelButtons);
-		footerPanelButtons.setBounds(0, 0, 800, 30);
-
-		if(getLastUsedVersion() == null) selectedVersion = null;
-		else selectedVersion = gameVersion.version;
-		createPlayPanel(footerPanel);
-		createServerPanel(footerPanel);
-
-		JPanel bottomPanel = new JPanel();
-		bottomPanel.setDoubleBuffered(true);
-		bottomPanel.setOpaque(false);
-		bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		footerPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-		JButton launchSettings = new SettingsDialogButton(
-				"Launch Settings",
-				ImageFileUtil.getIcon("sprites/memory_options_gear.png"),
-				e -> {
-					JDialog settingsDialog = new LaunchSettingsDialog("Launch Settings", 500, 350);
-					settingsDialog.setVisible(true);
-				}
-		);
-		bottomPanel.add(launchSettings);
-
-		JButton installSettings = new SettingsDialogButton(
-				"Installation Settings",
-				ImageFileUtil.getIcon("sprites/launch_options_gear.png"),
-				e -> {
-					JDialog installDialog = new InstallSettingsDialog(
-							"Installation Settings",
-							450,150,
-							e1 -> {
-								IndexFileEntry version = getLatestVersion(lastUsedBranch);
-								if(version != null) {
-									if(updaterThread == null || !updaterThread.updating) {
-										this.dispose();
-										recreateButtons(playPanel, true);
-										updateGame(version);
-									}
-								} else JOptionPane.showMessageDialog(this, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
-							}
-					);
-					installDialog.setVisible(true);
-				}
-		);
-		bottomPanel.add(installSettings);
-
-		if(serverPanel != null) serverPanel.setVisible(false);
-		versionPanel.setVisible(true);
-
-		normalPlayButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				normalPlayButton.setForeground(Palette.selectedColor);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				normalPlayButton.setForeground(Palette.textColor);
-			}
-		});
-		normalPlayButton.addActionListener(e -> switchToClientMode(footerLabel));
-
-		dedicatedServerButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				dedicatedServerButton.setForeground(Palette.selectedColor);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				dedicatedServerButton.setForeground(Palette.textColor);
-			}
-		});
-		dedicatedServerButton.addActionListener(e -> {
-			if(updaterThread == null || !updaterThread.updating) { //Don't allow this while the game is updating
-				switchToServerMode(footerLabel);
-			}
-		});
-
-		centerPanel = new JPanel();
-		centerPanel.setDoubleBuffered(true);
-		centerPanel.setOpaque(false);
-		centerPanel.setLayout(new BorderLayout());
-		mainPanel.add(centerPanel, BorderLayout.CENTER);
-		JLabel background = new JLabel();
-		background.setDoubleBuffered(true);
-		background.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 800, 500));
-		centerPanel.add(background, BorderLayout.CENTER);
-
-		switchToClientMode(footerLabel); // make sure right components are visible
-	}
-
-	private JPanel createTopPanel() {
-		JPanel topPanel = new WindowDragPanel(
-				ImageFileUtil.getIcon("sprites/header_top.png"),
-				new MouseAdapter() {
-					@Override
-					public void mousePressed(MouseEvent e) {
-						mouseX = e.getX();
-						mouseY = e.getY();
-						//If the mouse is on the top panel buttons, don't drag the window
-						if(mouseX > 770 || mouseY > 30) {
-							mouseX = 0;
-							mouseY = 0;
-						}
-						super.mousePressed(e);
-					}
-				},
-				new MouseMotionAdapter() {
-					@Override
-					public void mouseDragged(MouseEvent e) {
-						if(mouseX != 0 && mouseY != 0) {
-							setLocation(getLocation().x + e.getX() - mouseX, getLocation().y + e.getY() - mouseY);
-						}
-						super.mouseDragged(e);
-					}
-				}
-		);
-
-		//Buttons to minimize/close window
-		JPanel windowControlsPanel = new WindowControlsPanel(
-				ImageFileUtil.getIcon("sprites/minimize_icon.png"),
-				e -> setState(Frame.ICONIFIED),
-				ImageFileUtil.getIcon("sprites/close_icon.png"),
-				e -> {
-					dispose();
-					System.exit(0);
-				}
-		);
-
-		//Was previously topLabel.add(windowControlsPanel)
-		//Changing it doesn't seem to make a difference
-		topPanel.add(windowControlsPanel);
-
-		// Display Schine logo
-		JPanel topRightPanel = new JPanel();
-		topRightPanel.setDoubleBuffered(true);
-		topRightPanel.setOpaque(false);
-		topRightPanel.setLayout(new BorderLayout());
-		topPanel.add(topRightPanel, BorderLayout.EAST);
-
-		JLabel logoLabel = new JLabel();
-		logoLabel.setDoubleBuffered(true);
-		logoLabel.setOpaque(false);
-		logoLabel.setIcon(ImageFileUtil.getIcon("sprites/launcher_schine_logo.png"));
-		topRightPanel.add(logoLabel, BorderLayout.EAST);
-		return topPanel;
-	}
-
-	private JPanel createLeftPanel() {
-		JPanel leftPanel = new JPanel();
-		leftPanel.setDoubleBuffered(true);
-		leftPanel.setOpaque(false);
-		leftPanel.setLayout(new StackLayout());
-
-		JLabel leftLabel = new JLabel();
-		leftLabel.setDoubleBuffered(true);
-		//Resize the image to the left panel
-		leftLabel.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 150, 500));
-		//Stretch the image to the left panel
-		leftPanel.add(leftLabel, StackLayout.BOTTOM);
-
-		JPanel topLeftPanel = new JPanel();
-		topLeftPanel.setDoubleBuffered(true);
-		topLeftPanel.setOpaque(false);
-		topLeftPanel.setLayout(new BorderLayout());
-		leftPanel.add(topLeftPanel, StackLayout.TOP);
-
-		//Add list to display links to game website
-		JList<JLabel> list = createPanelSelectList();
-		topLeftPanel.add(list);
-
-		//Display game logo
-		JPanel topLeftLogoPanel = new JPanel();
-		topLeftLogoPanel.setDoubleBuffered(true);
-		topLeftLogoPanel.setOpaque(false);
-		topLeftLogoPanel.setLayout(new BorderLayout());
-		topLeftPanel.add(topLeftLogoPanel, BorderLayout.NORTH);
-
-		//Add a left inset
-		JPanel leftInset = new JPanel();
-		leftInset.setDoubleBuffered(true);
-		leftInset.setOpaque(false);
-		topLeftLogoPanel.add(leftInset, BorderLayout.CENTER);
-
-		//Add logo at top left
-		JLabel logo = new JLabel();
-		logo.setDoubleBuffered(true);
-		logo.setOpaque(false);
-		logo.setIcon(ImageFileUtil.getIcon("sprites/logo.png"));
-		leftInset.add(logo);
-		return leftPanel;
-	}
-
-	private JList<JLabel> createPanelSelectList() {
-		JList<JLabel> list = new PanelSelectList(
-				new String[] {"NEWS", "FORUMS", "CONTENT", "COMMUNITY"}
-		);
-		//Select panels on click
-		list.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount() == 1) {
-					int index = list.locationToIndex(e.getPoint());
-					if(index != -1) {
-						switch(index) {
-							case 0:
-								createNewsPanel();
-								break;
-							case 1:
-								createForumsPanel();
-								break;
-							case 2:
-								createContentPanel();
-								break;
-							case 3:
-								createCommunityPanel();
-								break;
-						}
-					}
-				}
-			}
-		});
-		return list;
-	}
-
-	private void switchToClientMode(JLabel footerLabel) {
-		footerLabel.setIcon(ImageFileUtil.getIcon("sprites/footer_normalplay_bg.jpg"));
-		serverPanel.setVisible(false);
-		versionPanel.setVisible(true);
-		createPlayPanel(footerPanel);
-	}
-
-	// Panel Methods
-
-	private void switchToServerMode(JLabel footerLabel) {
-		footerLabel.setIcon(ImageFileUtil.getIcon("sprites/footer_dedicated_bg.jpg"));
-		versionPanel.setVisible(false);
-		playPanelButtons.removeAll();
-		versionPanel.removeAll();
-		createServerPanel(footerPanel);
-		serverPanel.setVisible(true);
-	}
-
-	private void recreateButtons(JPanel playPanel, boolean repair) {
-		if(playPanelButtons != null) {
-			playPanelButtons.removeAll();
-			playPanel.remove(playPanelButtons);
-		}
-		playPanelButtons = new JPanel();
-		playPanelButtons.setDoubleBuffered(true);
-		playPanelButtons.setOpaque(false);
-		playPanelButtons.setLayout(new BorderLayout());
-		playPanel.remove(playPanelButtons);
-		playPanel.add(playPanelButtons, BorderLayout.EAST);
-		JPanel playPanelButtonsSub = new JPanel();
-		playPanelButtonsSub.setDoubleBuffered(true);
-		playPanelButtonsSub.setOpaque(false);
-		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
-
-		if((repair || !gameJarExists(LaunchSettings.getInstallDir()) || gameVersion == null || !Objects.equals(gameVersion.version, selectedVersion)) && !debugMode) {
-			updateButton = new JButton(ImageFileUtil.getIcon("sprites/update_btn.png"));
-			updateButton.setDoubleBuffered(true);
-			updateButton.setOpaque(false);
-			updateButton.setContentAreaFilled(false);
-			updateButton.setBorderPainted(false);
-			updateButton.addActionListener(e -> {
-				IndexFileEntry version = versionRegistry.searchForVersion(lastUsedBranch, v -> v.version.equals(selectedVersion));
-				System.out.println("selected version " + version);
-				if(version != null) {
-					if(updaterThread == null || !updaterThread.updating) updateGame(version);
-				} else {
-					JOptionPane.showMessageDialog(null, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			});
-			updateButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.updating) updateButton.setIcon(ImageFileUtil.getIcon("sprites/update_roll.png"));
-					else updateButton.setToolTipText(dlStatus.toString());
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-					if(updaterThread == null || !updaterThread.updating) updateButton.setIcon(ImageFileUtil.getIcon("sprites/update_btn.png"));
-					else updateButton.setToolTipText(dlStatus.toString());
-				}
-			});
-			playPanelButtonsSub.add(updateButton);
-		} else {
-			JButton playButton = new JButton(ImageFileUtil.getIcon("sprites/launch_btn.png")); //Todo: Reduce button glow so this doesn't look weird
-			playButton.setDoubleBuffered(true);
-			playButton.setOpaque(false);
-			playButton.setContentAreaFilled(false);
-			playButton.setBorderPainted(false);
-			playButton.addActionListener(e -> {
-				dispose();
-				LaunchSettings.setLastUsedVersion(gameVersion.version);
-				LaunchSettings.saveSettings();
-				try {
-					if(usingOldVersion()) downloadJRE(JavaVersion.JAVA_8);
-					else downloadJRE(JavaVersion.JAVA_18);
-				} catch(Exception exception) {
-					exception.printStackTrace();
-					(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
-					return;
-				}
-				runStarMade(serverMode);
-				System.exit(0);
-			});
-			playButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					playButton.setIcon(ImageFileUtil.getIcon("sprites/launch_roll.png"));
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-					playButton.setIcon(ImageFileUtil.getIcon("sprites/launch_btn.png"));
-				}
-			});
-			playPanelButtonsSub.add(playButton);
-		}
-		playPanel.revalidate();
-		playPanel.repaint();
 	}
 
 	private void runStarMade(boolean server) {
@@ -768,122 +298,6 @@ public class StarMadeLauncher extends JFrame {
 		return commandComponents;
 	}
 
-	private String getJavaPath(JavaVersion version) {
-		return LaunchSettings.getInstallDir() + "/" + String.format(currentOS.javaPath, version.number);
-	}
-
-	// Panel Methods
-
-	private void createPlayPanel(JPanel footerPanel) {
-		clearPanel(playPanel);
-		serverMode = false;
-		playPanel = createPanel(footerPanel, false);
-	}
-
-	private void createServerPanel(JPanel footerPanel) {
-		clearPanel(serverPanel);
-		serverMode = true;
-		serverPanel = createPanel(footerPanel, true);
-	}
-
-	private JPanel createPanel(JPanel footerPanel, boolean serverMode) {
-		JPanel panel = new JPanel();
-		panel.setDoubleBuffered(true);
-		panel.setOpaque(false);
-		panel.setLayout(new BorderLayout());
-		footerPanel.add(panel);
-
-		versionPanel = createVersionPanel(serverMode);
-		footerPanel.add(versionPanel, BorderLayout.WEST);
-
-		recreateButtons(panel, false);
-
-		footerPanel.revalidate();
-		footerPanel.repaint();
-		return panel;
-	}
-
-	private static void clearPanel(JPanel panel) {
-		if (panel != null) {
-			panel.removeAll();
-			panel.revalidate();
-			panel.repaint();
-		}
-	}
-
-	private JPanel createVersionPanel(boolean serverMode) {
-		JPanel versionPanel = new JPanel();
-		versionPanel.setDoubleBuffered(true);
-		versionPanel.setOpaque(false);
-		versionPanel.setLayout(new BorderLayout());
-
-		JPanel versionSubPanel = new JPanel();
-		versionSubPanel.setDoubleBuffered(true);
-		versionSubPanel.setOpaque(false);
-		versionSubPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		versionPanel.add(versionSubPanel, BorderLayout.SOUTH);
-
-		//Change color of arrow
-		UIDefaults defaults = new UIDefaults();
-		defaults.put("ComboBox:\"ComboBox.arrowButton\"[Enabled].backgroundPainter", Palette.buttonColor);
-
-		//Branch dropdown
-		JComboBox<String> branchDropdown = createBranchDropdown(lastUsedBranch.index, defaults);
-		versionSubPanel.add(branchDropdown);
-
-		//Version dropdown
-		JComboBox<String> versionDropdown = new DropdownMenu(defaults);
-		versionSubPanel.add(versionDropdown);
-
-		branchDropdown.addItemListener(e -> onSelectBranch(branchDropdown, versionDropdown));
-
-		versionDropdown.addItemListener(e -> onSelectVersion(versionDropdown));
-		setDropdownVersionsList(versionDropdown, lastUsedBranch, versionRegistry);
-		selectLastUsedVersion(versionDropdown);
-
-		//Port field
-		if(serverMode) {
-			if (portField == null) portField = new PortField("4242");
-			else portField.setVisible(true);
-			versionSubPanel.add(portField);
-		} else {
-			if(portField != null) {
-				portField.setVisible(false);
-				versionSubPanel.remove(portField);
-			}
-		}
-		return versionPanel;
-	}
-
-	private JComboBox<String> createBranchDropdown(int startIndex, UIDefaults defaults) {
-		JComboBox<String> branchDropdown = new DropdownMenu(defaults);
-		branchDropdown.addItem("Release");
-		branchDropdown.addItem("Dev");
-		branchDropdown.addItem("Pre-Release");
-		branchDropdown.setSelectedIndex(startIndex);
-		return branchDropdown;
-	}
-
-	private void onSelectBranch(JComboBox<String> branchDropdown, JComboBox<String> versionDropdown) {
-		//Change settings
-		int branchIndex = branchDropdown.getSelectedIndex();
-		setBranch(GameBranch.getForIndex(branchIndex));
-		LaunchSettings.saveSettings();
-
-		//Update UI components
-		GameBranch branch = GameBranch.getForIndex(branchDropdown.getSelectedIndex());
-		setDropdownVersionsList(versionDropdown, branch, versionRegistry);
-		recreateButtons(playPanel, false);
-	}
-
-	private void onSelectVersion(JComboBox<String> versionDropdown) {
-		if(versionDropdown.getSelectedIndex() == -1) return;
-		selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
-		LaunchSettings.setLastUsedVersion(selectedVersion);
-		LaunchSettings.saveSettings();
-		if(playPanel != null) recreateButtons(playPanel, false);
-	}
-
 	private void updateGame(IndexFileEntry version) {
 		String[] options = {"Backup Database", "Backup Everything", "Don't Backup"};
 		int choice = JOptionPane.showOptionDialog(this, "Would you like to backup your database, everything, or nothing?", "Backup", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
@@ -926,7 +340,7 @@ public class StarMadeLauncher extends JFrame {
 				SwingUtilities.invokeLater(() -> {
 					try {
 						sleep(1);
-						recreateButtons(playPanel, false);
+						updatePlayPanelButtons(playPanel, false);
 					} catch(InterruptedException e) {
 						throw new RuntimeException(e);
 					}
@@ -939,6 +353,624 @@ public class StarMadeLauncher extends JFrame {
 				updateButton.setIcon(ImageFileUtil.getIcon("sprites/update_btn.png"));
 			}
 		}).start();
+	}
+
+	// Launcher Getters and Setters
+
+	private static String getCurrentUser() {
+		try {
+			return StarMadeCredentials.read().getUser();
+		} catch(Exception ignored) {
+			return null;
+		}
+	}
+
+	private static void removeCurrentUser() {
+		try {
+			StarMadeCredentials.removeFile();
+		} catch(IOException exception) {
+			exception.printStackTrace();
+		}
+	}
+
+	private static void setGameVersion(IndexFileEntry gameVersion) {
+		if(gameVersion != null) {
+			LaunchSettings.setLastUsedVersion(gameVersion.version);
+			if(usingOldVersion()) LaunchSettings.setJvmArgs("--illegal-access=permit");
+			else LaunchSettings.setJvmArgs("");
+		} else {
+			LaunchSettings.setLastUsedVersion("NONE");
+			LaunchSettings.setJvmArgs("");
+		}
+	}
+
+	private static void setBranch(GameBranch branch) {
+		lastUsedBranch = branch;
+		LaunchSettings.setLastUsedBranch(lastUsedBranch.index);
+	}
+
+	private static boolean usingOldVersion() {
+		return gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
+	}
+
+	private void downloadJRE(JavaVersion version) throws Exception {
+		if(new File(getJavaPath(version)).exists()) {
+			System.out.println("JRE " + version + " already downloaded");
+			return;
+		}
+		System.out.println("Downloading JRE " + version);
+		(new JavaDownloader(version)).downloadAndUnzip();
+	}
+
+	private IndexFileEntry getLastUsedVersion() {
+		try {
+			String version;
+			File versionFile = new File(LaunchSettings.getInstallDir(), "version.txt");
+			if(versionFile.exists()) {
+				version = TextFileUtil.readText(versionFile);
+			} else {
+				version = LaunchSettings.getLastUsedVersion();
+			}
+			String shortVersion = version.substring(0, version.indexOf('#'));
+
+			IndexFileEntry entry = versionRegistry.searchForVersion(e -> shortVersion.equals(e.version));
+			if(entry != null) return entry;
+		} catch(Exception e) {
+			System.out.println("Could not read game version from file");
+		}
+		// Return latest release if nothing found
+		return versionRegistry.getLatestVersion(GameBranch.RELEASE);
+	}
+
+	private String getJavaPath(JavaVersion version) {
+		return LaunchSettings.getInstallDir() + "/" + String.format(currentOS.javaPath, version.number);
+	}
+
+	private IndexFileEntry getLatestVersion(GameBranch branch) {
+		IndexFileEntry currentVersion = getLastUsedVersion();
+		if(debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1"))) {
+			return getLastUsedVersion();
+		}
+		return versionRegistry.getLatestVersion(branch);
+	}
+
+	private boolean gameJarExists(String installDir) {
+		return (new File(installDir + "/StarMade.jar")).exists();
+	}
+
+	// UI Methods
+
+	private void createLauncherUI() {
+		JPanel mainPanel = new JPanel();
+		mainPanel.setDoubleBuffered(true);
+		mainPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+		mainPanel.setLayout(new BorderLayout(0, 0));
+		setContentPane(mainPanel);
+
+		//Drag and control the window with the top panel
+		JPanel topPanel = createTopPanel();
+		mainPanel.add(topPanel, BorderLayout.NORTH);
+
+		//Select the center panel with the left panel
+		JPanel leftPanel = createLeftPanel();
+		mainPanel.add(leftPanel, BorderLayout.WEST);
+
+		//Update and play the game with the footer panel
+		JPanel footerPanel = createFooterPanel();
+		mainPanel.add(footerPanel, BorderLayout.SOUTH);
+
+		if(serverPanel != null) serverPanel.setVisible(false);
+		versionPanel.setVisible(true);
+
+		//Display scollable content in the center
+		centerPanel = createCenterPanel();
+		mainPanel.add(centerPanel, BorderLayout.CENTER);
+
+		createNewsPanel();
+	}
+
+	// Top Panel Methods
+
+	private JPanel createTopPanel() {
+		JPanel topPanel = new WindowDragPanel(
+				ImageFileUtil.getIcon("sprites/header_top.png"),
+				new MouseAdapter() {
+					@Override
+					public void mousePressed(MouseEvent e) {
+						mouseX = e.getX();
+						mouseY = e.getY();
+						//If the mouse is on the top panel buttons, don't drag the window
+						if(mouseX > 770 || mouseY > 30) {
+							mouseX = 0;
+							mouseY = 0;
+						}
+						super.mousePressed(e);
+					}
+				},
+				new MouseMotionAdapter() {
+					@Override
+					public void mouseDragged(MouseEvent e) {
+						if(mouseX != 0 && mouseY != 0) {
+							setLocation(getLocation().x + e.getX() - mouseX, getLocation().y + e.getY() - mouseY);
+						}
+						super.mouseDragged(e);
+					}
+				}
+		);
+
+		//Buttons to minimize/close window
+		JPanel windowControlsPanel = new WindowControlsPanel(
+				ImageFileUtil.getIcon("sprites/minimize_icon.png"),
+				e -> setState(Frame.ICONIFIED),
+				ImageFileUtil.getIcon("sprites/close_icon.png"),
+				e -> {
+					dispose();
+					System.exit(0);
+				}
+		);
+		//Was previously topLabel.add(windowControlsPanel)
+		//Changing it doesn't seem to make a difference
+		topPanel.add(windowControlsPanel);
+
+		// Display Schine logo
+		JPanel topRightPanel = new JPanel();
+		topRightPanel.setDoubleBuffered(true);
+		topRightPanel.setOpaque(false);
+		topRightPanel.setLayout(new BorderLayout());
+		topPanel.add(topRightPanel, BorderLayout.EAST);
+
+		JLabel logoLabel = new JLabel();
+		logoLabel.setDoubleBuffered(true);
+		logoLabel.setOpaque(false);
+		logoLabel.setIcon(ImageFileUtil.getIcon("sprites/launcher_schine_logo.png"));
+		topRightPanel.add(logoLabel, BorderLayout.EAST);
+		return topPanel;
+	}
+
+	// Left Panel Methods
+
+	private JPanel createLeftPanel() {
+		JPanel leftPanel = new JPanel();
+		leftPanel.setDoubleBuffered(true);
+		leftPanel.setOpaque(false);
+		leftPanel.setLayout(new StackLayout());
+
+		JLabel leftLabel = new JLabel();
+		leftLabel.setDoubleBuffered(true);
+		//Resize the image to the left panel
+		leftLabel.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 150, 500));
+		//Stretch the image to the left panel
+		leftPanel.add(leftLabel, StackLayout.BOTTOM);
+
+		JPanel topLeftPanel = new JPanel();
+		topLeftPanel.setDoubleBuffered(true);
+		topLeftPanel.setOpaque(false);
+		topLeftPanel.setLayout(new BorderLayout());
+		leftPanel.add(topLeftPanel, StackLayout.TOP);
+
+		//Add list to display links to game website
+		JList<JLabel> list = createPanelSelectList();
+		topLeftPanel.add(list);
+
+		//Display game logo
+		JPanel topLeftLogoPanel = new JPanel();
+		topLeftLogoPanel.setDoubleBuffered(true);
+		topLeftLogoPanel.setOpaque(false);
+		topLeftLogoPanel.setLayout(new BorderLayout());
+		topLeftPanel.add(topLeftLogoPanel, BorderLayout.NORTH);
+
+		//Add a left inset
+		JPanel leftInset = new JPanel();
+		leftInset.setDoubleBuffered(true);
+		leftInset.setOpaque(false);
+		topLeftLogoPanel.add(leftInset, BorderLayout.CENTER);
+
+		//Add logo at top left
+		JLabel logo = new JLabel();
+		logo.setDoubleBuffered(true);
+		logo.setOpaque(false);
+		logo.setIcon(ImageFileUtil.getIcon("sprites/logo.png"));
+		leftInset.add(logo);
+		return leftPanel;
+	}
+
+	private JList<JLabel> createPanelSelectList() {
+		JList<JLabel> list = new PanelSelectList(
+				new String[]{"NEWS", "FORUMS", "CONTENT", "COMMUNITY"}
+		);
+		//Select panels on click
+		list.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 1) {
+					int index = list.locationToIndex(e.getPoint());
+					if(index != -1) {
+						switch (index) {
+							case 0:
+								createNewsPanel();
+								break;
+							case 1:
+								createForumsPanel();
+								break;
+							case 2:
+								createContentPanel();
+								break;
+							case 3:
+								createCommunityPanel();
+								break;
+						}
+					}
+				}
+			}
+		});
+		return list;
+	}
+
+	// Footer Panel Methods
+
+	private JPanel createFooterPanel() {
+		JPanel footerPanel = new JPanel();
+		footerPanel.setDoubleBuffered(true);
+		footerPanel.setOpaque(false);
+		footerPanel.setLayout(new StackLayout());
+
+		JLabel footerLabel = new JLabel();
+		footerLabel.setDoubleBuffered(true);
+		footerLabel.setIcon(ImageFileUtil.getIcon("sprites/footer_normalplay_bg.jpg"));
+		footerPanel.add(footerLabel);
+
+		JPanel footerPanelButtons = new JPanel();
+		footerPanelButtons.setDoubleBuffered(true);
+		footerPanelButtons.setLayout(new FlowLayout(FlowLayout.LEFT));
+		footerPanelButtons.setOpaque(false);
+		footerPanelButtons.add(Box.createRigidArea(new Dimension(10, 0)));
+		footerPanelButtons.add(Box.createRigidArea(new Dimension(30, 0)));
+		footerPanelButtons.setBounds(0, 0, 800, 30);
+		footerLabel.add(footerPanelButtons);
+
+		JButton clientPlayButton = new SetPlayModeButton("Play", e -> switchPlayMode(footerPanel, footerLabel, false));
+		footerPanelButtons.add(clientPlayButton);
+
+		JButton serverPlayButton = new SetPlayModeButton("Dedicated Server", e -> switchPlayMode(footerPanel, footerLabel, true));
+		footerPanelButtons.add(serverPlayButton);
+
+		if(getLastUsedVersion() == null) selectedVersion = null;
+		else selectedVersion = gameVersion.version;
+		createPlayPanel(footerPanel);
+		createServerPanel(footerPanel);
+
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setDoubleBuffered(true);
+		bottomPanel.setOpaque(false);
+		bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		footerPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+		JButton launchSettings = createLaunchSettingsDialogButton();
+		bottomPanel.add(launchSettings);
+
+		JButton installSettings = createInstallSettingsDialogButton();
+		bottomPanel.add(installSettings);
+
+		switchPlayMode(footerPanel, footerLabel, false); // make sure right components are visible
+		return footerPanel;
+	}
+
+	private static JButton createLaunchSettingsDialogButton() {
+		return new SettingsDialogButton(
+				"Launch Settings",
+				ImageFileUtil.getIcon("sprites/memory_options_gear.png"),
+				e -> {
+					JDialog settingsDialog = new LaunchSettingsDialog("Launch Settings", 500, 350);
+					settingsDialog.setVisible(true);
+				}
+		);
+	}
+
+	private JButton createInstallSettingsDialogButton() {
+		return new SettingsDialogButton(
+				"Installation Settings",
+				ImageFileUtil.getIcon("sprites/launch_options_gear.png"),
+				e -> {
+					JDialog installDialog = new InstallSettingsDialog(
+							"Installation Settings",
+							450, 150,
+							e1 -> {
+								IndexFileEntry version = getLatestVersion(lastUsedBranch);
+								if(version != null) {
+									if(updaterThread == null || !updaterThread.updating) {
+										this.dispose();
+										updatePlayPanelButtons(playPanel, true);
+										updateGame(version);
+									}
+								} else
+									JOptionPane.showMessageDialog(this, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+					);
+					installDialog.setVisible(true);
+				}
+		);
+	}
+
+	private void switchPlayMode(JPanel footerPanel, JLabel footerLabel, boolean serverMode) {
+		if(updaterThread != null && updaterThread.updating) { //Don't allow this while the game is updating
+			return;
+		}
+		if(serverMode) switchToServerMode(footerPanel, footerLabel);
+		else switchToClientMode(footerPanel, footerLabel);
+	}
+
+	private void switchToClientMode(JPanel footerPanel, JLabel footerLabel) {
+		footerLabel.setIcon(ImageFileUtil.getIcon("sprites/footer_normalplay_bg.jpg"));
+		serverPanel.setVisible(false);
+		versionPanel.setVisible(true);
+		createPlayPanel(footerPanel);
+		// TODO don't reset version dropdown
+	}
+
+	private void switchToServerMode(JPanel footerPanel, JLabel footerLabel) {
+		footerLabel.setIcon(ImageFileUtil.getIcon("sprites/footer_dedicated_bg.jpg"));
+		serverPanel.setVisible(true);
+		versionPanel.setVisible(false);
+		playPanelButtons.removeAll();
+		versionPanel.removeAll();
+		createServerPanel(footerPanel);
+	}
+
+	private JPanel createPlayButtonsPanel(boolean repair) {
+		JPanel playPanelButtons = new JPanel();
+		playPanelButtons.setDoubleBuffered(true);
+		playPanelButtons.setOpaque(false);
+		playPanelButtons.setLayout(new BorderLayout());
+
+		JPanel playPanelButtonsSub = new JPanel();
+		playPanelButtonsSub.setDoubleBuffered(true);
+		playPanelButtonsSub.setOpaque(false);
+		playPanelButtonsSub.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		playPanelButtons.add(playPanelButtonsSub, BorderLayout.SOUTH);
+
+		if((repair || !gameJarExists(LaunchSettings.getInstallDir()) || gameVersion == null || !Objects.equals(gameVersion.version, selectedVersion)) && !debugMode) {
+			updateButton = createUpdateButton();
+			playPanelButtonsSub.add(updateButton);
+		} else {
+			JButton playButton = createPlayButton();
+			playPanelButtonsSub.add(playButton);
+		}
+		return playPanelButtons;
+	}
+
+	private JButton createPlayButton() {
+		JButton playButton = new JButton(ImageFileUtil.getIcon("sprites/launch_btn.png")); //Todo: Reduce button glow so this doesn't look weird
+		playButton.setDoubleBuffered(true);
+		playButton.setOpaque(false);
+		playButton.setContentAreaFilled(false);
+		playButton.setBorderPainted(false);
+		playButton.addActionListener(e -> {
+			dispose();
+			LaunchSettings.setLastUsedVersion(gameVersion.version);
+			LaunchSettings.saveSettings();
+			try {
+				if(usingOldVersion()) downloadJRE(JavaVersion.JAVA_8);
+				else downloadJRE(JavaVersion.JAVA_18);
+			} catch(Exception exception) {
+				exception.printStackTrace();
+				(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
+				return;
+			}
+			runStarMade(serverMode);
+			System.exit(0);
+		});
+		playButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				playButton.setIcon(ImageFileUtil.getIcon("sprites/launch_roll.png"));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				playButton.setIcon(ImageFileUtil.getIcon("sprites/launch_btn.png"));
+			}
+		});
+		return playButton;
+	}
+
+	private JButton createUpdateButton() {
+		JButton updateButton = new JButton(ImageFileUtil.getIcon("sprites/update_btn.png"));
+		updateButton.setDoubleBuffered(true);
+		updateButton.setOpaque(false);
+		updateButton.setContentAreaFilled(false);
+		updateButton.setBorderPainted(false);
+		updateButton.addActionListener(e -> {
+			IndexFileEntry version = versionRegistry.searchForVersion(lastUsedBranch, v -> v.version.equals(selectedVersion));
+			System.out.println("selected version " + version);
+			if(version != null) {
+				if(updaterThread == null || !updaterThread.updating) updateGame(version);
+			} else {
+				JOptionPane.showMessageDialog(null, "The Launcher needs to be online to do this!", "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		});
+		updateButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if(updaterThread == null || !updaterThread.updating)
+					updateButton.setIcon(ImageFileUtil.getIcon("sprites/update_roll.png"));
+				else updateButton.setToolTipText(dlStatus.toString());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if(updaterThread == null || !updaterThread.updating)
+					updateButton.setIcon(ImageFileUtil.getIcon("sprites/update_btn.png"));
+				else updateButton.setToolTipText(dlStatus.toString());
+			}
+		});
+		return updateButton;
+	}
+
+	private void updatePlayPanelButtons(JPanel panel, boolean repair) {
+		// Called when switching client/server, and selecting branch/version
+		if(playPanelButtons != null) {
+			panel.remove(playPanelButtons);
+		}
+
+		playPanelButtons = createPlayButtonsPanel(repair);
+		panel.add(playPanelButtons, BorderLayout.EAST);
+		panel.revalidate();
+		panel.repaint();
+	}
+
+	// Panel Methods
+
+	private void createPlayPanel(JPanel footerPanel) {
+		clearPanel(playPanel);
+		serverMode = false;
+		playPanel = createPlayVersionPanel(footerPanel, false);
+		footerPanel.add(playPanel);
+		footerPanel.revalidate();
+		footerPanel.repaint();
+	}
+
+	private void createServerPanel(JPanel footerPanel) {
+		clearPanel(serverPanel);
+		serverMode = true;
+		serverPanel = createPlayVersionPanel(footerPanel, true);
+		footerPanel.add(serverPanel);
+		footerPanel.revalidate();
+		footerPanel.repaint();
+	}
+
+	private static void clearPanel(JPanel panel) {
+		if(panel != null) {
+			panel.removeAll();
+			panel.revalidate();
+			panel.repaint();
+		}
+	}
+
+	private JPanel createPlayVersionPanel(JPanel footerPanel, boolean serverMode) {
+		JPanel panel = new JPanel();
+		panel.setDoubleBuffered(true);
+		panel.setOpaque(false);
+		panel.setLayout(new BorderLayout());
+
+		versionPanel = createVersionSelectPanel(serverMode);
+		footerPanel.add(versionPanel, BorderLayout.WEST);
+
+		playPanelButtons = createPlayButtonsPanel(false);
+		panel.add(playPanelButtons, BorderLayout.EAST);
+		return panel;
+	}
+
+	private JPanel createVersionSelectPanel(boolean serverMode) {
+		JPanel versionPanel = new JPanel();
+		versionPanel.setDoubleBuffered(true);
+		versionPanel.setOpaque(false);
+		versionPanel.setLayout(new BorderLayout());
+
+		JPanel versionSubPanel = new JPanel();
+		versionSubPanel.setDoubleBuffered(true);
+		versionSubPanel.setOpaque(false);
+		versionSubPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		versionPanel.add(versionSubPanel, BorderLayout.SOUTH);
+
+		//Change color of arrow
+		UIDefaults defaults = new UIDefaults();
+		defaults.put("ComboBox:\"ComboBox.arrowButton\"[Enabled].backgroundPainter", Palette.buttonColor);
+
+		//Branch dropdown
+		JComboBox<String> branchDropdown = createBranchDropdown(lastUsedBranch.index, defaults);
+		versionSubPanel.add(branchDropdown);
+
+		//Version dropdown
+		JComboBox<String> versionDropdown = new DropdownMenu(defaults);
+		versionSubPanel.add(versionDropdown);
+
+		branchDropdown.addItemListener(e -> onSelectBranch(branchDropdown, versionDropdown));
+
+		versionDropdown.addItemListener(e -> onSelectVersion(versionDropdown));
+		setDropdownVersionsList(versionDropdown, lastUsedBranch, versionRegistry);
+		selectLastUsedVersion(versionDropdown);
+
+		//Port field
+		if(serverMode) {
+			if(portField == null) portField = new PortField("4242");
+			else portField.setVisible(true);
+			versionSubPanel.add(portField);
+		} else {
+			if(portField != null) {
+				portField.setVisible(false);
+				versionSubPanel.remove(portField);
+			}
+		}
+		return versionPanel;
+	}
+
+	private JComboBox<String> createBranchDropdown(int startIndex, UIDefaults defaults) {
+		JComboBox<String> branchDropdown = new DropdownMenu(defaults);
+		branchDropdown.addItem("Release");
+		branchDropdown.addItem("Dev");
+		branchDropdown.addItem("Pre-Release");
+		branchDropdown.setSelectedIndex(startIndex);
+		return branchDropdown;
+	}
+
+	private void onSelectBranch(JComboBox<String> branchDropdown, JComboBox<String> versionDropdown) {
+		//Change settings
+		int branchIndex = branchDropdown.getSelectedIndex();
+		setBranch(GameBranch.getForIndex(branchIndex));
+		LaunchSettings.saveSettings();
+
+		//Update UI components
+		GameBranch branch = GameBranch.getForIndex(branchDropdown.getSelectedIndex());
+		setDropdownVersionsList(versionDropdown, branch, versionRegistry);
+		updatePlayPanelButtons(playPanel, false);
+	}
+
+	private void onSelectVersion(JComboBox<String> versionDropdown) {
+		if(versionDropdown.getSelectedIndex() == -1) return;
+		selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
+		LaunchSettings.setLastUsedVersion(selectedVersion);
+		LaunchSettings.saveSettings();
+		if(playPanel != null) updatePlayPanelButtons(playPanel, false);
+	}
+
+	// TODO maybe save and don't re-add every time
+	private static void setDropdownVersionsList(JComboBox<String> versionDropdown, GameBranch branch, VersionRegistry versionRegistry) {
+		List<IndexFileEntry> versions = versionRegistry.getVersions(branch);
+		if(versions == null) return;
+
+		// Add versions to dropdown
+		versionDropdown.removeAllItems();
+		for(IndexFileEntry version : versions) {
+			if(version.equals(versions.get(0))) versionDropdown.addItem(version.version + " (Latest)");
+			else versionDropdown.addItem(version.version);
+		}
+	}
+
+	private static void selectLastUsedVersion(JComboBox<String> versionDropdown) {
+		String lastUsedVersion = LaunchSettings.getLastUsedVersion();
+		if(lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
+		//Select last used version in dropdown if it exists
+		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
+			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
+				versionDropdown.setSelectedIndex(i);
+				break;
+			}
+		}
+	}
+
+	// Center Panel Methods
+
+	private JPanel createCenterPanel() {
+		JPanel centerPanel = new JPanel();
+		centerPanel.setDoubleBuffered(true);
+		centerPanel.setOpaque(false);
+		centerPanel.setLayout(new BorderLayout());
+
+		JLabel background = new JLabel();
+		background.setDoubleBuffered(true);
+		background.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 800, 500));
+		centerPanel.add(background, BorderLayout.CENTER);
+		return centerPanel;
 	}
 
 	private void createScroller(JPanel currentPanel) {
@@ -1012,18 +1044,6 @@ public class StarMadeLauncher extends JFrame {
 			JScrollBar vertical = centerScrollPane.getVerticalScrollBar();
 			vertical.setValue(vertical.getMinimum());
 		});
-	}
-
-	private IndexFileEntry getLatestVersion(GameBranch branch) {
-		IndexFileEntry currentVersion = getLastUsedVersion();
-		if(debugMode || (currentVersion != null && !currentVersion.version.startsWith("0.2") && !currentVersion.version.startsWith("0.1"))) {
-			return getLastUsedVersion();
-		}
-		return versionRegistry.getLatestVersion(branch);
-	}
-
-	private boolean gameJarExists(String installDir) {
-		return (new File(installDir + "/StarMade.jar")).exists();
 	}
 
 }
