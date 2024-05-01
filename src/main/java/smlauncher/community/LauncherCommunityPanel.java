@@ -1,6 +1,7 @@
 package smlauncher.community;
 
 import smlauncher.fileio.ImageFileUtil;
+import smlauncher.mainui.LauncherScrollablePanel;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
@@ -16,18 +17,13 @@ import java.net.URISyntaxException;
  *
  * @author TheDerpGamer
  */
-public class LauncherCommunityPanel extends JPanel {
+public class LauncherCommunityPanel extends LauncherScrollablePanel {
 
 	private static final String MAIN_DISCORD_URL = "https://discord.gg/SXbkYpU";
 	private static final String STARLOADER_DISCORD_URL = "https://discord.gg/Y2UR7AXfsE";
 	private static final String COMMUNITY_SERVER_JSON_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/community-servers.json";
 
-	public LauncherCommunityPanel() {
-		super(true);
-		setBackground(Palette.paneColor);
-		setOpaque(true);
-	}
-
+	@Override
 	public void updatePanel() {
 		removeAll();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

@@ -1,5 +1,6 @@
 package smlauncher.content;
 
+import smlauncher.mainui.LauncherScrollablePanel;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
@@ -9,14 +10,9 @@ import javax.swing.*;
  *
  * @author TheDerpGamer
  */
-public class LauncherContentPanel extends JPanel {
+public class LauncherContentPanel extends LauncherScrollablePanel {
 
-	public LauncherContentPanel() {
-		super(true);
-		setBackground(Palette.paneColor);
-		setOpaque(true);
-	}
-
+	@Override
 	public void updatePanel() {
 		removeAll();
 	}

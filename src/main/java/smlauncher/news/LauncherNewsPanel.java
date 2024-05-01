@@ -1,5 +1,6 @@
 package smlauncher.news;
 
+import smlauncher.mainui.LauncherScrollablePanel;
 import smlauncher.util.BBCodeToHTMLConverter;
 import smlauncher.util.Palette;
 import smlauncher.util.SteamNewsAPI;
@@ -16,14 +17,9 @@ import java.util.ArrayList;
  *
  * @author TheDerpGamer
  */
-public class LauncherNewsPanel extends JPanel {
+public class LauncherNewsPanel extends LauncherScrollablePanel {
 
-	public LauncherNewsPanel() {
-		super(true);
-		setBackground(Palette.paneColor);
-		setOpaque(true);
-	}
-
+	@Override
 	public void updatePanel() {
 		removeAll();
 		JEditorPane htmlPanel = new JEditorPane();

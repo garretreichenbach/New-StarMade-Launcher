@@ -54,7 +54,6 @@ public class StarMadeLauncher extends JFrame {
 	private int mouseY;
 	private JButton updateButton;
 	private JTextField portField;
-	private JPanel centerPanel;
 	private JPanel versionPanel;
 	private JPanel playPanel;
 	private JPanel serverPanel;
@@ -463,10 +462,8 @@ public class StarMadeLauncher extends JFrame {
 		versionPanel.setVisible(true);
 
 		//Display scollable content in the center
-		centerPanel = createCenterPanel();
+		JPanel centerPanel = createCenterPanel();
 		mainPanel.add(centerPanel, BorderLayout.CENTER);
-
-		createNewsPanel();
 	}
 
 	// Top Panel Methods
@@ -970,30 +967,16 @@ public class StarMadeLauncher extends JFrame {
 		background.setDoubleBuffered(true);
 		background.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 800, 500));
 		centerPanel.add(background, BorderLayout.CENTER);
-		return centerPanel;
-	}
 
-	private void createScroller(JPanel currentPanel) {
-		//Display selected content in the scroll pane
-		if(centerScrollPane == null) {
-			centerScrollPane = new JScrollPane(currentPanel);
-			centerScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			centerScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
-			centerScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-			centerScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-			centerPanel.add(centerScrollPane, BorderLayout.CENTER);
-		}
-		centerScrollPane.setViewportView(currentPanel);
+		centerScrollPane = new PanelScrollPane();
+		centerPanel.add(centerScrollPane, BorderLayout.CENTER);
+		createNewsPanel();
+		return centerPanel;
 	}
 
 	private void createNewsPanel() {
 		if(newsPanel == null) newsPanel = new LauncherNewsPanel();
-		createScroller(newsPanel);
-		newsPanel.updatePanel();
-		SwingUtilities.invokeLater(() -> {
-			JScrollBar vertical = centerScrollPane.getVerticalScrollBar();
-			vertical.setValue(vertical.getMinimum());
-		});
+		centerScrollPane.setViewportView(newsPanel);
 	}
 
 	private void createForumsPanel() {
@@ -1007,12 +990,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 		/* Todo: Create forums panel
 		forumsPanel = new LauncherForumsPanel();
-		createScroller(forumsPanel);
-		forumsPanel.updatePanel();
-		SwingUtilities.invokeLater(() -> {
-			JScrollBar vertical = centerScrollPane.getVerticalScrollBar();
-			vertical.setValue(vertical.getMinimum());
-		});
+		centerScrollPane.setViewportView(forumsPanel);
 		 */
 	}
 
@@ -1027,23 +1005,13 @@ public class StarMadeLauncher extends JFrame {
 		}
 		/* Todo: Create content panel
 		contentPanel = new LauncherContentPanel();
-		createScroller(contentPanel);
-		contentPanel.updatePanel();
-		SwingUtilities.invokeLater(() -> {
-			JScrollBar vertical = centerScrollPane.getVerticalScrollBar();
-			vertical.setValue(vertical.getMinimum());
-		});
+		centerScrollPane.setViewportView(contentPanel);
 		 */
 	}
 
 	private void createCommunityPanel() {
-		communityPanel = new LauncherCommunityPanel();
-		createScroller(communityPanel);
-		communityPanel.updatePanel();
-		SwingUtilities.invokeLater(() -> {
-			JScrollBar vertical = centerScrollPane.getVerticalScrollBar();
-			vertical.setValue(vertical.getMinimum());
-		});
+		if(communityPanel == null) communityPanel = new LauncherCommunityPanel();
+		centerScrollPane.setViewportView(communityPanel);
 	}
 
 }
