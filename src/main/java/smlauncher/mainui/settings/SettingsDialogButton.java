@@ -1,4 +1,4 @@
-package smlauncher.mainui;
+package smlauncher.mainui.settings;
 
 import smlauncher.util.Palette;
 
@@ -24,6 +24,8 @@ public class SettingsDialogButton extends JButton {
 		setOpaque(false);
 		setContentAreaFilled(false);
 		setForeground(Palette.textColor);
+
+		// Change color on hover
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -35,6 +37,8 @@ public class SettingsDialogButton extends JButton {
 				setForeground(Palette.textColor);
 			}
 		});
+
+		// Do something on click
 		addActionListener(clickAction);
 	}
 }

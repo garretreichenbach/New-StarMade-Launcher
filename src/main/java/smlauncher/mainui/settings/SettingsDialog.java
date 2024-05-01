@@ -1,4 +1,4 @@
-package smlauncher.mainui;
+package smlauncher.mainui.settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,8 +21,8 @@ public class SettingsDialog extends JDialog {
 		setTitle(title);
 		setSize(width, height);
 		setLocationRelativeTo(null);
-		setLayout(new BorderLayout());
 		setAlwaysOnTop(true);
+		setLayout(new BorderLayout());
 //		setBackground(Palette.paneColor);
 //		setForeground(Palette.foregroundColor);
 
@@ -39,19 +39,19 @@ public class SettingsDialog extends JDialog {
 		dialogPanel.add(component, constraints);
 	}
 
-	protected static JPanel createSaveSettingsPanel(
-			ActionListener saveAction, ActionListener cancelAction
-	) {
+	protected static JPanel createSaveSettingsPanel(ActionListener saveAction, ActionListener cancelAction) {
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setDoubleBuffered(true);
 		buttonPanel.setOpaque(true);
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+		// Commit changes
 		JButton saveButton = new JButton("Save");
 		saveButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		saveButton.setDoubleBuffered(true);
 		buttonPanel.add(saveButton);
 
+		// Go back
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		cancelButton.setDoubleBuffered(true);

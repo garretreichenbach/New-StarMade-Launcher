@@ -25,9 +25,11 @@ public class LauncherUpdateDialog extends JDialog {
 		setAlwaysOnTop(true);
 		setLayout(new BorderLayout());
 
+		// Notify an update is available
 		JPanel descPanel = createDescPanel();
 		add(descPanel);
 
+		// Accept or cancel the update
 		JPanel buttonPanel = createButtonPanel(updateAction, cancelAction);
 		add(buttonPanel, BorderLayout.SOUTH);
 	}

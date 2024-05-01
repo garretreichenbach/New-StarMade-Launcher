@@ -1,4 +1,4 @@
-package smlauncher.mainui;
+package smlauncher.mainui.settings;
 
 import smlauncher.LaunchSettings;
 
@@ -7,7 +7,7 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * A text field for setting the install directory of the game.
+ * A text field for setting the installation directory of the game.
  *
  * @author TheDerpGamer
  * @author SlavSquatSuperstar
@@ -17,9 +17,8 @@ public class InstallDirectoryPanel extends JPanel {
 	private final JTextField installDirField;
 
 	public InstallDirectoryPanel() {
-		setDoubleBuffered(true);
+		super(new FlowLayout(FlowLayout.CENTER), true);
 		setOpaque(false);
-		setLayout(new FlowLayout(FlowLayout.CENTER));
 
 		JLabel installLabel = new JLabel("Install Directory: ");
 		installLabel.setDoubleBuffered(true);
@@ -27,6 +26,7 @@ public class InstallDirectoryPanel extends JPanel {
 		installLabel.setFont(new Font("Roboto", Font.BOLD, 12));
 		add(installLabel);
 
+		// Set the installation path by typing
 		installDirField = new JTextField(LaunchSettings.getInstallDir());
 		installDirField.setDoubleBuffered(true);
 		installDirField.setOpaque(false);
@@ -35,7 +35,6 @@ public class InstallDirectoryPanel extends JPanel {
 		installDirField.setPreferredSize(new Dimension(200, 20));
 		installDirField.setMaximumSize(new Dimension(200, 20));
 		installDirField.addActionListener(e -> {
-			//Set the install path by typing
 			String path = installDirField.getText();
 			if (path == null || path.isEmpty()) return;
 			File file = new File(path);
@@ -45,6 +44,7 @@ public class InstallDirectoryPanel extends JPanel {
 		});
 		add(installDirField);
 
+		// Set the installation path through the file chooser
 		JButton setInstallButton = new JButton("Change");
 		setInstallButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
 		setInstallButton.setDoubleBuffered(true);
@@ -53,7 +53,6 @@ public class InstallDirectoryPanel extends JPanel {
 		setInstallButton.setBorderPainted(false);
 		setInstallButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		setInstallButton.addActionListener(e -> {
-			//Set the install path through the file chooser
 			JFileChooser fileChooser = new JFileChooser(getInstallDir());
 			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int result = fileChooser.showOpenDialog(this);

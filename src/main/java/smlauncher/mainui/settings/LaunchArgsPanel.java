@@ -1,4 +1,4 @@
-package smlauncher.mainui;
+package smlauncher.mainui.settings;
 
 import smlauncher.LaunchSettings;
 
@@ -16,12 +16,20 @@ public class LaunchArgsPanel extends JPanel {
 	private final JTextArea launchArgsArea;
 
 	public LaunchArgsPanel() {
-		setDoubleBuffered(true);
+		super(new FlowLayout(FlowLayout.CENTER), true);
 		setOpaque(false);
-		setLayout(new BorderLayout());
 //		setBackground(Palette.backgroundColor);
 //		setForeground(Palette.foregroundColor);
 
+		JLabel launchArgsLabel = new JLabel("Launch Arguments");
+//		launchArgsLabel.setBackground(Palette.paneColor);
+		launchArgsLabel.setDoubleBuffered(true);
+		launchArgsLabel.setOpaque(true);
+		launchArgsLabel.setFont(new Font("Roboto", Font.BOLD, 12));
+		launchArgsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		add(launchArgsLabel, BorderLayout.NORTH);
+
+		// Set the launch arguments
 		launchArgsArea = new JTextArea();
 //		launchArgsArea.setBackground(Palette.paneColor);
 		launchArgsArea.setDoubleBuffered(true);
@@ -31,14 +39,6 @@ public class LaunchArgsPanel extends JPanel {
 		launchArgsArea.setWrapStyleWord(true);
 		launchArgsArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		add(launchArgsArea, BorderLayout.CENTER);
-
-		JLabel launchArgsLabel = new JLabel("Launch Arguments");
-//		launchArgsLabel.setBackground(Palette.paneColor);
-		launchArgsLabel.setDoubleBuffered(true);
-		launchArgsLabel.setOpaque(true);
-		launchArgsLabel.setFont(new Font("Roboto", Font.BOLD, 12));
-		launchArgsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		add(launchArgsLabel, BorderLayout.NORTH);
 	}
 
 	public String getArgsText() {

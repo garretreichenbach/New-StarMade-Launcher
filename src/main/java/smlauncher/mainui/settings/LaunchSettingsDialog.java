@@ -1,4 +1,4 @@
-package smlauncher.mainui;
+package smlauncher.mainui.settings;
 
 import smlauncher.LaunchSettings;
 
@@ -16,11 +16,11 @@ public class LaunchSettingsDialog extends SettingsDialog {
 	public LaunchSettingsDialog(String title, int width, int height) {
 		super(title, width, height);
 
-		// Memory
+		// Set memory
 		MemorySliderPanel northPanel = new MemorySliderPanel();
 		addToDialog(northPanel, BorderLayout.NORTH);
 
-		// Launch args
+		// Set launch args
 		LaunchArgsPanel centerPanel = new LaunchArgsPanel();
 		addToDialog(centerPanel, BorderLayout.CENTER);
 

@@ -1,10 +1,9 @@
-package smlauncher.mainui;
+package smlauncher.mainui.settings;
 
 import com.sun.management.OperatingSystemMXBean;
 import smlauncher.LaunchSettings;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import java.lang.management.ManagementFactory;
 
 /**

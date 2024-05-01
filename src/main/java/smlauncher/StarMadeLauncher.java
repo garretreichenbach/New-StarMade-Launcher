@@ -9,6 +9,10 @@ import smlauncher.fileio.ImageFileUtil;
 import smlauncher.fileio.TextFileUtil;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.mainui.*;
+import smlauncher.mainui.settings.InstallSettingsDialog;
+import smlauncher.mainui.settings.LaunchSettingsDialog;
+import smlauncher.mainui.LauncherUpdateDialog;
+import smlauncher.mainui.settings.SettingsDialogButton;
 import smlauncher.mainui.scrolldisplay.ScrollDisplayPanel;
 import smlauncher.mainui.scrolldisplay.ScrollablePanel;
 import smlauncher.mainui.scrolldisplay.ScrollDisplayControlPanel;
@@ -449,9 +453,9 @@ public class StarMadeLauncher extends JFrame {
 
 		//Display scrollable content in the center
 		ScrollDisplayPanel centerPanel = new ScrollDisplayPanel(
-				new ScrollablePanel[] {
-					new LauncherNewsPanel(), new LauncherForumsPanel(),
-					new LauncherContentPanel(), new LauncherCommunityPanel()
+			new ScrollablePanel[] {
+				new LauncherNewsPanel(), new LauncherForumsPanel(),
+				new LauncherContentPanel(), new LauncherCommunityPanel()
 			}
 		);
 		mainPanel.add(centerPanel, BorderLayout.CENTER);
