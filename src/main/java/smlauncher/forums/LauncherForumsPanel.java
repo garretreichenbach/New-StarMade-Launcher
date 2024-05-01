@@ -1,23 +1,29 @@
 package smlauncher.forums;
 
-import smlauncher.util.Palette;
+import smlauncher.mainui.scrolldisplay.ScrollablePanel;
 
-import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Panel for displaying forums in the launcher.
  *
  * @author TheDerpGamer
  */
-public class LauncherForumsPanel extends JPanel {
+public class LauncherForumsPanel extends ScrollablePanel {
 
-	public LauncherForumsPanel() {
-		super(true);
-		setBackground(Palette.paneColor);
-		setOpaque(true);
-	}
-
+	@Override
 	public void updatePanel() {
 		removeAll();
+		if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+			String ccURL = "https://starmadedock.net/forums/";
+			try {
+				Desktop.getDesktop().browse(new URI(ccURL));
+			} catch(IOException | URISyntaxException exception) {
+				exception.printStackTrace();
+			}
+		}
 	}
 }

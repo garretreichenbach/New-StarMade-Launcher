@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 /**
  * Checks whether the launcher needs to be updated and runs the launcher updater.
@@ -64,6 +65,7 @@ public class LauncherUpdaterHelper {
 					System.out.println("Could not open launcher website");
 				}
 			}).setVisible(true);
+			System.exit(1);
 		}
 	}
 
@@ -105,7 +107,7 @@ public class LauncherUpdaterHelper {
 	private static void extractUpdater(File out) {
 		try (
 				InputStream inputStream = StarMadeLauncher.class.getClassLoader().getResourceAsStream("Updater.jar");
-				OutputStream outputStream = new FileOutputStream(out)
+				OutputStream outputStream = Files.newOutputStream(out.toPath())
 		) {
 			assert inputStream != null;
 			IOUtils.copy(inputStream, outputStream);

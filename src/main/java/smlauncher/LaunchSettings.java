@@ -13,14 +13,16 @@ import java.io.IOException;
  */
 public final class LaunchSettings {
 
-	// TODO store more properties
-
+	private static final String SETTINGS_FILENAME = "launch-settings.json";
 	private static JSONObject launchSettings;
+
+	static {
+		// Make sure this isn't null on startup
+		launchSettings = getDefaultLaunchSettings();
+	}
 
 	private LaunchSettings() {
 	}
-
-	private static final String SETTINGS_FILENAME = "launch-settings.json";
 
 	// Settings File Methods
 
