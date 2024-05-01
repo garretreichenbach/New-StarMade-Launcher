@@ -32,7 +32,7 @@ public class SettingsDialog extends JDialog {
 //		dialogPanel.setBackground(Palette.paneColor);
 //		dialogPanel.setForeground(Palette.foregroundColor);
 		dialogPanel.setLayout(new BorderLayout());
-		add(dialogPanel);
+		add(dialogPanel, BorderLayout.CENTER);
 	}
 
 	protected void addToDialog(JComponent component, Object constraints) {
