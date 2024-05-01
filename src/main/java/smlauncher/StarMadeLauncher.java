@@ -2,10 +2,12 @@ package smlauncher;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import smlauncher.community.LauncherCommunityPanel;
+import smlauncher.content.LauncherContentPanel;
 import smlauncher.downloader.JavaDownloader;
 import smlauncher.downloader.JavaVersion;
 import smlauncher.fileio.ImageFileUtil;
 import smlauncher.fileio.TextFileUtil;
+import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.mainui.*;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
@@ -20,8 +22,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,11 +58,6 @@ public class StarMadeLauncher extends JFrame {
 	private JPanel playPanel;
 	private JPanel serverPanel;
 	private JPanel playPanelButtons;
-	private JScrollPane centerScrollPane;
-	private LauncherNewsPanel newsPanel;
-//	private LauncherForumsPanel forumsPanel;
-//	private LauncherContentPanel contentPanel;
-	private LauncherCommunityPanel communityPanel;
 
 	public StarMadeLauncher() {
 		// Set window properties
@@ -450,8 +445,17 @@ public class StarMadeLauncher extends JFrame {
 		JPanel topPanel = createTopPanel();
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 
-		//Select the center panel with the left panel
-		JPanel leftPanel = createLeftPanel();
+		//Display scrollable content in the center
+		CenterDisplayPanel centerPanel = new CenterDisplayPanel(
+				new LauncherScrollablePanel[] {
+					new LauncherNewsPanel(), new LauncherForumsPanel(),
+					new LauncherContentPanel(), new LauncherCommunityPanel()
+			}
+		);
+		mainPanel.add(centerPanel, BorderLayout.CENTER);
+
+		//Select the center panel view with the left panel
+		JPanel leftPanel = createLeftPanel(centerPanel);
 		mainPanel.add(leftPanel, BorderLayout.WEST);
 
 		//Update and play the game with the footer panel
@@ -460,10 +464,6 @@ public class StarMadeLauncher extends JFrame {
 
 		if(serverPanel != null) serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
-
-		//Display scollable content in the center
-		JPanel centerPanel = createCenterPanel();
-		mainPanel.add(centerPanel, BorderLayout.CENTER);
 	}
 
 	// Top Panel Methods
@@ -526,7 +526,7 @@ public class StarMadeLauncher extends JFrame {
 
 	// Left Panel Methods
 
-	private JPanel createLeftPanel() {
+	private JPanel createLeftPanel(CenterDisplayPanel centerPanel) {
 		JPanel leftPanel = new JPanel();
 		leftPanel.setDoubleBuffered(true);
 		leftPanel.setOpaque(false);
@@ -546,7 +546,7 @@ public class StarMadeLauncher extends JFrame {
 		leftPanel.add(topLeftPanel, StackLayout.TOP);
 
 		//Add list to display links to game website
-		JList<JLabel> list = createPanelSelectList();
+		JList<JLabel> list = createPanelSelectList(centerPanel);
 		topLeftPanel.add(list);
 
 		//Display game logo
@@ -571,7 +571,7 @@ public class StarMadeLauncher extends JFrame {
 		return leftPanel;
 	}
 
-	private JList<JLabel> createPanelSelectList() {
+	private JList<JLabel> createPanelSelectList(CenterDisplayPanel centerPanel) {
 		JList<JLabel> list = new PanelSelectList(
 				new String[]{"NEWS", "FORUMS", "CONTENT", "COMMUNITY"}
 		);
@@ -581,22 +581,7 @@ public class StarMadeLauncher extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 1) {
 					int index = list.locationToIndex(e.getPoint());
-					if(index != -1) {
-						switch (index) {
-							case 0:
-								createNewsPanel();
-								break;
-							case 1:
-								createForumsPanel();
-								break;
-							case 2:
-								createContentPanel();
-								break;
-							case 3:
-								createCommunityPanel();
-								break;
-						}
-					}
+					centerPanel.setActiveViewPanel(index);
 				}
 			}
 		});
@@ -953,65 +938,6 @@ public class StarMadeLauncher extends JFrame {
 				break;
 			}
 		}
-	}
-
-	// Center Panel Methods
-
-	private JPanel createCenterPanel() {
-		JPanel centerPanel = new JPanel();
-		centerPanel.setDoubleBuffered(true);
-		centerPanel.setOpaque(false);
-		centerPanel.setLayout(new BorderLayout());
-
-		JLabel background = new JLabel();
-		background.setDoubleBuffered(true);
-		background.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 800, 500));
-		centerPanel.add(background, BorderLayout.CENTER);
-
-		centerScrollPane = new PanelScrollPane();
-		centerPanel.add(centerScrollPane, BorderLayout.CENTER);
-		createNewsPanel();
-		return centerPanel;
-	}
-
-	private void createNewsPanel() {
-		if(newsPanel == null) newsPanel = new LauncherNewsPanel();
-		centerScrollPane.setViewportView(newsPanel);
-	}
-
-	private void createForumsPanel() {
-		if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-			String ccURL = "https://starmadedock.net/forums/";
-			try {
-				Desktop.getDesktop().browse(new URI(ccURL));
-			} catch(IOException | URISyntaxException exception) {
-				exception.printStackTrace();
-			}
-		}
-		/* Todo: Create forums panel
-		forumsPanel = new LauncherForumsPanel();
-		centerScrollPane.setViewportView(forumsPanel);
-		 */
-	}
-
-	private void createContentPanel() {
-		if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-			String ccURL = "https://starmadedock.net/content/";
-			try {
-				Desktop.getDesktop().browse(new URI(ccURL));
-			} catch(IOException | URISyntaxException exception) {
-				exception.printStackTrace();
-			}
-		}
-		/* Todo: Create content panel
-		contentPanel = new LauncherContentPanel();
-		centerScrollPane.setViewportView(contentPanel);
-		 */
-	}
-
-	private void createCommunityPanel() {
-		if(communityPanel == null) communityPanel = new LauncherCommunityPanel();
-		centerScrollPane.setViewportView(communityPanel);
 	}
 
 }

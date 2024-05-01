@@ -19,16 +19,7 @@ public class PanelScrollPane extends JScrollPane {
 		getVerticalScrollBar().setUnitIncrement(16);
 	}
 
-	@Override
-	public void setViewportView(Component view) {
-		if (view instanceof LauncherScrollablePanel) {
-			setActivePanel((LauncherScrollablePanel) view);
-		} else {
-			super.setViewportView(view);
-		}
-	}
-
-	private void setActivePanel(LauncherScrollablePanel panel) {
+	public void setActivePanel(LauncherScrollablePanel panel) {
 		panel.updatePanel();
 		setViewportView(panel);
 		SwingUtilities.invokeLater(() -> {
