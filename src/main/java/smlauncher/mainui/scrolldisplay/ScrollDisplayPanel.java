@@ -17,9 +17,8 @@ public class ScrollDisplayPanel extends JPanel {
 	private final ScrollablePanel[] panels;
 
 	public ScrollDisplayPanel(ScrollablePanel[] panels) {
-		setDoubleBuffered(true);
+		super(new BorderLayout(), true);
 		setOpaque(false);
-		setLayout(new BorderLayout());
 
 		JLabel background = new JLabel();
 		background.setDoubleBuffered(true);
@@ -36,6 +35,7 @@ public class ScrollDisplayPanel extends JPanel {
 		setActiveViewPanel(0);
 	}
 
+	//Set the active view
 	public void setActiveViewPanel(int index) {
 		if (index >= 0 && index < panels.length) {
 			ScrollablePanel panel = panels[index];

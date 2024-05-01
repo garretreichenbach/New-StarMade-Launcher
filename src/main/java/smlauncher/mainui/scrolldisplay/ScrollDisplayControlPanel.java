@@ -15,15 +15,13 @@ import java.awt.*;
 public class ScrollDisplayControlPanel extends JPanel {
 
 	public ScrollDisplayControlPanel(ScrollDisplayPanel centerPanel) {
-		setDoubleBuffered(true);
+		super(new StackLayout(), true);
 		setOpaque(false);
-		setLayout(new StackLayout());
 
+		//Resize and stretch image to fill panel
 		JLabel leftLabel = new JLabel();
 		leftLabel.setDoubleBuffered(true);
-		//Resize the image to the left panel
 		leftLabel.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 150, 500));
-		//Stretch the image to the left panel
 		add(leftLabel, StackLayout.BOTTOM);
 
 		JPanel topLeftPanel = new JPanel();

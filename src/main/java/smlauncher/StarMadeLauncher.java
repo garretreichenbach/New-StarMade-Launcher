@@ -12,7 +12,6 @@ import smlauncher.mainui.*;
 import smlauncher.mainui.scrolldisplay.ScrollDisplayPanel;
 import smlauncher.mainui.scrolldisplay.ScrollablePanel;
 import smlauncher.mainui.scrolldisplay.ScrollDisplayControlPanel;
-import smlauncher.mainui.windowcontrols.WindowControlsPanel;
 import smlauncher.mainui.windowcontrols.WindowDragPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
@@ -55,8 +54,6 @@ public class StarMadeLauncher extends JFrame {
 	private final VersionRegistry versionRegistry;
 	private final DownloadStatus dlStatus = new DownloadStatus();
 	private GameUpdaterThread updaterThread;
-	private int mouseX;
-	private int mouseY;
 	private JButton updateButton;
 	private JTextField portField;
 	private JPanel versionPanel;
@@ -447,7 +444,7 @@ public class StarMadeLauncher extends JFrame {
 		setContentPane(mainPanel);
 
 		//Drag and control the window with the top panel
-		JPanel topPanel = createTopPanel();
+		JPanel topPanel = new WindowDragPanel(ImageFileUtil.getIcon("sprites/header_top.png"), this);
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 
 		//Display scrollable content in the center
@@ -469,64 +466,6 @@ public class StarMadeLauncher extends JFrame {
 
 		if(serverPanel != null) serverPanel.setVisible(false);
 		versionPanel.setVisible(true);
-	}
-
-	// Top Panel Methods
-
-	private JPanel createTopPanel() {
-		JPanel topPanel = new WindowDragPanel(
-				ImageFileUtil.getIcon("sprites/header_top.png"),
-				new MouseAdapter() {
-					@Override
-					public void mousePressed(MouseEvent e) {
-						mouseX = e.getX();
-						mouseY = e.getY();
-						//If the mouse is on the top panel buttons, don't drag the window
-						if(mouseX > 770 || mouseY > 30) {
-							mouseX = 0;
-							mouseY = 0;
-						}
-						super.mousePressed(e);
-					}
-				},
-				new MouseMotionAdapter() {
-					@Override
-					public void mouseDragged(MouseEvent e) {
-						if(mouseX != 0 && mouseY != 0) {
-							setLocation(getLocation().x + e.getX() - mouseX, getLocation().y + e.getY() - mouseY);
-						}
-						super.mouseDragged(e);
-					}
-				}
-		);
-
-		//Buttons to minimize/close window
-		JPanel windowControlsPanel = new WindowControlsPanel(
-				ImageFileUtil.getIcon("sprites/minimize_icon.png"),
-				e -> setState(Frame.ICONIFIED),
-				ImageFileUtil.getIcon("sprites/close_icon.png"),
-				e -> {
-					dispose();
-					System.exit(0);
-				}
-		);
-		//Was previously topLabel.add(windowControlsPanel)
-		//Changing it doesn't seem to make a difference
-		topPanel.add(windowControlsPanel);
-
-		// Display Schine logo
-		JPanel topRightPanel = new JPanel();
-		topRightPanel.setDoubleBuffered(true);
-		topRightPanel.setOpaque(false);
-		topRightPanel.setLayout(new BorderLayout());
-		topPanel.add(topRightPanel, BorderLayout.EAST);
-
-		JLabel logoLabel = new JLabel();
-		logoLabel.setDoubleBuffered(true);
-		logoLabel.setOpaque(false);
-		logoLabel.setIcon(ImageFileUtil.getIcon("sprites/launcher_schine_logo.png"));
-		topRightPanel.add(logoLabel, BorderLayout.EAST);
-		return topPanel;
 	}
 
 	// Footer Panel Methods

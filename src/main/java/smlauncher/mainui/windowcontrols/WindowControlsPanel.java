@@ -12,19 +12,18 @@ import java.awt.event.ActionListener;
  */
 public class WindowControlsPanel extends JPanel {
 
-	public WindowControlsPanel(
-			ImageIcon minimizeIcon, ActionListener minimizeAction,
-			ImageIcon closeIcon, ActionListener closeAction
-	) {
-		setDoubleBuffered(true);
-		setLayout(new FlowLayout(FlowLayout.RIGHT));
+	public WindowControlsPanel(ImageIcon minimizeIcon, ImageIcon closeIcon, Frame window) {
+		super(new FlowLayout(FlowLayout.RIGHT), true);
 		setOpaque(false);
 		setBounds(0, 0, 800, 30);
 
-		JButton minimizeButton = createControlButton(minimizeIcon, minimizeAction);
+		JButton minimizeButton = createControlButton(minimizeIcon, e -> window.setState(Frame.ICONIFIED));
 		add(minimizeButton);
 
-		JButton closeButton = createControlButton(closeIcon, closeAction);
+		JButton closeButton = createControlButton(closeIcon, e -> {
+			window.dispose();
+			System.exit(0);
+		});
 		add(closeButton);
 	}
 

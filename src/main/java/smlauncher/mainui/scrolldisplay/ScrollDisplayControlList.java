@@ -32,6 +32,7 @@ public abstract class ScrollDisplayControlList extends JList<JLabel> {
 			}
 			return value;
 		});
+
 		//Highlight on mouse hover
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
@@ -41,6 +42,7 @@ public abstract class ScrollDisplayControlList extends JList<JLabel> {
 				else clearSelection();
 			}
 		});
+
 		//Do something on mouse click
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -51,6 +53,7 @@ public abstract class ScrollDisplayControlList extends JList<JLabel> {
 				}
 			}
 		});
+
 		//Add list labels
 		setFixedCellHeight(48);
 		setListModel(labelNames);
