@@ -1,6 +1,6 @@
 package smlauncher.news;
 
-import smlauncher.mainui.LauncherScrollablePanel;
+import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
 import smlauncher.util.BBCodeToHTMLConverter;
 import smlauncher.util.Palette;
 import smlauncher.util.SteamNewsAPI;

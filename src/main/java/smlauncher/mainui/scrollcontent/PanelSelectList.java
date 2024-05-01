@@ -1,9 +1,10 @@
-package smlauncher.mainui;
+package smlauncher.mainui.scrollcontent;
 
 import smlauncher.util.Palette;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
@@ -11,9 +12,9 @@ import java.awt.event.MouseMotionAdapter;
  * A list of buttons for displaying different panels.
  *
  * @author TheDerpGamer
- *  @author SlavSquatSuperstar
+ * @author SlavSquatSuperstar
  */
-public class PanelSelectList extends JList<JLabel> {
+public abstract class PanelSelectList extends JList<JLabel> {
 
 	public PanelSelectList(String[] labelNames) {
 		setDoubleBuffered(true);
@@ -40,10 +41,22 @@ public class PanelSelectList extends JList<JLabel> {
 				else clearSelection();
 			}
 		});
+		//Do something on mouse click
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 1) {
+					int index = locationToIndex(e.getPoint());
+					onClickLabel(index);
+				}
+			}
+		});
 		//Add list labels
 		setFixedCellHeight(48);
 		setListModel(labelNames);
 	}
+
+	public abstract void onClickLabel(int index);
 
 	//Add labels to list
 	private void setListModel(String[] labelNames) {
@@ -60,4 +73,5 @@ public class PanelSelectList extends JList<JLabel> {
 		}
 		setModel(listModel);
 	}
+
 }

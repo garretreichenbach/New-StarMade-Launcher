@@ -1,9 +1,7 @@
 package smlauncher.forums;
 
-import smlauncher.mainui.LauncherScrollablePanel;
-import smlauncher.util.Palette;
+import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;

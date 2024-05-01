@@ -1,4 +1,4 @@
-package smlauncher.mainui;
+package smlauncher.mainui.windowcontrols;
 
 import javax.swing.*;
 import java.awt.*;

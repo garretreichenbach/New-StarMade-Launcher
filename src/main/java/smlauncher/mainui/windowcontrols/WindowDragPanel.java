@@ -1,11 +1,9 @@
-package smlauncher.mainui;
+package smlauncher.mainui.windowcontrols;
 
 import smlauncher.starmade.StackLayout;
 
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
 /**

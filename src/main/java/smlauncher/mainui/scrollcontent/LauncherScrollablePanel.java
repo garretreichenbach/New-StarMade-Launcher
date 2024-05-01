@@ -1,4 +1,4 @@
-package smlauncher.mainui;
+package smlauncher.mainui.scrollcontent;
 
 import smlauncher.util.Palette;
 

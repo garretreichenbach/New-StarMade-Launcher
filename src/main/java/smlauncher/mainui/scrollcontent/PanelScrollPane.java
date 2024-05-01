@@ -1,8 +1,7 @@
-package smlauncher.mainui;
+package smlauncher.mainui.scrollcontent;
 
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * A scrolling pane that can be made to display a panel.

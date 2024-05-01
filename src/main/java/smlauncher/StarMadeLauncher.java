@@ -9,6 +9,11 @@ import smlauncher.fileio.ImageFileUtil;
 import smlauncher.fileio.TextFileUtil;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.mainui.*;
+import smlauncher.mainui.scrollcontent.CenterDisplayPanel;
+import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
+import smlauncher.mainui.scrollcontent.DisplayControlPanel;
+import smlauncher.mainui.windowcontrols.WindowControlsPanel;
+import smlauncher.mainui.windowcontrols.WindowDragPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
 import smlauncher.util.OperatingSystem;
@@ -454,8 +459,8 @@ public class StarMadeLauncher extends JFrame {
 		);
 		mainPanel.add(centerPanel, BorderLayout.CENTER);
 
-		//Select the center panel view with the left panel
-		JPanel leftPanel = createLeftPanel(centerPanel);
+		//Control the center panel view with the left panel
+		JPanel leftPanel = new DisplayControlPanel(centerPanel);
 		mainPanel.add(leftPanel, BorderLayout.WEST);
 
 		//Update and play the game with the footer panel
@@ -522,70 +527,6 @@ public class StarMadeLauncher extends JFrame {
 		logoLabel.setIcon(ImageFileUtil.getIcon("sprites/launcher_schine_logo.png"));
 		topRightPanel.add(logoLabel, BorderLayout.EAST);
 		return topPanel;
-	}
-
-	// Left Panel Methods
-
-	private JPanel createLeftPanel(CenterDisplayPanel centerPanel) {
-		JPanel leftPanel = new JPanel();
-		leftPanel.setDoubleBuffered(true);
-		leftPanel.setOpaque(false);
-		leftPanel.setLayout(new StackLayout());
-
-		JLabel leftLabel = new JLabel();
-		leftLabel.setDoubleBuffered(true);
-		//Resize the image to the left panel
-		leftLabel.setIcon(ImageFileUtil.getIcon("sprites/left_panel.png", 150, 500));
-		//Stretch the image to the left panel
-		leftPanel.add(leftLabel, StackLayout.BOTTOM);
-
-		JPanel topLeftPanel = new JPanel();
-		topLeftPanel.setDoubleBuffered(true);
-		topLeftPanel.setOpaque(false);
-		topLeftPanel.setLayout(new BorderLayout());
-		leftPanel.add(topLeftPanel, StackLayout.TOP);
-
-		//Add list to display links to game website
-		JList<JLabel> list = createPanelSelectList(centerPanel);
-		topLeftPanel.add(list);
-
-		//Display game logo
-		JPanel topLeftLogoPanel = new JPanel();
-		topLeftLogoPanel.setDoubleBuffered(true);
-		topLeftLogoPanel.setOpaque(false);
-		topLeftLogoPanel.setLayout(new BorderLayout());
-		topLeftPanel.add(topLeftLogoPanel, BorderLayout.NORTH);
-
-		//Add a left inset
-		JPanel leftInset = new JPanel();
-		leftInset.setDoubleBuffered(true);
-		leftInset.setOpaque(false);
-		topLeftLogoPanel.add(leftInset, BorderLayout.CENTER);
-
-		//Add logo at top left
-		JLabel logo = new JLabel();
-		logo.setDoubleBuffered(true);
-		logo.setOpaque(false);
-		logo.setIcon(ImageFileUtil.getIcon("sprites/logo.png"));
-		leftInset.add(logo);
-		return leftPanel;
-	}
-
-	private JList<JLabel> createPanelSelectList(CenterDisplayPanel centerPanel) {
-		JList<JLabel> list = new PanelSelectList(
-				new String[]{"NEWS", "FORUMS", "CONTENT", "COMMUNITY"}
-		);
-		//Select panels on click
-		list.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount() == 1) {
-					int index = list.locationToIndex(e.getPoint());
-					centerPanel.setActiveViewPanel(index);
-				}
-			}
-		});
-		return list;
 	}
 
 	// Footer Panel Methods

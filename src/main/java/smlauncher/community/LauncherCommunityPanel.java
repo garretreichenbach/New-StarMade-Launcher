@@ -1,7 +1,7 @@
 package smlauncher.community;
 
 import smlauncher.fileio.ImageFileUtil;
-import smlauncher.mainui.LauncherScrollablePanel;
+import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
