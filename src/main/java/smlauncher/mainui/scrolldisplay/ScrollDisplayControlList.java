@@ -1,4 +1,4 @@
-package smlauncher.mainui.scrollcontent;
+package smlauncher.mainui.scrolldisplay;
 
 import smlauncher.util.Palette;
 
@@ -9,20 +9,20 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
 /**
- * A list of buttons for displaying different panels.
+ * A list of buttons used to control the view of a scroll pane.
  *
  * @author TheDerpGamer
  * @author SlavSquatSuperstar
  */
-public abstract class PanelSelectList extends JList<JLabel> {
+public abstract class ScrollDisplayControlList extends JList<JLabel> {
 
-	public PanelSelectList(String[] labelNames) {
+	public ScrollDisplayControlList(String[] labelNames) {
 		setDoubleBuffered(true);
 		setOpaque(false);
 		setLayoutOrientation(JList.VERTICAL);
 		setVisibleRowCount(-1);
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		setCellRenderer((list1, value, index, isSelected, cellHasFocus) -> {
+		setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
 			if (isSelected) {
 				value.setForeground(Palette.selectedColor);
 				value.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Palette.selectedColor));

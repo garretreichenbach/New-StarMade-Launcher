@@ -1,6 +1,6 @@
 package smlauncher.content;
 
-import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
+import smlauncher.mainui.scrolldisplay.ScrollablePanel;
 
 import java.awt.*;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
  *
  * @author TheDerpGamer
  */
-public class LauncherContentPanel extends LauncherScrollablePanel {
+public class LauncherContentPanel extends ScrollablePanel {
 
 	@Override
 	public void updatePanel() {

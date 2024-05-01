@@ -1,6 +1,6 @@
 package smlauncher.news;
 
-import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
+import smlauncher.mainui.scrolldisplay.ScrollablePanel;
 import smlauncher.util.BBCodeToHTMLConverter;
 import smlauncher.util.Palette;
 import smlauncher.util.SteamNewsAPI;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
  *
  * @author TheDerpGamer
  */
-public class LauncherNewsPanel extends LauncherScrollablePanel {
+public class LauncherNewsPanel extends ScrollablePanel {
 
 	@Override
 	public void updatePanel() {

@@ -1,7 +1,7 @@
 package smlauncher.community;
 
 import smlauncher.fileio.ImageFileUtil;
-import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
+import smlauncher.mainui.scrolldisplay.ScrollablePanel;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
  *
  * @author TheDerpGamer
  */
-public class LauncherCommunityPanel extends LauncherScrollablePanel {
+public class LauncherCommunityPanel extends ScrollablePanel {
 
 	private static final String MAIN_DISCORD_URL = "https://discord.gg/SXbkYpU";
 	private static final String STARLOADER_DISCORD_URL = "https://discord.gg/Y2UR7AXfsE";

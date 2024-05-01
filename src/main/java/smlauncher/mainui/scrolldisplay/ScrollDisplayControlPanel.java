@@ -1,4 +1,4 @@
-package smlauncher.mainui.scrollcontent;
+package smlauncher.mainui.scrolldisplay;
 
 import smlauncher.fileio.ImageFileUtil;
 import smlauncher.starmade.StackLayout;
@@ -12,9 +12,9 @@ import java.awt.*;
  * @author TheDerpGamer
  * @author SlavSquatSuperstar
  */
-public class DisplayControlPanel extends JPanel {
+public class ScrollDisplayControlPanel extends JPanel {
 
-	public DisplayControlPanel(CenterDisplayPanel centerPanel) {
+	public ScrollDisplayControlPanel(ScrollDisplayPanel centerPanel) {
 		setDoubleBuffered(true);
 		setOpaque(false);
 		setLayout(new StackLayout());
@@ -33,7 +33,7 @@ public class DisplayControlPanel extends JPanel {
 		add(topLeftPanel, StackLayout.TOP);
 
 		//Add list to display links to game website
-		JList<JLabel> list = new PanelSelectList(
+		JList<JLabel> list = new ScrollDisplayControlList(
 				new String[]{"NEWS", "FORUMS", "CONTENT", "COMMUNITY"}
 		) {
 			@Override

@@ -1,4 +1,4 @@
-package smlauncher.mainui.scrollcontent;
+package smlauncher.mainui.scrolldisplay;
 
 import smlauncher.util.Palette;
 
@@ -9,9 +9,9 @@ import javax.swing.*;
  *
  * @author SlavSquatSuperstar
  */
-public abstract class LauncherScrollablePanel extends JPanel {
+public abstract class ScrollablePanel extends JPanel {
 
-	public LauncherScrollablePanel() {
+	public ScrollablePanel() {
 		super(true);
 		setBackground(Palette.paneColor);
 		setOpaque(true);

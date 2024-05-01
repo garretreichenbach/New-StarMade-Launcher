@@ -9,9 +9,9 @@ import smlauncher.fileio.ImageFileUtil;
 import smlauncher.fileio.TextFileUtil;
 import smlauncher.forums.LauncherForumsPanel;
 import smlauncher.mainui.*;
-import smlauncher.mainui.scrollcontent.CenterDisplayPanel;
-import smlauncher.mainui.scrollcontent.LauncherScrollablePanel;
-import smlauncher.mainui.scrollcontent.DisplayControlPanel;
+import smlauncher.mainui.scrolldisplay.ScrollDisplayPanel;
+import smlauncher.mainui.scrolldisplay.ScrollablePanel;
+import smlauncher.mainui.scrolldisplay.ScrollDisplayControlPanel;
 import smlauncher.mainui.windowcontrols.WindowControlsPanel;
 import smlauncher.mainui.windowcontrols.WindowDragPanel;
 import smlauncher.news.LauncherNewsPanel;
@@ -451,8 +451,8 @@ public class StarMadeLauncher extends JFrame {
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 
 		//Display scrollable content in the center
-		CenterDisplayPanel centerPanel = new CenterDisplayPanel(
-				new LauncherScrollablePanel[] {
+		ScrollDisplayPanel centerPanel = new ScrollDisplayPanel(
+				new ScrollablePanel[] {
 					new LauncherNewsPanel(), new LauncherForumsPanel(),
 					new LauncherContentPanel(), new LauncherCommunityPanel()
 			}
@@ -460,7 +460,7 @@ public class StarMadeLauncher extends JFrame {
 		mainPanel.add(centerPanel, BorderLayout.CENTER);
 
 		//Control the center panel view with the left panel
-		JPanel leftPanel = new DisplayControlPanel(centerPanel);
+		JPanel leftPanel = new ScrollDisplayControlPanel(centerPanel);
 		mainPanel.add(leftPanel, BorderLayout.WEST);
 
 		//Update and play the game with the footer panel
