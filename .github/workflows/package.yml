@@ -217,9 +217,9 @@ jobs:
         with:
           name: 'upload_url.txt'
       - name: 'Get Upload URL'
+        if: contains(github.ref, 'v')
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-        if: contains(github.ref, 'v')
         run: |
           echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
         shell: bash
