@@ -89,7 +89,7 @@ jobs:
           echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
       - name: 'Compile'
         run: |
-          native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar "StarMade Launcher.jar"
+          native-image --no-server --no-fallback -H:ReflectionConfigurationResources=src/main/resources/reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar "StarMade Launcher.jar"
       - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
