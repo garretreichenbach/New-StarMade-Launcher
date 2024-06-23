@@ -57,6 +57,7 @@ jobs:
           name: 'upload_url.txt'
           path: 'upload_url.txt'
   build:
+    needs: build-jar-job
     name: Package on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -66,7 +67,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '21'
+          java-version: '11'
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
