@@ -22,7 +22,7 @@ jobs:
       - name: 'Publish JAR'
         uses: actions/upload-artifact@v2-preview
         with:
-          name: 'simple-socket-fn-logger-${{env.VERSION}}-all.jar'
+          name: 'StarMade Launcher.jar'
           path: 'build/libs/StarMade Launcher.jar'
       - name: 'Create Release'
         if: contains(github.ref, 'v')
@@ -45,8 +45,8 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
-          asset_path: build/libs/simple-socket-fn-logger-${{env.VERSION}}-all.jar
-          asset_name: simple-socket-fn-logger-${{env.VERSION}}-all.jar
+          asset_path: 'build/libs/StarMade Launcher.jar'
+          asset_name: 'StarMade Launcher.jar'
           asset_content_type: application/java-archive
       - name: 'Write Upload URL To File'
         if: contains(github.ref, 'v')
@@ -84,7 +84,7 @@ jobs:
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
-          name: 'simple-socket-fn-logger-${{env.VERSION}}-all.jar'
+          name: 'StarMade Launcher.jar'
       - name: 'Download Release URL'
         if: contains(github.ref, 'v')
         uses: actions/download-artifact@v2-preview
@@ -98,7 +98,7 @@ jobs:
           echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
       - name: 'Build Linux Image'
         run: |
-          native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar simple-socket-fn-logger-${{env.VERSION}}-all.jar
+          native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar "StarMade Launcher.jar"
       - name: 'Publish Linux Image'
         if: success()
         uses: actions/upload-artifact@v2-preview
@@ -142,7 +142,7 @@ jobs:
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
-          name: 'simple-socket-fn-logger-${{env.VERSION}}-all.jar'
+          name: 'StarMade Launcher.jar'
       - name: 'Get Release URL'
         if: contains(github.ref, 'v')
         uses: actions/download-artifact@v2-preview
@@ -156,7 +156,7 @@ jobs:
           echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
       - name: 'Build Mac OS Image'
         run: |
-          native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar simple-socket-fn-logger-${{env.VERSION}}-all.jar
+          native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar "StarMade Launcher.jar"
       - name: 'Publish Mac OS Image'
         if: success() && contains(github.ref, 'v')
         uses: actions/upload-artifact@v2-preview
@@ -203,14 +203,14 @@ jobs:
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
-          name: 'simple-socket-fn-logger-${{env.VERSION}}-all.jar'
+          name: 'StarMade Launcher.jar'
       - name: 'Build Native Image'
         shell: cmd
         env:
           JAVA_HOME: ./graalvm-ce-java11-20.1.0
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-          ./graalvm-ce-java11-20.1.0/bin/native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml -H:Name=simple-socket-fn-logger-${{env.VERSION}}-all --allow-incomplete-classpath -jar simple-socket-fn-logger-${{env.VERSION}}-all.jar
+          ./graalvm-ce-java11-20.1.0/bin/native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml -H:Name="StarMade Launcher.jar" --allow-incomplete-classpath -jar "StarMade Launcher.jar"
       - name: 'Get Release URL'
         if: contains(github.ref, 'v')
         uses: actions/download-artifact@v2-preview
