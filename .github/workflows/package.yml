@@ -23,7 +23,7 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: 'simple-socket-fn-logger-${{env.VERSION}}-all.jar'
-          path: build/libs/*-all.jar
+          path: 'build/libs/StarMade Launcher.jar'
       - name: 'Create Release'
         if: contains(github.ref, 'v')
         id: create_release
