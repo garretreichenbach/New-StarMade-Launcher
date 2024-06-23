@@ -18,7 +18,7 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
+          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Publish JAR'
         uses: actions/upload-artifact@v2-preview
         with:
@@ -138,7 +138,7 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
+          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
@@ -198,7 +198,7 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
+          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
         shell: bash
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
