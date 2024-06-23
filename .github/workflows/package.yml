@@ -18,7 +18,8 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
+            echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+#          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Publish JAR'
         uses: actions/upload-artifact@v2-preview
         with:
@@ -42,6 +43,7 @@ jobs:
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
@@ -64,13 +66,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v2'
+        uses: actions/checkout@v1'
       - name: 'Setup Java 11'
         uses: actions/setup-java@v1
         with:
           java-version: 11
       - name: 'Setup GraalVM Environment'
         uses: DeLaGuardo/setup-graalvm@2.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           graalvm-version: '20.1.0.java11'
       - name: 'Install Native Image Plugin'
@@ -80,7 +84,8 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
+          echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+#          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
@@ -95,7 +100,8 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
+          echo "UPLOAD_URL": $(cat upload_url.txt)
+#          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
       - name: 'Build Linux Image'
         run: |
           native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar "StarMade Launcher.jar"
@@ -138,7 +144,8 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
+            echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+#          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
@@ -153,7 +160,8 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
+            echo "UPLOAD_URL": $(cat upload_url.txt)
+#          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
       - name: 'Build Mac OS Image'
         run: |
           native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar "StarMade Launcher.jar"
@@ -198,7 +206,8 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
+            echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+#          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
         shell: bash
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
@@ -207,6 +216,7 @@ jobs:
       - name: 'Build Native Image'
         shell: cmd
         env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
           JAVA_HOME: ./graalvm-ce-java11-20.1.0
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
@@ -221,7 +231,8 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
+            echo "UPLOAD_URL": $(cat upload_url.txt)
+#          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
         shell: bash
       - name: 'Publish Windows Image'
         if: success()
