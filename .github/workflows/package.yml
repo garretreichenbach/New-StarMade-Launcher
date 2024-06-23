@@ -15,8 +15,6 @@ jobs:
         run: |
           ./gradlew jar
       - name: 'Get Version Number'
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
             echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
@@ -43,7 +41,6 @@ jobs:
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
@@ -66,23 +63,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v1'
+        uses: actions/checkout@v2'
       - name: 'Setup Java 11'
         uses: actions/setup-java@v1
         with:
           java-version: 11
       - name: 'Setup GraalVM Environment'
         uses: DeLaGuardo/setup-graalvm@2.0
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           graalvm-version: '20.1.0.java11'
       - name: 'Install Native Image Plugin'
         run: |
           gu install native-image
       - name: 'Get Version Number'
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
@@ -97,8 +90,6 @@ jobs:
           name: 'upload_url.txt'
       - name: 'Set Upload URL Env Var'
         if: contains(github.ref, 'v')
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           echo "UPLOAD_URL": $(cat upload_url.txt)
 #          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
@@ -141,8 +132,6 @@ jobs:
         run: |
           gu install native-image
       - name: 'Get Version Number'
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
             echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
@@ -157,8 +146,6 @@ jobs:
           name: 'upload_url.txt'
       - name: 'Get Upload URL'
         if: contains(github.ref, 'v')
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
             echo "UPLOAD_URL": $(cat upload_url.txt)
 #          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
@@ -176,7 +163,6 @@ jobs:
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
@@ -203,8 +189,6 @@ jobs:
         run: |
           choco install visualstudio2017-workload-vctools
       - name: 'Get Version Number'
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
             echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
@@ -216,7 +200,6 @@ jobs:
       - name: 'Build Native Image'
         shell: cmd
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
           JAVA_HOME: ./graalvm-ce-java11-20.1.0
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
@@ -228,8 +211,6 @@ jobs:
           name: 'upload_url.txt'
       - name: 'Get Upload URL'
         if: contains(github.ref, 'v')
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
             echo "UPLOAD_URL": $(cat upload_url.txt)
 #          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
