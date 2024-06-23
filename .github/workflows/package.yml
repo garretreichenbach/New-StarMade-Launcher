@@ -16,7 +16,7 @@ jobs:
           ./gradlew jar
       - name: 'Get Version Number'
         run: |
-            echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+            echo "VERSION=$(./gradlew properties -q | grep "version=" | awk '{print $2}')" >> $GITHUB_ENV
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Publish JAR'
         uses: actions/upload-artifact@v2-preview
@@ -77,7 +77,7 @@ jobs:
           gu install native-image
       - name: 'Get Version Number'
         run: |
-          echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+          echo "VERSION=$(./gradlew properties -q | grep "version=" | awk '{print $2}')" >> $GITHUB_ENV
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
@@ -91,7 +91,7 @@ jobs:
       - name: 'Set Upload URL Env Var'
         if: contains(github.ref, 'v')
         run: |
-          echo "UPLOAD_URL": $(cat upload_url.txt)
+          echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
 #          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
       - name: 'Build Linux Image'
         run: |
@@ -133,7 +133,7 @@ jobs:
           gu install native-image
       - name: 'Get Version Number'
         run: |
-            echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+            echo "VERSION=$(./gradlew properties -q | grep "version=" | awk '{print $2}')" >> $GITHUB_ENV
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
@@ -147,7 +147,7 @@ jobs:
       - name: 'Get Upload URL'
         if: contains(github.ref, 'v')
         run: |
-            echo "UPLOAD_URL": $(cat upload_url.txt)
+            echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
 #          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
       - name: 'Build Mac OS Image'
         run: |
@@ -190,7 +190,7 @@ jobs:
           choco install visualstudio2017-workload-vctools
       - name: 'Get Version Number'
         run: |
-            echo "VERSION": $(./gradlew properties -q | grep "version=" | awk '{print $2}')
+            echo "VERSION=$(./gradlew properties -q | grep "version=" | awk '{print $2}')" >> $GITHUB_ENV
 #          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
         shell: bash
       - name: 'Get JAR Artifact'
@@ -212,7 +212,7 @@ jobs:
       - name: 'Get Upload URL'
         if: contains(github.ref, 'v')
         run: |
-            echo "UPLOAD_URL": $(cat upload_url.txt)
+            echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
 #          echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
         shell: bash
       - name: 'Publish Windows Image'
