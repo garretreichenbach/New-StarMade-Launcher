@@ -103,8 +103,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: 'simple-socket-fn-logger-${{env.VERSION}}-linux'
-          path: 'simple-socket-fn-logger-${{env.VERSION}}-all'
+          name: 'StarMade Launcher-Linux'
+          path: 'StarMade Launcher-All'
       - name: 'Upload Linux Image Asset'
         if: success() && contains(github.ref, 'v')
         id: upload-release-asset
@@ -113,8 +113,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
-          asset_name: 'simple-socket-fn-logger-${{env.VERSION}}-linux'
-          asset_path: 'simple-socket-fn-logger-${{env.VERSION}}-all'
+          asset_name: 'StarMade Launcher-Linux'
+          asset_path: 'StarMade Launcher-All'
           asset_content_type: application/octet-stream
   build-macos-image:
     needs: [ build-jar-job ]
@@ -161,8 +161,8 @@ jobs:
         if: success() && contains(github.ref, 'v')
         uses: actions/upload-artifact@v2-preview
         with:
-          name: 'simple-socket-fn-logger-${{env.VERSION}}-macOS'
-          path: 'simple-socket-fn-logger-${{env.VERSION}}-all'
+          name: 'StarMade Launcher-Mac'
+          path: 'StarMade Launcher-All'
       - name: 'Upload Mac OS Image Asset'
         if: success()
         id: upload-release-asset
@@ -172,8 +172,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
-          asset_name: 'simple-socket-fn-logger-${{env.VERSION}}-macOS'
-          asset_path: 'simple-socket-fn-logger-${{env.VERSION}}-all'
+          asset_name: 'StarMade Launcher-Mac'
+          asset_path: 'StarMade Launcher-All'
           asset_content_type: application/octet-stream
   build-windows-image:
     needs: [ build-jar-job ]
@@ -227,8 +227,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: 'simple-socket-fn-logger-${{env.VERSION}}-windows.exe'
-          path: 'simple-socket-fn-logger-${{env.VERSION}}-all.exe'
+          name: 'StarMade Launcher.exe'
+          path: 'StarMade Launcher.exe'
       - name: 'Release Windows Image Asset'
         if: success() && contains(github.ref, 'v')
         id: upload-release-asset
@@ -237,6 +237,6 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{env.UPLOAD_URL}}
-          asset_name: 'simple-socket-fn-logger-${{env.VERSION}}-windows.exe'
-          asset_path: 'simple-socket-fn-logger-${{env.VERSION}}-all.exe'
+          asset_name: 'StarMade Launcher.exe'
+          asset_path: 'StarMade Launcher.exe'
           asset_content_type: application/octet-stream
