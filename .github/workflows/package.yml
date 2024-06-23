@@ -15,6 +15,8 @@ jobs:
         run: |
           ./gradlew jar
       - name: 'Get Version Number'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
       - name: 'Publish JAR'
@@ -75,6 +77,8 @@ jobs:
         run: |
           gu install native-image
       - name: 'Get Version Number'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
@@ -87,6 +91,8 @@ jobs:
         with:
           name: 'upload_url.txt'
       - name: 'Set Upload URL Env Var'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         if: contains(github.ref, 'v')
         run: |
           echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
@@ -129,6 +135,8 @@ jobs:
         run: |
           gu install native-image
       - name: 'Get Version Number'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
@@ -141,6 +149,8 @@ jobs:
         with:
           name: 'upload_url.txt'
       - name: 'Get Upload URL'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         if: contains(github.ref, 'v')
         run: |
           echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
@@ -184,6 +194,8 @@ jobs:
         run: |
           choco install visualstudio2017-workload-vctools
       - name: 'Get Version Number'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
         shell: bash
@@ -204,6 +216,8 @@ jobs:
         with:
           name: 'upload_url.txt'
       - name: 'Get Upload URL'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         if: contains(github.ref, 'v')
         run: |
           echo "::set-env name=UPLOAD_URL::$(cat upload_url.txt)"
