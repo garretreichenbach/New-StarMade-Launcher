@@ -80,7 +80,7 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
-          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
+          echo "::set-env name=VERSION::$(./gradlew properties -q | grep "version=" | awk '{print $2}')"
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
