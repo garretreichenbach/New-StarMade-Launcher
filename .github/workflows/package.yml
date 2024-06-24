@@ -21,7 +21,7 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: 'StarMade Launcher.jar'
-          path: 'build/libs/StarMade Launcher.jar'
+          path: 'StarMade Launcher.jar'
       - name: 'Create Release'
         id: create_release
         uses: actions/create-release@v1
@@ -41,7 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: 'build/libs/StarMade Launcher.jar'
+          asset_path: 'StarMade Launcher.jar'
           asset_name: 'StarMade Launcher.jar'
           asset_content_type: application/java-archive
       - name: 'Write Upload URL To File'
@@ -81,9 +81,6 @@ jobs:
       - name: 'Set Upload URL Env Var'
         run: |
           echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
-      - name: 'Print Current Directory'
-        run: |
-          pwd
       - name: 'Compile'
         run: |
           native-image --no-server --no-fallback -H:ReflectionConfigurationResources=reflection-config.json -H:IncludeResources=logback.xml --allow-incomplete-classpath -jar "StarMade Launcher.jar"
