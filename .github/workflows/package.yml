@@ -20,8 +20,8 @@ jobs:
       - name: 'Publish JAR'
         uses: actions/upload-artifact@v2-preview
         with:
-          name: 'StarMade Launcher.jar'
-          path: 'build/libs/StarMade Launcher.jar'
+          name: 'StarMade-Launcher.jar'
+          path: 'build/libs/StarMade-Launcher.jar'
       - name: 'Create Release'
         id: create_release
         uses: actions/create-release@v1
@@ -41,8 +41,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: 'build/libs/StarMade Launcher.jar'
-          asset_name: 'StarMade Launcher.jar'
+          asset_path: 'build/libs/StarMade-Launcher.jar'
+          asset_name: 'StarMade-Launcher.jar'
           asset_content_type: application/java-archive
       - name: 'Write Upload URL To File'
         run: |
@@ -73,7 +73,7 @@ jobs:
       - name: 'Get JAR Artifact'
         uses: actions/download-artifact@v2-preview
         with:
-          name: 'StarMade Launcher.jar'
+          name: 'StarMade-Launcher.jar'
       - name: 'Download Release URL'
         uses: actions/download-artifact@v2-preview
         with:
@@ -88,8 +88,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: "StarMade Launcher-${{ matrix.os }}"
-          path: "StarMade Launcher-${{ matrix.os }}"
+          name: "StarMade-Launcher-${{ matrix.os }}"
+          path: "StarMade-Launcher-${{ matrix.os }}"
       - name: 'Publish'
         if: success()
         id: upload-release-asset
@@ -98,6 +98,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
-          asset_name: "StarMade Launcher-${{ matrix.os }}"
-          asset_path: "StarMade Launcher-${{ matrix.os }}"
+          asset_name: "StarMade-Launcher-${{ matrix.os }}"
+          asset_path: "StarMade-Launcher-${{ matrix.os }}"
           asset_content_type: application/octet-stream
