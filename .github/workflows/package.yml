@@ -103,5 +103,5 @@ jobs:
         with:
           upload_url: ${{ env.UPLOAD_URL }}
           asset_name: ${{ matrix.os == 'windows-latest' && 'StarMade-Launcher-${{ matrix.os }}.exe' || 'StarMade-Launcher-${{ matrix.os }}' }}
-          asset_path: "StarMade-Launcher-*"
+          asset_path: ${{ matrix.os == 'windows-latest' && 'StarMade-Launcher-${{ matrix.os }}.exe' || 'StarMade-Launcher-${{ matrix.os }}' }}
           asset_content_type: application/octet-stream
