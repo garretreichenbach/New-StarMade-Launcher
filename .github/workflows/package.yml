@@ -89,7 +89,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "StarMade-Launcher-${{ matrix.os }}"
-          path: "StarMade-Launcher-${{ matrix.os }}"
+          path: "StarMade-Launcher"
       - name: 'Publish'
         if: success()
         id: upload-release-asset
@@ -99,5 +99,5 @@ jobs:
         with:
           upload_url: ${{ env.UPLOAD_URL }}
           asset_name: "StarMade-Launcher-${{ matrix.os }}"
-          asset_path: "StarMade-Launcher-${{ matrix.os }}"
+          asset_path: "StarMade-Launcher"
           asset_content_type: application/octet-stream
