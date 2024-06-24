@@ -38,7 +38,7 @@ jar {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 //    destinationDirectory.set(file("./release-builds/"))
 
-    archiveFileName = 'StarMade Launcher.jar'
+    archiveFileName = 'StarMade-Launcher.jar'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
