@@ -201,7 +201,7 @@ public class StarMadeLauncher extends JFrame {
 
 	private static JDialog createLauncherUpdateDialog() {
 		JDialog dialog = new JDialog();
-		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		dialog.setModal(true);
 		dialog.setResizable(false);
 		dialog.setTitle("Launcher Update Available");
@@ -235,7 +235,15 @@ public class StarMadeLauncher extends JFrame {
 		updateButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		updateButton.addActionListener(e -> {
 			dialog.dispose();
-			LauncherUpdaterHelper.updateLauncher();
+			try {
+				//Since we moved to graalvm native images, we can't just extract the Update.jar and run it anymore
+				//For now, just open the github releases page, but in future we should re-implement the self updating
+				//Todo: Re-implement self updating
+				Desktop.getDesktop().browse(URI.create("https://github.com/garretreichenbach/New-StarMade-Launcher/releases"));
+			} catch(IOException exception) {
+				exception.printStackTrace();
+			}
+//			LauncherUpdaterHelper.updateLauncher();
 		});
 		buttonPanel.add(updateButton);
 

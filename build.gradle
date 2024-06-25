@@ -3,6 +3,7 @@ plugins {
     id "application"
     id "com.github.johnrengelman.shadow" version "7.1.0"
     id 'maven-publish'
+    id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 
 targetCompatibility = 8
@@ -10,10 +11,13 @@ sourceCompatibility = 8
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
+version = '3.1.0'
 
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven { url "https://raw.githubusercontent.com/graalvm/native-build-tools/snapshots" }
+    gradlePluginPortal()
 }
 
 dependencies {
@@ -23,98 +27,23 @@ dependencies {
     implementation 'org.jasypt:jasypt:1.9.3'
     implementation 'org.json:json:20230227'
     implementation 'it.unimi.dsi:fastutil:8.5.12'
-
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
 }
 
-/*
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            name = "StarMade Launcher Repository"
-            url = uri("") //Todo: Add repo url
-        }
-    }
-}
- */
-
-// Tasks
-
-test {
-    useJUnitPlatform()
-}
-
-tasks.register('all_jar', Jar) {
-    dependsOn('win_jar')
-    dependsOn('linux_jar')
-    dependsOn('mac_jar')
-}
-
-tasks.register('win_jar', Jar) {
+jar {
     manifest {
         attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
     }
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./release-builds/StarMade Launcher-win32-ia32"))
+//    destinationDirectory.set(file("./release-builds/"))
 
-    setArchivesBaseName("starmade-launcher")
+    archiveFileName = 'StarMade-Launcher.jar'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
     from(sourceSets.main.output)
     from('resources/Updater.jar') {
         into 'Updater.jar'
-    }
-    copy {
-        from('release-assets/windows/')
-        into 'release-builds/StarMade Launcher-win32-ia32'
-    }
-}
-
-tasks.register('linux_jar', Jar) {
-    manifest {
-        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
-    }
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./release-builds/StarMade Launcher-linux-x64"))
-
-    setArchivesBaseName("starmade-launcher")
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    from(sourceSets.main.output)
-    from('resources/Updater.jar') {
-        into 'Updater.jar'
-    }
-    copy {
-        from('release-assets/linux/')
-        into 'release-builds/StarMade Launcher-linux-x64'
-    }
-}
-
-tasks.register('mac_jar', Jar) {
-    manifest {
-        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
-    }
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./release-builds/StarMade Launcher-darwin-x64"))
-
-    setArchivesBaseName("starmade-launcher")
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    from(sourceSets.main.output)
-    from('resources/Updater.jar') {
-        into 'Updater.jar'
-    }
-    copy {
-        from('release-assets/macos/')
-        into 'release-builds/StarMade Launcher-darwin-x64'
     }
 }

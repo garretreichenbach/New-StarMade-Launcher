@@ -41,7 +41,7 @@ public class LauncherUpdater {
 			unzip(outputFile);
 			outputFile.deleteOnExit();
 
-			File launcherJar = new File("starmade-launcher.jar");
+			File launcherJar = new File("StarMade-Launcher.jar");
 			if (launcherJar.exists()) launcherJar.delete();
 
 			File releaseFolder;
@@ -51,13 +51,13 @@ public class LauncherUpdater {
 			else releaseFolder = new File("./release-builds/StarMade Launcher-linux-x64");
 
 			//Move everything in the folder to current directory
-			FileUtils.copyFile(new File(releaseFolder, "starmade-launcher.jar"), new File("starmade-launcher.jar"));
+			FileUtils.copyFile(new File(releaseFolder, "Starmade-Launcher.jar"), new File("Starmade-Launcher.jar"));
 			(new File("release-builds")).delete();
 			System.out.println("Finished updating launcher");
 
 			//Restart the launcher
 			System.out.println("Restarting launcher...");
-			runLauncher(new File("starmade-launcher.jar").getAbsolutePath());
+			runLauncher(new File("Starmade-Launcher.jar").getAbsolutePath());
 		} catch (Exception exception) {
 			exception.printStackTrace();
 			System.exit(-1);
