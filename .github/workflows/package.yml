@@ -67,7 +67,15 @@ jobs:
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
-      - name: 'Get Version Number'
+      - name: 'Get Version Number Windows'
+        if: matrix.os == 'windows-latest'
+        run: |
+          $VersionOutput = ./gradlew properties -q | Select-String -Pattern "version: "
+          $Version = ($VersionOutput -split " ")[1]
+          echo "VERSION=$Version" >> $env:GITHUB_ENV
+        shell: powershell
+      - name: 'Get Version Number Other'
+        if: matrix.os != 'windows-latest'
         run: |
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
       - name: 'Get JAR Artifact'
@@ -78,7 +86,13 @@ jobs:
         uses: actions/download-artifact@v2-preview
         with:
           name: 'upload_url.txt'
-      - name: 'Set Upload URL Env Var'
+      - name: 'Set Upload URL Env Var Windows'
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "UPLOAD_URL=$(type upload_url.txt)" >> $env:GITHUB_ENV
+        shell: powershell
+      - name: 'Set Upload URL Env Var Other'
+        if: matrix.os != 'windows-latest'
         run: |
           echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
       - name: 'Compile'
