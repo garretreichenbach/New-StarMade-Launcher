@@ -102,7 +102,7 @@ jobs:
         if: success() && matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
-          name: "StarMade-Launcher-Windows"
+          name: "StarMade-Launcher.exe"
           path: "StarMade-Launcher.exe"
       - name: 'Upload MacOS Binary'
         if: success() && matrix.os == 'macos-latest'
@@ -123,7 +123,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
-          asset_name: 'StarMade-Launcher-Windows'
+          asset_name: 'StarMade-Launcher.exe'
           asset_path: 'StarMade-Launcher.exe'
           asset_content_type: application/octet-stream
       - name: 'Publish MacOS Executable'
