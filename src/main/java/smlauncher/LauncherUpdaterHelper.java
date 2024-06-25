@@ -49,7 +49,7 @@ public class LauncherUpdaterHelper {
 			// Send the link to the latest launcher jar file in args
 			ProcessBuilder processBuilder = new ProcessBuilder(
 					"java", "-jar", "Updater.jar",
-					getLatestLauncherURL(), getZipFileName()
+					getLatestLauncherURL(), getFileName()
 			);
 			processBuilder.inheritIO();
 			processBuilder.start();
@@ -83,18 +83,16 @@ public class LauncherUpdaterHelper {
 	}
 
 	private static String getLatestLauncherURL() {
-		return UPDATE_URL_BASE + getLatestVersion() + "/" + getZipFileName();
+		return UPDATE_URL_BASE + getLatestVersion() + "/" + getFileName();
 	}
 
-	private static String getZipFileName() {
-		return "StarMade_Launcher_" + getPlatformFolder() + ".zip";
-	}
-
-	private static String getPlatformFolder() {
+	private static String getFileName() {
+		String s = "StarMade-Launcher-";
 		OperatingSystem currentOS = OperatingSystem.getCurrent();
-		if (currentOS == OperatingSystem.WINDOWS) return "Windows";
-		else if (currentOS == OperatingSystem.MAC) return "Mac";
-		else return "Linux";
+		if (currentOS == OperatingSystem.WINDOWS) s += "Windows.exe";
+		else if (currentOS == OperatingSystem.MAC) s += "Mac";
+		else s += "Linux";
+		return s;
 	}
 
 	/**
