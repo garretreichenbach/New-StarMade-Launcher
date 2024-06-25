@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: 'Setup Java 11'
         uses: actions/setup-java@v1
         with:
@@ -60,7 +60,7 @@ jobs:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - uses: graalvm/setup-graalvm@v1
         with:
           java-version: '21'
@@ -84,24 +84,58 @@ jobs:
       - name: 'Compile'
         run: |
           native-image --no-server --no-fallback  --allow-incomplete-classpath -jar "StarMade-Launcher.jar"
-      - name: Upload binary
-        if: success()
+      - name: 'Rename Windows Executable'
+        if: success() && matrix.os == 'windows-latest'
+        run: |
+          mv "StarMade-Launcher" "StarMade-Launcher.exe"
+      - name: 'Upload Windows Executable'
+        if: success() && matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
-          name: "StarMade-Launcher-${{ matrix.os }}"
-          path: "StarMade-Launcher-${{ matrix.os }}"
-      - name: Rename binary for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          mv "StarMade-Launcher-${{ matrix.os }}" "StarMade-Launcher-${{ matrix.os }}.exe"
-      - name: 'Publish'
-        if: success()
+          name: "StarMade-Launcher-Windows"
+          path: "StarMade-Launcher.exe"
+      - name: 'Upload MacOS Binary'
+        if: success() && matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: "StarMade-Launcher-Mac"
+          path: "StarMade-Launcher"
+      - name: 'Upload Linux Binary'
+        if: success() && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: "StarMade-Launcher-Linux"
+          path: "StarMade-Launcher"
+      - name: 'Publish Windows Executable'
+        if: success() && matrix.os == 'windows-latest'
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
-          asset_name: ${{ matrix.os == 'windows-latest' && 'StarMade-Launcher-${{ matrix.os }}.exe' || 'StarMade-Launcher-${{ matrix.os }}' }}
-          asset_path: ${{ matrix.os == 'windows-latest' && 'StarMade-Launcher-${{ matrix.os }}.exe' || 'StarMade-Launcher-${{ matrix.os }}' }}
+          asset_name: 'StarMade-Launcher-Windows'
+          asset_path: 'StarMade-Launcher.exe'
+          asset_content_type: application/octet-stream
+      - name: 'Publish MacOS Executable'
+        if: success() && matrix.os == 'macos-latest'
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_name: 'StarMade-Launcher-Mac'
+          asset_path: 'StarMade-Launcher'
+          asset_content_type: application/octet-stream
+      - name: 'Publish Linux Executable'
+        if: success() && matrix.os == 'ubuntu-latest'
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_name: 'StarMade-Launcher-Linux'
+          asset_path: 'StarMade-Launcher'
           asset_content_type: application/octet-stream
