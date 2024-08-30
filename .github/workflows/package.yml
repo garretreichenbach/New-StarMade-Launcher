@@ -22,7 +22,7 @@ jobs:
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
       - name: 'List Files'
         run: |
-          ls -l
+          ls -l -r
       - name: 'Zip ${{ matrix.os }} Executable'
         run: |
           zip -r release-builds/StarMade-Launcher-${{ matrix.os }}.zip release-builds/StarMade-Launcher-${{ matrix.os }}
