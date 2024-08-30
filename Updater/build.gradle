@@ -4,8 +4,8 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
-targetCompatibility = 8
-sourceCompatibility = 8
+targetCompatibility = 11
+sourceCompatibility = 11
 
 group = 'smlauncher.updater'
 mainClassName = 'smlauncher.StarMadeLauncher'

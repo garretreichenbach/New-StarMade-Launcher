@@ -1,58 +1,88 @@
 plugins {
-    id "java"
-    id "application"
-//    id "com.github.johnrengelman.shadow" version "7.1.0"
-    id 'org.beryx.jlink' version '2.23.5'
+	id "java"
+	id "application"
+	id "org.panteleyev.jpackageplugin" version "1.6.0"
 }
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
 version = '3.1.0'
 
+sourceCompatibility = 18
+targetCompatibility = 18
+
+application {
+	mainClassName = 'smlauncher.StarMadeLauncher'
+	mainModule = 'smlauncher'
+}
+
 repositories {
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
-    gradlePluginPortal()
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
+	maven { url "https://plugins.gradle.org/m2/" }
+	gradlePluginPortal()
 }
 
 dependencies {
-    implementation 'com.formdev:flatlaf:3.0'
-    implementation 'commons-io:commons-io:2.11.0'
-    implementation 'org.codehaus.plexus:plexus-archiver:4.9.0'
-    implementation 'org.jasypt:jasypt:1.9.3'
-    implementation 'org.json:json:20231013'
-    implementation 'it.unimi.dsi:fastutil:8.5.12'
+	implementation('org.codehaus.plexus:plexus-archiver:4.10.0') {
+		exclude group: 'org.codehaus.plexus', module: 'plexus-io'
+	}
+	implementation 'commons-io:commons-io:2.11.0'
+	implementation 'org.json:json:20231013'
+	implementation 'it.unimi.dsi:fastutil:8.5.12'
+	implementation 'org.jasypt:jasypt:1.9.3'
+	implementation 'com.formdev:flatlaf:3.0'
+	implementation 'org.panteleyev:jpackage-gradle-plugin:1.6.0'
 }
 
 java {
-    modularity.inferModulePath = true
+	modularity.inferModulePath = true
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(18)
+		vendor = JvmVendorSpec.ADOPTIUM
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += [
+			'--module-path', configurations.compileClasspath.asPath
+	]
 }
 
 jar {
-    manifest {
-        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
-    }
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./release-builds/"))
-
-    archiveFileName = 'StarMade-Launcher.jar'
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    from(sourceSets.main.output)
-    from('resources/Updater.jar') {
-        into 'Updater.jar'
-    }
+	manifest {
+		attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
+	}
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+	destinationDirectory.set(file("./release-builds/"))
+	archiveFileName = 'StarMade-Launcher.jar'
+	from(sourceSets.main.output)
+	from('resources/Updater.jar') {
+		into 'Updater.jar'
+	}
 }
 
-jlink {
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    jpackage {
-        skipInstaller = true
-        imageOptions = ['--icon', 'assets/starmade.ico']
-        installerOptions = ['--win-menu', '--win-shortcut']
-    }
-    launcher {
-        name = 'StarMade Launcher'
-    }
+jpackage {
+	dependsOn jar
+	appName = "StarMade-Launcher"
+	appVersion = project.version.toString()
+	vendor = "smlauncher"
+	copyright = "Copyright (c) 2024 Schine GmbH"
+	runtimeImage = System.getProperty("java.home")
+	module = "smlauncher/smlauncher.StarMadeLauncher"
+	modulePaths = [file("$buildDir/classes/java/main").absolutePath]
+	destination = "./release-builds"
+	mac {
+		icon = "./src/main/resources/starmade.icns"
+	}
+	windows {
+		icon = "./src/main/resources/starmade.ico"
+		winMenu = true
+		winDirChooser = true
+		winShortcut = true
+		winConsole = true
+	}
+	linux {
+		icon = "./src/main/resources/starmade.png"
+	}
 }
