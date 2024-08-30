@@ -20,7 +20,10 @@ jobs:
       - name: 'Get Version Number'
         run: |
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
-      - name: 'Zip ${{ matrix.os }} Executable' # There will be a StarMade-Launcher folder at ./release-builds/StarMade-Launcher-${{ matrix.os }}/
+      - name: 'List Files'
+        run: |
+          ls -l
+      - name: 'Zip ${{ matrix.os }} Executable'
         run: |
           zip -r release-builds/StarMade-Launcher-${{ matrix.os }}.zip release-builds/StarMade-Launcher-${{ matrix.os }}
       - name: 'Publish Executable'
