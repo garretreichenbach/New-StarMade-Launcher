@@ -4,6 +4,9 @@ jobs:
   build-executables:
     name: 'Build ${{ matrix.os }} Executable'
     runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3

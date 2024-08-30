@@ -1,0 +1,148 @@
+name: Package
+on: [ push ]
+jobs:
+  build-jar-job:
+    name: 'Build JAR'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+      - name: 'Setup Java 11'
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: 'Build JAR'
+        run: |
+          ./gradlew jar
+      - name: 'Get Version Number'
+        run: |
+            echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
+      - name: 'Publish JAR'
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: 'StarMade-Launcher.jar'
+          path: 'build/libs/StarMade-Launcher.jar'
+      - name: 'Create Release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v${{ env.VERSION }}"
+          release_name: "v${{ env.VERSION }}"
+          body: |
+            Initial release
+          draft: true
+          prerelease: false
+      - name: 'Upload Release Asset'
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: 'build/libs/StarMade-Launcher.jar'
+          asset_name: 'StarMade-Launcher.jar'
+          asset_content_type: application/java-archive
+      - name: 'Write Upload URL To File'
+        run: |
+          echo "${{ steps.create_release.outputs.upload_url }}" > upload_url.txt
+      - name: 'Publish Upload URL'
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: 'upload_url.txt'
+          path: 'upload_url.txt'
+  build:
+    needs: build-jar-job
+    name: Package on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+      - name: 'Get Version Number Windows'
+        if: matrix.os == 'windows-latest'
+        run: |
+          $VersionOutput = ./gradlew properties -q | Select-String -Pattern "version: "
+          $Version = ($VersionOutput -split " ")[1]
+          echo "VERSION=$Version" >> $env:GITHUB_ENV
+        shell: powershell
+      - name: 'Get Version Number Other'
+        if: matrix.os != 'windows-latest'
+        run: |
+          echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
+      - name: 'Get JAR Artifact'
+        uses: actions/download-artifact@v2-preview
+        with:
+          name: 'StarMade-Launcher.jar'
+      - name: 'Download Release URL'
+        uses: actions/download-artifact@v2-preview
+        with:
+          name: 'upload_url.txt'
+      - name: 'Set Upload URL Env Var Windows'
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "UPLOAD_URL=$(type upload_url.txt)" >> $env:GITHUB_ENV
+        shell: powershell
+      - name: 'Set Upload URL Env Var Other'
+        if: matrix.os != 'windows-latest'
+        run: |
+          echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
+      - name: 'Compile'
+        run: |
+          native-image --no-server --no-fallback  --allow-incomplete-classpath -jar "StarMade-Launcher.jar"
+      - name: 'Upload Windows Executable'
+        if: success() && matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: "StarMade-Launcher.exe"
+          path: "StarMade-Launcher.exe"
+      - name: 'Upload MacOS Binary'
+        if: success() && matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: "StarMade-Launcher-Mac"
+          path: "StarMade-Launcher"
+      - name: 'Upload Linux Binary'
+        if: success() && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: "StarMade-Launcher-Linux"
+          path: "StarMade-Launcher"
+      - name: 'Publish Windows Executable'
+        if: success() && matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_name: 'StarMade-Launcher.exe'
+          asset_path: 'StarMade-Launcher.exe'
+          asset_content_type: application/octet-stream
+      - name: 'Publish MacOS Executable'
+        if: success() && matrix.os == 'macos-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_name: 'StarMade-Launcher-Mac'
+          asset_path: 'StarMade-Launcher'
+          asset_content_type: application/octet-stream
+      - name: 'Publish Linux Executable'
+        if: success() && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_name: 'StarMade-Launcher-Linux'
+          asset_path: 'StarMade-Launcher'
+          asset_content_type: application/octet-stream
