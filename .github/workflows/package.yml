@@ -25,7 +25,7 @@ jobs:
           ls -l release-builds
       - name: 'Zip ${{ matrix.os }} Executable'
         run: |
-          zip -r StarMade-Launcher-${{ matrix.os }}.zip release-builds/StarMade-Launcher-${{ matrix.os }}
+          zip -r ${{ matrix.os }}.zip release-builds/${{ matrix.os }}
       - name: 'Publish Executable'
         uses: actions/upload-artifact@v2-preview
         with:
