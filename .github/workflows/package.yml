@@ -22,10 +22,10 @@ jobs:
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
       - name: 'List Files'
         run: |
-          ls -l -r
+          ls -l release-builds
       - name: 'Zip ${{ matrix.os }} Executable'
         run: |
-          zip -r release-builds/StarMade-Launcher-${{ matrix.os }}.zip release-builds/StarMade-Launcher-${{ matrix.os }}
+          zip -r StarMade-Launcher-${{ matrix.os }}.zip release-builds/StarMade-Launcher-${{ matrix.os }}
       - name: 'Publish Executable'
         uses: actions/upload-artifact@v2-preview
         with:
