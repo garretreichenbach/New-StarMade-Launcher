@@ -4,6 +4,7 @@ jobs:
   build-executables:
     name: Build ${{ matrix.os }} Executable
     runs-on: ${{ matrix.os }}
+    steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
       - name: 'Setup Java 18'
