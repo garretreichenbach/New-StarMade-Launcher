@@ -26,4 +26,5 @@ jobs:
       - name: 'Publish Executable'
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ matrix.os }}.zip'
+            name: StarMade-Launcher-${{ matrix.os }}
+            path: ${{ matrix.os }}.zip
