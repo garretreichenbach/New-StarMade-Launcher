@@ -116,6 +116,7 @@ public class StarMadeLauncher extends JFrame {
 			downloadJRE(JavaVersion.JAVA_18);
 		} catch(Exception exception) {
 			System.out.println("Could not download JREs");
+			exception.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -454,7 +455,18 @@ public class StarMadeLauncher extends JFrame {
 			return;
 		}
 		System.out.println("Downloading JRE " + version);
-		(new JavaDownloader(version)).downloadAndUnzip();
+		JavaDownloader downloader = new JavaDownloader(version);
+		JDialog dialog = new JDialog();
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		dialog.setModal(true);
+		dialog.setResizable(false);
+		dialog.setTitle("Downloading JRE " + version);
+		dialog.setSize(500, 100);
+		dialog.setLocationRelativeTo(null);
+		dialog.setLayout(new BorderLayout());
+		dialog.setAlwaysOnTop(true);
+		downloader.downloadAndUnzip();
+		dialog.dispose();
 	}
 
 	private IndexFileEntry getLastUsedVersion() {
