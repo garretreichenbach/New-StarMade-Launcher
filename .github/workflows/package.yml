@@ -22,9 +22,7 @@ jobs:
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
       - name: 'Zip ${{ matrix.os }} Executable' # There will be a StarMade-Launcher folder at ./release-builds/StarMade-Launcher-${{ matrix.os }}/
         run: |
-          mkdir -p release-builds/StarMade-Launcher-${{ matrix.os }}
-          cp -r build/jpackage/StarMadeLauncher/* release-builds/StarMade-Launcher-${{ matrix.os }}
-          zip -r StarMade-Launcher-${{ matrix.os }}.zip release-builds/StarMade-Launcher-${{ matrix.os }}
+          zip -r release-builds/StarMade-Launcher-${{ matrix.os }}.zip release-builds/StarMade-Launcher-${{ matrix.os }}
       - name: 'Publish Executable'
         uses: actions/upload-artifact@v2-preview
         with:
