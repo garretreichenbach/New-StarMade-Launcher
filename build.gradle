@@ -9,8 +9,8 @@ group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
 version = '3.1.0'
 
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceCompatibility = 18
+targetCompatibility = 18
 
 application {
 	mainClassName = 'smlauncher.StarMadeLauncher'
@@ -25,23 +25,13 @@ repositories {
 }
 
 dependencies {
-	implementation('org.codehaus.plexus:plexus-archiver:4.10.0') {
-		exclude(group: 'org.codehaus.plexus', module: 'plexus-io')
-	}
+	implementation 'org.codehaus.plexus:plexus-archiver:4.10.0'
 	implementation 'commons-io:commons-io:2.11.0'
 	implementation 'org.json:json:20231013'
 	implementation 'it.unimi.dsi:fastutil:8.5.12'
 	implementation 'org.jasypt:jasypt:1.9.3'
 	implementation 'com.formdev:flatlaf:3.0'
 	implementation 'org.panteleyev:jpackage-gradle-plugin:1.6.0'
-}
-
-java {
-	modularity.inferModulePath = true
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-		vendor = JvmVendorSpec.ADOPTIUM
-	}
 }
 
 var os = System.getProperty('os.name').toLowerCase()
@@ -89,6 +79,7 @@ jpackage {
 	}
 	windows {
 		icon = "./src/main/resources/starmade.ico"
+//		winConsole = true
 	}
 	linux {
 		icon = "./src/main/resources/starmade.png"

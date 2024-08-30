@@ -7,7 +7,10 @@ import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import smlauncher.LaunchSettings;
 import smlauncher.util.OperatingSystem;
 
-import java.io.*;
+import javax.swing.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -33,16 +36,31 @@ public class JavaDownloader {
 		this.version = version;
 	}
 
-	public void downloadAndUnzip() throws IOException {
+	public void downloadAndUnzip(JDialog dialog) throws IOException {
 		// Don't unzip if the folder already exists
-		if (doesJreFolderExist()) return;
-		download();
-		unzip();
+		if(doesJreFolderExist()) return;
+		new Thread(() -> {
+			try {
+				download();
+				unzip();
+				dialog.setVisible(false);
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}).start();
+		dialog.setVisible(true);
+		while(dialog.isVisible()) {
+			try {
+				Thread.sleep(100);
+			} catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void download() throws IOException {
 		String url = getJavaURL();
-		if (url == null) return;
+		if(url == null) return;
 
 		URL website = new URL(url);
 		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
@@ -60,7 +78,7 @@ public class JavaDownloader {
 
 		// Extract the file
 		UnArchiver unzipper;
-		if (currentOS.zipExtension.equals("zip")) {
+		if(currentOS.zipExtension.equals("zip")) {
 			unzipper = new ZipUnArchiver(zipFile);
 		} else {
 			unzipper = new TarGZipUnArchiver(zipFile);
@@ -78,13 +96,13 @@ public class JavaDownloader {
 		File extractedFolder = null;
 
 		// Find the extracted folder
-		for (File file : Objects.requireNonNull(new File("./").listFiles())) {
-			if (file.getName().startsWith(version.fileStart)) {
+		for(File file : Objects.requireNonNull(new File("./").listFiles())) {
+			if(file.getName().startsWith(version.fileStart)) {
 				extractedFolder = file;
 				break;
 			}
 		}
-		if (extractedFolder == null) throw new IOException("Could not find extracted folder");
+		if(extractedFolder == null) throw new IOException("Could not find extracted folder");
 
 		// Rename the extracted folder to jre<#>/
 		FileUtils.moveDirectory(extractedFolder, jreFolder);
@@ -111,17 +129,17 @@ public class JavaDownloader {
 
 	void cleanupZip() {
 		File zipFile = new File(getZipFilename());
-		if (zipFile.exists()) zipFile.delete();
+		if(zipFile.exists()) zipFile.delete();
 	}
 
 	void cleanupFolder() {
 		File jreFolder = new File(getJreFolderName());
 		try {
-			if (jreFolder.exists()) {
+			if(jreFolder.exists()) {
 				FileUtils.cleanDirectory(jreFolder);
 				FileUtils.deleteDirectory(jreFolder);
 			}
-		} catch (IOException ignored) {
+		} catch(IOException ignored) {
 		}
 	}
 

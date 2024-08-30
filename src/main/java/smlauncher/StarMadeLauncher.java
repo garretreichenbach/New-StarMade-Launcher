@@ -451,22 +451,35 @@ public class StarMadeLauncher extends JFrame {
 
 	private void downloadJRE(JavaVersion version) throws Exception {
 		if(new File(getJavaPath(version)).exists()) {
-			System.out.println("JRE " + version + " already downloaded");
+			System.out.println(version + " already downloaded");
 			return;
 		}
-		System.out.println("Downloading JRE " + version);
+		System.out.println("Downloading " + version + "...");
 		JavaDownloader downloader = new JavaDownloader(version);
 		JDialog dialog = new JDialog();
 		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		dialog.setModal(true);
 		dialog.setResizable(false);
-		dialog.setTitle("Downloading JRE " + version);
+		dialog.setTitle("Performing First Time Setup");
 		dialog.setSize(500, 100);
 		dialog.setLocationRelativeTo(null);
 		dialog.setLayout(new BorderLayout());
 		dialog.setAlwaysOnTop(true);
-		downloader.downloadAndUnzip();
-		dialog.dispose();
+
+		JPanel dialogPanel = new JPanel();
+		dialogPanel.setDoubleBuffered(true);
+		dialogPanel.setOpaque(true);
+		dialogPanel.setLayout(new BorderLayout());
+		dialog.add(dialogPanel);
+
+		JLabel downloadLabel = new JLabel("Downloading " + version + "...");
+		downloadLabel.setDoubleBuffered(true);
+		downloadLabel.setOpaque(true);
+		downloadLabel.setFont(new Font("Roboto", Font.BOLD, 16));
+		downloadLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		dialogPanel.add(downloadLabel, BorderLayout.CENTER);
+
+		downloader.downloadAndUnzip(dialog);
 	}
 
 	private IndexFileEntry getLastUsedVersion() {
