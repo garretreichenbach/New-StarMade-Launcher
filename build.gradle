@@ -9,8 +9,8 @@ group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
 version = '3.1.0'
 
-sourceCompatibility = 18
-targetCompatibility = 18
+sourceCompatibility = 17
+targetCompatibility = 17
 
 application {
 	mainClassName = 'smlauncher.StarMadeLauncher'
@@ -39,7 +39,7 @@ dependencies {
 java {
 	modularity.inferModulePath = true
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(18)
+		languageVersion = JavaLanguageVersion.of(17)
 		vendor = JvmVendorSpec.ADOPTIUM
 	}
 }
