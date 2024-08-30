@@ -16,7 +16,7 @@ jobs:
           java-version: 18
       - name: 'Build Executable'
         run: |
-          ./gradlew jpackage
+          ./gradlew package
       - name: 'Get Version Number'
         run: |
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
@@ -25,7 +25,7 @@ jobs:
           ls -l release-builds
       - name: 'Zip ${{ matrix.os }} Executable'
         run: |
-          zip -r ${{ matrix.os }}.zip release-builds/${{ matrix.os }}
+          zip -r StarMade-Launcher-${{ matrix.os }}.zip release-builds/${{ matrix.os }}
       - name: 'Publish Executable'
         uses: actions/upload-artifact@v2-preview
         with:

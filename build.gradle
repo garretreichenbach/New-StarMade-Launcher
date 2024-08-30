@@ -85,3 +85,14 @@ jpackage {
 		icon = "./src/main/resources/starmade.png"
 	}
 }
+
+tasks.register('package') {
+	dependsOn(jpackage)
+	doLast {
+		delete fileTree('release-builds/' + os).matching {
+			include '**/*.ico'
+			include '**/*.icns'
+			include '**/*.png'
+		}
+	}
+}
