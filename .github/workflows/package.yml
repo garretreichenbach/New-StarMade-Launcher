@@ -20,17 +20,10 @@ jobs:
             -   name: 'Get Version Number'
                 run: |
                     echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
-    debug:
-        name: 'Debug'
-        runs-on: ubuntu-latest
-        steps:
-            -   name: 'List Files'
-                run: |
-                    ls -la
     create-windows-archive:
         name: 'Create Windows Archive'
         runs-on: windows-latest
-        needs: [ debug, build-executables ]
+        needs: build-executables
         steps:
             -   name: 'Checkout'
                 uses: actions/checkout@v3
@@ -45,10 +38,13 @@ jobs:
     create-macos-archive:
         name: 'Create MacOS Archive'
         runs-on: macos-latest
-        needs: [ debug, build-executables ]
+        needs: build-executables
         steps:
             -   name: 'Checkout'
                 uses: actions/checkout@v3
+            -   name: 'List Files'
+                run: |
+                    ls -la
             -   name: 'Zip MacOS Executable'
                 run: |
                     zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
@@ -60,10 +56,13 @@ jobs:
     create-linux-archive:
         name: 'Create Linux Archive'
         runs-on: ubuntu-latest
-        needs: [ debug, build-executables ]
+        needs: build-executables
         steps:
             -   name: 'Checkout'
                 uses: actions/checkout@v3
+            -   name: 'List Files'
+                run: |
+                    ls -la
             -   name: 'Zip Linux Executable'
                 run: |
                     zip -r StarMade-Launcher_Linux.zip ./release-builds/linux
@@ -79,6 +78,9 @@ jobs:
         steps:
             -   name: 'Checkout'
                 uses: actions/checkout@v3
+            -   name: 'List Files'
+                run: |
+                    ls -la
             -   name: 'Create Release'
                 id: create_release
                 uses: actions/create-release@v1
