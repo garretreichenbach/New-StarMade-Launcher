@@ -20,31 +20,60 @@ jobs:
             -   name: 'Get Version Number'
                 run: |
                     echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
+    create-windows-archive:
+        name: 'Create Windows Archive'
+        runs-on: windows-latest
+        needs: build-executables
+        steps:
+            -   name: 'Checkout'
+                uses: actions/checkout@v3
             -   name: 'Zip Windows Executable'
                 run: |
                     powershell Compress-Archive ./release-builds/windows ./StarMade-Launcher_Windows.zip
-            -   name: 'Zip MacOS Executable'
-                run: |
-                    zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
-            -   name: 'Zip Ubuntu Executable'
-                run: |
-                    zip -r StarMade-Launcher_Ubuntu.zip ./release-builds/ubuntu
             -   name: 'Publish Windows Executable'
                 uses: actions/upload-artifact@v2-preview
                 with:
                     name: StarMade-Launcher (Windows)
                     path: StarMade-Launcher_Windows.zip
+    create-macos-archive:
+        name: 'Create MacOS Archive'
+        runs-on: macos-latest
+        needs: build-executables
+        steps:
+            -   name: 'Checkout'
+                uses: actions/checkout@v3
+            -   name: 'Zip MacOS Executable'
+                run: |
+                    zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
             -   name: 'Publish MacOS Executable'
                 uses: actions/upload-artifact@v2-preview
                 with:
                     name: StarMade-Launcher (MacOS)
                     path: StarMade-Launcher_MacOS.zip
+    create-ubuntu-archive:
+        name: 'Create Ubuntu Archive'
+        runs-on: ubuntu-latest
+        needs: build-executables
+        steps:
+            -   name: 'Checkout'
+                uses: actions/checkout@v3
+            -   name: 'Zip Ubuntu Executable'
+                run: |
+                    zip -r StarMade-Launcher_Ubuntu.zip ./release-builds/ubuntu
             -   name: 'Publish Ubuntu Executable'
                 uses: actions/upload-artifact@v2-preview
                 with:
                     name: StarMade-Launcher (Ubuntu)
+                    path: StarMade-Launcher_Ubuntu.zip
+    create-release:
+        name: 'Create Release'
+        runs-on: ubuntu-latest
+        needs: [ create-windows-archive, create-macos-archive, create-ubuntu-archive ]
+        steps:
+            -   name: 'Checkout'
+                uses: actions/checkout@v3
             -   name: 'Create Release'
-                id: create-release
+                id: create_release
                 uses: actions/create-release@v1
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
