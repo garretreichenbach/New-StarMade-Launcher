@@ -47,13 +47,13 @@ public class StarMadeLauncher extends JFrame {
 	private static boolean serverMode;
 	private static int port;
 	private static OperatingSystem currentOS;
+	private static JTextField portField;
 	private final VersionRegistry versionRegistry;
 	private final DownloadStatus dlStatus = new DownloadStatus();
 	private UpdaterThread updaterThread;
 	private int mouseX;
 	private int mouseY;
 	private JButton updateButton;
-	private JTextField portField;
 	private JPanel mainPanel;
 	private JPanel centerPanel;
 	private JPanel footerPanel;
@@ -191,38 +191,39 @@ public class StarMadeLauncher extends JFrame {
 				} else if(!gameVersion.version.startsWith("0.2") && !gameVersion.version.startsWith("0.1")) javaVersion = JavaVersion.JAVA_18;
 				setGameVersion(gameVersion);
 				System.out.println("Using game version " + gameVersion.version + " on branch " + gameVersion.branch + " with Java " + javaVersion);
-				if(serverMode) startServerHeadless(port, javaVersion);
-				else startGameHeadless(javaVersion);
+				if(serverMode) startServerHeadless();
+				else startGameHeadless();
 			} else startup();
 		}
 	}
 
-	private static void startGameHeadless(JavaVersion version) {
+	private static void startGameHeadless() {
+		ArrayList<String> commandComponents = getCommandComponents(false);
+		ProcessBuilder process = new ProcessBuilder(commandComponents);
+		process.directory(new File(LaunchSettings.getInstallDir()));
+		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+		process.redirectError(ProcessBuilder.Redirect.INHERIT);
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder();
-			processBuilder.command(getJavaPath(version), "-jar", "StarMade.jar");
-			processBuilder.directory(new File(LaunchSettings.getInstallDir()));
-			processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-			processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-			processBuilder.start();
+			System.out.println("Command: " + String.join(" ", commandComponents));
+			process.start();
 			System.exit(0);
-		} catch(IOException exception) {
-			exception.printStackTrace();
+		} catch(Exception exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 
-	private static void startServerHeadless(int port, JavaVersion version) {
-		System.out.println("Starting server on port " + port);
+	private static void startServerHeadless() {
+		ArrayList<String> commandComponents = getCommandComponents(true);
+		ProcessBuilder process = new ProcessBuilder(commandComponents);
+		process.directory(new File(LaunchSettings.getInstallDir()));
+		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+		process.redirectError(ProcessBuilder.Redirect.INHERIT);
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder();
-			processBuilder.command(getJavaPath(version), "-jar", "StarMade.jar", "-server", "-port", Integer.toString(port));
-			processBuilder.directory(new File(LaunchSettings.getInstallDir()));
-			processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-			processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-			processBuilder.start();
+			System.out.println("Command: " + String.join(" ", commandComponents));
+			process.start();
 			System.exit(0);
-		} catch(IOException exception) {
-			exception.printStackTrace();
+		} catch(Exception exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 
@@ -495,6 +496,50 @@ public class StarMadeLauncher extends JFrame {
 		return LaunchSettings.getInstallDir() + "/" + String.format(currentOS.javaPath, version.number);
 	}
 
+	public static ArrayList<String> getCommandComponents(boolean server) {
+		boolean useJava8 = gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
+		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getAbsolutePath();
+
+		ArrayList<String> commandComponents = new ArrayList<>();
+		commandComponents.add(bundledJavaPath);
+		if(!useJava8) commandComponents.addAll(Arrays.asList(J18ARGS));
+
+		if(currentOS == OperatingSystem.MAC) {
+			// Run OpenGL on main thread on macOS
+			// Needs to be added before "-jar"
+			commandComponents.add("-XstartOnFirstThread");
+		}
+//		commandComponents.add("-Dfml.earlyprogresswindow=false");
+
+		if(currentOS == OperatingSystem.LINUX) {
+			// Override (meaningless?) default library path
+			commandComponents.add("-Djava.library.path=lib:native/linux");
+		}
+
+		commandComponents.add("-jar");
+		commandComponents.add("StarMade.jar");
+
+		// Memory Arguments
+		if(!LaunchSettings.getJvmArgs().isEmpty()) {
+			String[] launchArgs = LaunchSettings.getLaunchArgs().split(" ");
+			for(String arg : launchArgs) {
+				if(arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
+				commandComponents.add(arg.trim());
+			}
+		}
+		commandComponents.add("-Xms1024m");
+		commandComponents.add("-Xmx" + LaunchSettings.getMemory() + "m");
+
+		// Game arguments
+		commandComponents.add("-force");
+		if(portField != null) port = Integer.parseInt(portField.getText());
+		if(server) {
+			commandComponents.add("-server");
+			commandComponents.add("-port:" + port);
+		}
+		return commandComponents;
+	}
+
 	private void downloadJRE(JavaVersion version) throws Exception {
 		if(new File(getJavaPath(version)).exists()) {
 			System.out.println(version + " already downloaded");
@@ -547,6 +592,8 @@ public class StarMadeLauncher extends JFrame {
 		// Return latest release if nothing found
 		return versionRegistry.getLatestVersion(GameBranch.RELEASE);
 	}
+
+	// Panel Methods
 
 	private void createMainPanel() {
 		mainPanel = new JPanel();
@@ -1060,8 +1107,6 @@ public class StarMadeLauncher extends JFrame {
 		switchToClientMode(footerLabel); // make sure right components are visible
 	}
 
-	// Panel Methods
-
 	private void switchToClientMode(JLabel footerLabel) {
 		footerLabel.setIcon(getIcon("sprites/footer_normalplay_bg.jpg"));
 		serverPanel.setVisible(false);
@@ -1172,7 +1217,6 @@ public class StarMadeLauncher extends JFrame {
 
 	private void runStarMade(boolean server) {
 		ArrayList<String> commandComponents = getCommandComponents(server);
-		//Run game
 		ProcessBuilder process = new ProcessBuilder(commandComponents);
 		process.directory(new File(LaunchSettings.getInstallDir()));
 		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
@@ -1184,50 +1228,6 @@ public class StarMadeLauncher extends JFrame {
 		} catch(Exception exception) {
 			throw new RuntimeException(exception);
 		}
-	}
-
-	public ArrayList<String> getCommandComponents(boolean server) {
-		boolean useJava8 = gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
-		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getAbsolutePath();
-
-		ArrayList<String> commandComponents = new ArrayList<>();
-		commandComponents.add(bundledJavaPath);
-		if(!useJava8) commandComponents.addAll(Arrays.asList(J18ARGS));
-
-		if(currentOS == OperatingSystem.MAC) {
-			// Run OpenGL on main thread on macOS
-			// Needs to be added before "-jar"
-			commandComponents.add("-XstartOnFirstThread");
-		}
-//		commandComponents.add("-Dfml.earlyprogresswindow=false");
-
-		if(currentOS == OperatingSystem.LINUX) {
-			// Override (meaningless?) default library path
-			commandComponents.add("-Djava.library.path=lib:native/linux");
-		}
-
-		commandComponents.add("-jar");
-		commandComponents.add("StarMade.jar");
-
-		// Memory Arguments
-		if(!LaunchSettings.getJvmArgs().isEmpty()) {
-			String[] launchArgs = LaunchSettings.getLaunchArgs().split(" ");
-			for(String arg : launchArgs) {
-				if(arg.startsWith("-Xms") || arg.startsWith("-Xmx")) continue;
-				commandComponents.add(arg.trim());
-			}
-		}
-		commandComponents.add("-Xms1024m");
-		commandComponents.add("-Xmx" + LaunchSettings.getMemory() + "m");
-
-		// Game arguments
-		commandComponents.add("-force");
-		if(portField != null) port = Integer.parseInt(portField.getText());
-		if(server) {
-			commandComponents.add("-server");
-			commandComponents.add("-port:" + port);
-		}
-		return commandComponents;
 	}
 
 	// Dropdown Methods
