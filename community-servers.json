@@ -1,19 +1,19 @@
 {
   "servers": [
-    {
-      "name": "Skies of Eden",
-      "description": "The official Discord for the Skies of Eden StarMade server.",
-      "url": "https://discord.gg/4gvTW7655H"
+     {
+      "name": "Want your server here?",
+      "description": "Fill out the linked form to have your server added to this list.",
+      "url": "https://forms.gle/K2E3Eqq6RfKybbVR9"
     },
     {
       "name": "The Cake Network",
       "description": "The official Discord for The Cake Network StarMade server.",
       "url": "https://discord.gg/KXpxqdn"
     },
-    {
-      "name": "Want your server here?",
-      "description": "Fill out the linked form to have your server added to this list.",
-      "url": "https://forms.gle/K2E3Eqq6RfKybbVR9"
+       {
+      "name": "Skies of Eden",
+      "description": "The official Discord for the Skies of Eden StarMade server.",
+      "url": "https://discord.gg/4gvTW7655H"
     }
   ]
 }
