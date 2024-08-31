@@ -17,6 +17,11 @@ jobs:
       - name: 'Build Executable'
         run: |
           ./gradlew package
+      - name: 'Upload Build Artifacts'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts-${{ matrix.os }}
+          path: ./release-builds
   publish-executables:
     name: 'Publish Executables'
     runs-on: ubuntu-latest
@@ -24,6 +29,21 @@ jobs:
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
+      - name: 'Download Build Artifacts (Linux)'
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts-ubuntu-latest
+          path: ./release-builds/linux
+      - name: 'Download Build Artifacts (Windows)'
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts-windows-latest
+          path: ./release-builds/windows
+      - name: 'Download Build Artifacts (MacOS)'
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts-macos-latest
+          path: ./release-builds/macos
       - name: 'Set Version Number'
         run: |
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
@@ -39,8 +59,6 @@ jobs:
       - name: 'Create MacOS Archive'
         run: |
           zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
-      - name: 'Checkout'
-        uses: actions/checkout@v3
       - name: 'Publish Linux Executable'
         id: publish-linux
         uses: actions/upload-artifact@v2-preview
