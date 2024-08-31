@@ -17,9 +17,6 @@ jobs:
             -   name: 'Build Executable'
                 run: |
                     ./gradlew package
-            -   name: 'Get Version Number'
-                run: |
-                    echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
             -   name: 'Create Windows Archive'
                 if: runner.os == 'windows-latest'
                 run: |
@@ -50,6 +47,9 @@ jobs:
                 with:
                     name: StarMade-Launcher (Linux)
                     path: StarMade-Launcher_Linux.zip
+            -   name: 'Set Version Number'
+                run: |
+                    echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
             -   name: 'Create Release'
                 id: create_release
                 uses: actions/create-release@v1
@@ -68,7 +68,7 @@ jobs:
                 with:
                     upload_url: ${{ steps.create_release.outputs.upload_url }}
                     asset_path: StarMade-Launcher_Windows.zip
-                    asset_name: StarMade-Launcher_Windows.zip
+                    asset_name: StarMade Launcher (Windows)
                     asset_content_type: application/zip
             -   name: 'Upload Release Asset (MacOS)'
                 if: runner.os == 'macos-latest'
@@ -78,7 +78,7 @@ jobs:
                 with:
                     upload_url: ${{ steps.create_release.outputs.upload_url }}
                     asset_path: StarMade-Launcher_MacOS.zip
-                    asset_name: StarMade-Launcher_MacOS.zip
+                    asset_name: StarMade Launcher (MacOS)
                     asset_content_type: application/zip
             -   name: 'Upload Release Asset (Linux)'
                 if: runner.os == 'ubuntu-latest'
@@ -88,5 +88,5 @@ jobs:
                 with:
                     upload_url: ${{ steps.create_release.outputs.upload_url }}
                     asset_path: StarMade-Launcher_Linux.zip
-                    asset_name: StarMade-Launcher_Linux.zip
+                    asset_name: StarMade Launcher (Linux)
                     asset_content_type: application/zip
