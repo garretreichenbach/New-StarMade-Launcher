@@ -289,7 +289,7 @@ public class GameUpdater extends Observable {
 					}
 				}
 			} else {
-				FlatDarkLaf.setup();
+				EventQueue.invokeLater(FlatDarkLaf::setup);
 				if(eula != null) {
 					//eula not accepted
 					//create new dialog

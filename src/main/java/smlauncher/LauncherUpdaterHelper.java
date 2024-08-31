@@ -19,8 +19,8 @@ import java.nio.charset.StandardCharsets;
 public class LauncherUpdaterHelper {
 
 	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
-	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v"; //Temp link for testing
-	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json"; //Temp link for testing
+	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v";
+	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json";
 
 	/**
 	 * Checks whether the launcher should be updated.
@@ -38,30 +38,32 @@ public class LauncherUpdaterHelper {
 	 */
 	public static void updateLauncher() {
 		String latestVersion = getLatestVersion();
-		System.err.println("Updating launcher to version " + latestVersion);
+		System.out.println("Updating launcher to version " + latestVersion);
 		try {
 			// Copy updater jar
 			File updaterJar = new File("Updater.jar");
 			if(updaterJar.exists()) updaterJar.delete();
 			extractUpdater(updaterJar);
+			updaterJar.deleteOnExit();
 
 			// Run updater jar
 			// Send the link to the latest launcher jar file in args
-			ProcessBuilder processBuilder = new ProcessBuilder(
-					"java", "-jar", "Updater.jar",
-					getLatestLauncherURL(), getFileName()
-			);
+			String javaPath = "./runtime/bin/java";
+			if(OperatingSystem.getCurrent() == OperatingSystem.WINDOWS) javaPath += ".exe";
+			ProcessBuilder processBuilder = new ProcessBuilder(javaPath, "-jar", "Updater.jar", getLatestLauncherURL(), getFileName());
 			processBuilder.inheritIO();
 			processBuilder.start();
 			System.exit(0);
 		} catch(Exception exception) {
-			System.out.println("Could not update launcher");
+			exception.printStackTrace();
+			System.err.println("Could not update launcher");
 			// Open website to launcher download
 			new MiscErrorDialog(MiscErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
 				try {
 					Desktop.getDesktop().browse(new URL(DOWNLOAD_URL).toURI());
 				} catch(Exception exception1) {
-					System.out.println("Could not open launcher website");
+					exception1.printStackTrace();
+					System.err.println("Could not open launcher website");
 				}
 			}).setVisible(true);
 		}
@@ -87,11 +89,11 @@ public class LauncherUpdaterHelper {
 	}
 
 	private static String getFileName() {
-		String s = "StarMade-Launcher-";
+		String s = "StarMade_Launcher_";
 		OperatingSystem currentOS = OperatingSystem.getCurrent();
-		if(currentOS == OperatingSystem.WINDOWS) s += "Windows.exe";
-		else if(currentOS == OperatingSystem.MAC) s += "Mac";
-		else s += "Linux";
+		if(currentOS == OperatingSystem.WINDOWS) s += "Windows.zip";
+		else if(currentOS == OperatingSystem.MAC) s += "Mac.zip";
+		else s += "Linux.zip";
 		return s;
 	}
 
@@ -101,14 +103,13 @@ public class LauncherUpdaterHelper {
 	 * @param out the output file
 	 */
 	private static void extractUpdater(File out) {
-		try(
-				InputStream inputStream = StarMadeLauncher.class.getClassLoader().getResourceAsStream("Updater.jar");
-				OutputStream outputStream = new FileOutputStream(out)
-		) {
+		try(InputStream inputStream = StarMadeLauncher.class.getClassLoader().getResourceAsStream("Updater.jar");
+		    OutputStream outputStream = new FileOutputStream(out)) {
 			assert inputStream != null;
 			IOUtils.copy(inputStream, outputStream);
 		} catch(Exception exception) {
-			System.out.println("Could not extract updater jar");
+			exception.printStackTrace();
+			System.err.println("Could not extract updater jar");
 		}
 	}
 
@@ -124,5 +125,4 @@ public class LauncherUpdaterHelper {
 		}
 		return os.toByteArray();
 	}
-
 }

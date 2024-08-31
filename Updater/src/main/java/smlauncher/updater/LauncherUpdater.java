@@ -1,6 +1,5 @@
 package smlauncher.updater;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -17,8 +16,8 @@ public class LauncherUpdater {
 
 	public static void main(String[] args) {
 		try {
-			if (args.length == 0) throw new IllegalArgumentException("No URL specified");
-		} catch (IllegalArgumentException exception) {
+			if(args.length == 0) throw new IllegalArgumentException("No URL specified");
+		} catch(IllegalArgumentException exception) {
 			exception.printStackTrace();
 			System.exit(-1);
 		}
@@ -29,7 +28,7 @@ public class LauncherUpdater {
 		try {
 			//Delete the output file if it exists
 			File outputFile = new File(output);
-			if (outputFile.exists()) outputFile.delete();
+			if(outputFile.exists()) outputFile.delete();
 			outputFile.createNewFile();
 
 			//Download the file at the URL and write it to the output file
@@ -39,26 +38,13 @@ public class LauncherUpdater {
 
 			//Unzip the downloaded file
 			unzip(outputFile);
-			outputFile.deleteOnExit();
-
-			File launcherJar = new File("StarMade-Launcher.jar");
-			if (launcherJar.exists()) launcherJar.delete();
-
-			File releaseFolder;
-			String os = System.getProperty("os.name").toLowerCase();
-			if (os.contains("win")) releaseFolder = new File("./release-builds/StarMade Launcher-win32-ia32");
-			else if (os.contains("mac")) releaseFolder = new File("./release-builds/StarMade Launcher-darwin-x64");
-			else releaseFolder = new File("./release-builds/StarMade Launcher-linux-x64");
-
-			//Move everything in the folder to current directory
-			FileUtils.copyFile(new File(releaseFolder, "Starmade-Launcher.jar"), new File("Starmade-Launcher.jar"));
-			(new File("release-builds")).delete();
+			outputFile.delete();
 			System.out.println("Finished updating launcher");
 
 			//Restart the launcher
 			System.out.println("Restarting launcher...");
-			runLauncher(new File("Starmade-Launcher.jar").getAbsolutePath());
-		} catch (Exception exception) {
+			runLauncher(new File("./app/StarMade-Launcher.jar").getAbsolutePath());
+		} catch(Exception exception) {
 			exception.printStackTrace();
 			System.exit(-1);
 		}
@@ -70,31 +56,31 @@ public class LauncherUpdater {
 			zipFile.stream().forEach(zipEntry -> {
 				try {
 					File outputFile = new File(zipEntry.getName());
-					if (zipEntry.isDirectory()) outputFile.mkdirs();
+					if(zipEntry.isDirectory()) outputFile.mkdirs();
 					else {
-						if (outputFile.exists()) outputFile.delete();
+						if(outputFile.exists()) outputFile.delete();
 						outputFile.createNewFile();
 						IOUtils.copy(zipFile.getInputStream(zipEntry), new FileOutputStream(outputFile));
 					}
-				} catch (Exception exception) {
+				} catch(Exception exception) {
 					exception.printStackTrace();
 				}
 			});
 			zipFile.close();
-		} catch (Exception exception) {
+		} catch(Exception exception) {
 			exception.printStackTrace();
 		}
 	}
 
 	private static void runLauncher(String absolutePath) {
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder(
-					"java", "-jar", absolutePath
-			);
+			String javaPath = "./runtime/bin/java";
+			if(System.getProperty("os.name").toLowerCase().contains("win")) javaPath += ".exe";
+			ProcessBuilder processBuilder = new ProcessBuilder(javaPath, "-jar", absolutePath);
 			processBuilder.inheritIO();
 			processBuilder.start();
 			System.exit(0);
-		} catch (Exception exception) {
+		} catch(Exception exception) {
 			exception.printStackTrace();
 			System.exit(1);
 		}

@@ -38,7 +38,7 @@ import java.util.Objects;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.1.0";
+	public static final String LAUNCHER_VERSION = "3.1.1";
 	private static final String[] J18ARGS = {"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED", "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED", "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED", "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED", "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED", "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED", "--add-opens=java.base/java.io=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"};
 	private static IndexFileEntry gameVersion;
 	private static GameBranch lastUsedBranch = GameBranch.RELEASE;
@@ -284,15 +284,7 @@ public class StarMadeLauncher extends JFrame {
 		updateButton.setFont(new Font("Roboto", Font.BOLD, 12));
 		updateButton.addActionListener(e -> {
 			dialog.dispose();
-			try {
-				//Since we moved to graalvm native images, we can't just extract the Update.jar and run it anymore
-				//For now, just open the github releases page, but in future we should re-implement the self updating
-				//Todo: Re-implement self updating
-				Desktop.getDesktop().browse(URI.create("https://github.com/garretreichenbach/New-StarMade-Launcher/releases"));
-			} catch(IOException exception) {
-				exception.printStackTrace();
-			}
-//			LauncherUpdaterHelper.updateLauncher();
+			LauncherUpdaterHelper.updateLauncher();
 		});
 		buttonPanel.add(updateButton);
 
