@@ -1,0 +1,36 @@
+name: build-windows
+on: [ push ]
+jobs:
+    build-executables:
+        name: 'Build Windows Executable'
+        runs-on: windows-latest
+        steps:
+            -   name: 'Checkout'
+                uses: actions/checkout@v3
+            -   name: 'Setup Java 18'
+                uses: actions/setup-java@v1
+                with:
+                    java-version: 18
+            -   name: 'Build Executable'
+                run: |
+                    ./gradlew package
+            -   name: 'Set Version Number'
+                run: |
+                    echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
+            -   name: 'Create Windows Archive'
+                run: |
+                    powershell Compress-Archive ./release-builds/windows ./StarMade-Launcher_Windows.zip
+            -   name: 'Publish Windows Executable'
+                uses: actions/upload-artifact@v2-preview
+                with:
+                    name: StarMade-Launcher (Windows)
+                    path: StarMade-Launcher_Windows.zip
+            -   name: 'Upload Release Asset (Windows)'
+                uses: actions/upload-release-asset@v1
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                with:
+                    upload_url: ${{ steps.create_release.outputs.upload_url }}
+                    asset_path: StarMade-Launcher_Windows.zip
+                    asset_name: StarMade Launcher (Windows)
+                    asset_content_type: application/zip
