@@ -27,6 +27,9 @@ jobs:
       - name: 'Set Version Number'
         run: |
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
+      - name: 'Debug'
+        run: |
+          ls -la
       - name: 'Create Linux Archive'
         run: |
           zip -r StarMade-Launcher_Linux.zip ./release-builds/linux
