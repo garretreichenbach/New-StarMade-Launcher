@@ -27,6 +27,9 @@ jobs:
         steps:
             -   name: 'Checkout'
                 uses: actions/checkout@v3
+            -   name: 'List Files'
+                run: |
+                    ls -la
             -   name: 'Zip Windows Executable'
                 run: |
                     powershell Compress-Archive ./release-builds/windows ./StarMade-Launcher_Windows.zip
@@ -78,9 +81,6 @@ jobs:
         steps:
             -   name: 'Checkout'
                 uses: actions/checkout@v3
-            -   name: 'List Files'
-                run: |
-                    ls -la
             -   name: 'Create Release'
                 id: create_release
                 uses: actions/create-release@v1
