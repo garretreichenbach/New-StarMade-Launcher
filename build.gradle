@@ -36,11 +36,11 @@ dependencies {
 
 var os = System.getProperty('os.name').toLowerCase()
 if(os.contains('win')) {
-	os = 'windows-latest'
+	os = 'windows'
 } else if(os.contains('mac')) {
-	os = 'macos-latest'
+	os = 'macos'
 } else {
-	os = 'ubuntu-latest'
+	os = 'ubuntu'
 }
 
 jar {
