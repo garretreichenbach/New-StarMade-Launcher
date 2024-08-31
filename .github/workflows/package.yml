@@ -20,9 +20,6 @@ jobs:
             -   name: 'Get Version Number'
                 run: |
                     echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
-            -   name: 'List Files'
-                run: |
-                    ls -la
             -   name: 'Create Windows Archive'
                 if: runner.os == 'windows-latest'
                 run: |
