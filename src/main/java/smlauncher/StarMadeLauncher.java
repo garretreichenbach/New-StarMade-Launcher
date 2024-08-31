@@ -152,23 +152,28 @@ public class StarMadeLauncher extends JFrame {
 				backupMode = GameUpdater.BACK_ALL;
 			} else if(argList.contains("-no_backup")) {
 				backupMode = GameUpdater.BACK_NONE;
+			} else if(argList.contains("-help")) {
+				displayHelp();
+				return;
+			} else if(argList.contains("-headless")) {
+				headless = true;
 			} else if(argList.contains("-server")) {
 				boolean hasPort = false;
-				if(argList.contains("-port")) {
+				if(argList.contains("-port:")) {
 					try {
-						port = Integer.parseInt(argList.get(argList.indexOf("-port") + 1));
+						port = Integer.parseInt(argList.get(argList.indexOf("-port:") + 1).trim());
 						hasPort = true;
-					} catch(NumberFormatException ignored) {
-					}
+					} catch(NumberFormatException ignored) {}
 				}
 				if(!hasPort) {
 					displayHelp();
 					System.out.println("Please specify a port for the server to run on");
 					return;
 				}
+				headless = true;
 				serverMode = true;
 			}
-
+			LaunchSettings.readSettings();
 			if(autoUpdate) {
 				if(headless) GameUpdater.withoutGUI(true, LaunchSettings.getInstallDir(), buildBranch, backupMode, selectVersion);
 				else LauncherUpdaterHelper.checkForUpdate();
@@ -347,7 +352,7 @@ public class StarMadeLauncher extends JFrame {
 		System.out.println("-backup_all : Create backup of everything (default backup is server database only)");
 		System.out.println("-pre : Use pre branch (default is release)");
 		System.out.println("-dev : Use dev branch (default is release)");
-		System.out.println("-server -port:<port> : Start in server mode");
+		System.out.println("-server -port: <port> : Start in server mode");
 	}
 
 	private static String getCurrentUser() {
@@ -628,7 +633,7 @@ public class StarMadeLauncher extends JFrame {
 		minimizeButton.setOpaque(false);
 		minimizeButton.setContentAreaFilled(false);
 		minimizeButton.setBorderPainted(false);
-		minimizeButton.addActionListener(e -> setState(Frame.ICONIFIED));
+		minimizeButton.addActionListener(e -> setState(ICONIFIED));
 		topPanelButtons.add(minimizeButton);
 		topPanelButtons.add(closeButton);
 		topLabel.add(topPanelButtons);
@@ -832,7 +837,7 @@ public class StarMadeLauncher extends JFrame {
 		});
 		launchSettings.addActionListener(e -> {
 			JDialog dialog = new JDialog();
-			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			dialog.setModal(true);
 			dialog.setResizable(false);
 			dialog.setTitle("Launch Settings");
@@ -950,9 +955,9 @@ public class StarMadeLauncher extends JFrame {
 			}
 		});
 		installSettings.addActionListener(e -> {
-			final String[] tempInstallDir = {null};
+			String[] tempInstallDir = {null};
 
-			final JDialog[] dialog = {new JDialog()};
+			JDialog[] dialog = {new JDialog()};
 			dialog[0].setModal(true);
 			dialog[0].setResizable(false);
 			dialog[0].setTitle("Installation Settings");
@@ -960,7 +965,7 @@ public class StarMadeLauncher extends JFrame {
 			dialog[0].setLocationRelativeTo(null);
 			dialog[0].setLayout(new BorderLayout());
 			dialog[0].setAlwaysOnTop(true);
-			dialog[0].setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			dialog[0].setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			JPanel dialogPanel = new JPanel();
 			dialogPanel.setDoubleBuffered(true);
 			dialogPanel.setOpaque(false);
@@ -1350,7 +1355,7 @@ public class StarMadeLauncher extends JFrame {
 				dlStatus.setDownloadedMb(mbDownloaded);
 				dlStatus.setTotalMb(mbTotal);
 				dlStatus.setSpeedMb(mbSpeed);
-				if(file != null && !file.equals("null")) dlStatus.setFilename(file);
+				if(file != null && !"null".equals(file)) dlStatus.setFilename(file);
 				int width = updateButtonEmpty.getIconWidth();
 				int height = updateButtonEmpty.getIconHeight();
 				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

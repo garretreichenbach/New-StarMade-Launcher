@@ -23,10 +23,10 @@ public class ChecksumFileEntry {
 		File dst = new File(installDirStr, relativePath);
 
 		boolean replace = false;
-		if (dst.exists()) {
+		if(dst.exists()) {
 			String localChecksum = FileUtil.getSha1Checksum(dst.getAbsolutePath());
 			replace = !localChecksum.equals(checksum);
-			if (replace) {
+			if(replace) {
 				System.err.println("[UPDATER] Checksum Differs for " + relativePath + ": " + localChecksum + " :: " + checksum);
 			} else {
 				System.err.println("[UPDATER] Not downloading " + relativePath + ": remote file same as local");
@@ -48,12 +48,12 @@ public class ChecksumFileEntry {
 
 		boolean replace = needsDownload(buildPath, installDirStr) || force;
 
-		if (dst.exists() && replace) {
-			if (!dst.delete()) {
+		if(dst.exists() && replace) {
+			if(!dst.delete()) {
 				throw new IOException("File " + dst.getAbsolutePath() + " could not be removed! Is it still in use?");
 			}
 		}
-		if (!dst.getParentFile().exists()) {
+		if(!dst.getParentFile().exists()) {
 			System.err.println("Creating path: " + dst.getParentFile().getAbsolutePath());
 		}
 
@@ -72,12 +72,12 @@ public class ChecksumFileEntry {
 				@Override
 				public void doneDownloading() {
 					int s = Integer.MAX_VALUE;
-					synchronized (ChecksumFile.running) {
-						for (ChecksumFileEntry en : ChecksumFile.running) {
+					synchronized(ChecksumFile.running) {
+						for(ChecksumFileEntry en : ChecksumFile.running) {
 							s = Math.min(en.index, s);
 						}
 					}
-					if (s == index) {
+					if(s == index) {
 						cb.done(e);
 					} else {
 
@@ -100,7 +100,7 @@ public class ChecksumFileEntry {
 					e.currentSize = o.currentSize;
 
 					long diffTime = System.currentTimeMillis() - o.startTime;
-					if (diffTime / 200 > 1) {
+					if(diffTime / 200 > 1) {
 						double secs = diffTime / 200.0d;
 
 						o.downloadSpeed = o.lastSpeedSize / secs;
@@ -111,12 +111,12 @@ public class ChecksumFileEntry {
 					e.downloadSpeed = o.downloadSpeed;
 
 					int s = Integer.MAX_VALUE;
-					synchronized (ChecksumFile.running) {
-						for (ChecksumFileEntry en : ChecksumFile.running) {
+					synchronized(ChecksumFile.running) {
+						for(ChecksumFileEntry en : ChecksumFile.running) {
 							s = Math.min(en.index, s);
 						}
 					}
-					if (s == index) {
+					if(s == index) {
 //						System.err.println("INDNN "+index+": "+ChecksumFile.running);
 						cb.update(e);
 					} else {
@@ -126,7 +126,7 @@ public class ChecksumFileEntry {
 			}, "dev", "dev", true);
 
 			file.renameTo(dst);
-		} catch (URISyntaxException e1) {
+		} catch(URISyntaxException e1) {
 			e1.printStackTrace();
 			throw new IOException(e1);
 		}

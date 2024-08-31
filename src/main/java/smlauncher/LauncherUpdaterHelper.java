@@ -42,7 +42,7 @@ public class LauncherUpdaterHelper {
 		try {
 			// Copy updater jar
 			File updaterJar = new File("Updater.jar");
-			if (updaterJar.exists()) updaterJar.delete();
+			if(updaterJar.exists()) updaterJar.delete();
 			extractUpdater(updaterJar);
 
 			// Run updater jar
@@ -54,13 +54,13 @@ public class LauncherUpdaterHelper {
 			processBuilder.inheritIO();
 			processBuilder.start();
 			System.exit(0);
-		} catch (Exception exception) {
+		} catch(Exception exception) {
 			System.out.println("Could not update launcher");
 			// Open website to launcher download
 			new MiscErrorDialog(MiscErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
 				try {
 					Desktop.getDesktop().browse(new URL(DOWNLOAD_URL).toURI());
-				} catch (Exception exception1) {
+				} catch(Exception exception1) {
 					System.out.println("Could not open launcher website");
 				}
 			}).setVisible(true);
@@ -70,13 +70,13 @@ public class LauncherUpdaterHelper {
 	// Helper Methods
 
 	private static String getLatestVersion() {
-		try (InputStream stream = new URL(INDEX_URL).openStream()) {
+		try(InputStream stream = new URL(INDEX_URL).openStream()) {
 			String indexJSON = new String(getBytesFromInputStream(stream), StandardCharsets.UTF_8);
 			JSONObject index = new JSONObject(indexJSON);
 			JSONArray versions = index.getJSONArray("versions");
 			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);
 			return latestVersion.getString("version");
-		} catch (IOException exception) {
+		} catch(IOException exception) {
 			System.out.println("Could not get latest version");
 			return "UNKNOWN";
 		}
@@ -89,8 +89,8 @@ public class LauncherUpdaterHelper {
 	private static String getFileName() {
 		String s = "StarMade-Launcher-";
 		OperatingSystem currentOS = OperatingSystem.getCurrent();
-		if (currentOS == OperatingSystem.WINDOWS) s += "Windows.exe";
-		else if (currentOS == OperatingSystem.MAC) s += "Mac";
+		if(currentOS == OperatingSystem.WINDOWS) s += "Windows.exe";
+		else if(currentOS == OperatingSystem.MAC) s += "Mac";
 		else s += "Linux";
 		return s;
 	}
@@ -101,13 +101,13 @@ public class LauncherUpdaterHelper {
 	 * @param out the output file
 	 */
 	private static void extractUpdater(File out) {
-		try (
+		try(
 				InputStream inputStream = StarMadeLauncher.class.getClassLoader().getResourceAsStream("Updater.jar");
 				OutputStream outputStream = new FileOutputStream(out)
 		) {
 			assert inputStream != null;
 			IOUtils.copy(inputStream, outputStream);
-		} catch (Exception exception) {
+		} catch(Exception exception) {
 			System.out.println("Could not extract updater jar");
 		}
 	}
@@ -119,7 +119,7 @@ public class LauncherUpdaterHelper {
 	public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		byte[] buffer = new byte[0xFFFF];
-		for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
+		for(int len = is.read(buffer); len != -1; len = is.read(buffer)) {
 			os.write(buffer, 0, len);
 		}
 		return os.toByteArray();

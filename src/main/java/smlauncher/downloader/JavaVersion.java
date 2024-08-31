@@ -21,8 +21,8 @@ public enum JavaVersion {
 	}
 
 	public static JavaVersion getWithNumber(int number) {
-		if (number == 8) return JAVA_8;
-		else if (number == 18) return JAVA_18;
+		if(number == 8) return JAVA_8;
+		else if(number == 18) return JAVA_18;
 		else return null;
 	}
 

@@ -290,7 +290,6 @@ public class FileUtil {
 	 *                          will timeout if no connection could be established to the {@code source}
 	 * @param readTimeout       the number of milliseconds until this method will
 	 *                          timeout if no data could be read from the {@code source}
-	 *
 	 * @throws IOException if {@code source} URL cannot be opened
 	 * @throws IOException if {@code destination} is a directory
 	 * @throws IOException if {@code destination} cannot be written
@@ -358,7 +357,6 @@ public class FileUtil {
 	 * @param source      the {@code InputStream} to copy bytes from, must not be {@code null}
 	 * @param destination the non-directory {@code File} to write bytes to
 	 *                    (possibly overwriting), must not be {@code null}
-	 *
 	 * @throws IOException if {@code destination} is a directory
 	 * @throws IOException if {@code destination} cannot be written
 	 * @throws IOException if {@code destination} needs creating but can't be
@@ -395,7 +393,6 @@ public class FileUtil {
 	 *
 	 * @param input  the {@code InputStream} to read from
 	 * @param output the {@code OutputStream} to write to
-	 *
 	 * @return the number of bytes copied, or -1 if &gt; Integer.MAX_VALUE
 	 * @throws NullPointerException if the input or output is null
 	 * @throws IOException          if an I/O error occurs
@@ -414,7 +411,6 @@ public class FileUtil {
 	 * to the given package and subpackages.
 	 *
 	 * @param packageName The base package
-	 *
 	 * @return The classes
 	 * @throws ClassNotFoundException
 	 * @throws IOException
@@ -442,7 +438,6 @@ public class FileUtil {
 	 *
 	 * @param directory   The base directory
 	 * @param packageName The package name for classes found inside the base directory
-	 *
 	 * @return The classes
 	 * @throws ClassNotFoundException
 	 */
@@ -476,7 +471,6 @@ public class FileUtil {
 	 * An exception is thrown if the parent directory cannot be created.
 	 *
 	 * @param file the file to open for output, must not be {@code null}
-	 *
 	 * @return a new {@link FileOutputStream} for the specified file
 	 * @throws IOException if the file object is a directory
 	 * @throws IOException if the file cannot be written to
@@ -503,7 +497,6 @@ public class FileUtil {
 	 * @param file   the file to open for output, must not be {@code null}
 	 * @param append if {@code true}, then bytes will be added to the
 	 *               end of the file rather than overwriting
-	 *
 	 * @return a new {@link FileOutputStream} for the specified file
 	 * @throws IOException if the file object is a directory
 	 * @throws IOException if the file cannot be written to
@@ -534,7 +527,6 @@ public class FileUtil {
 	 * Closes a URLConnection.
 	 *
 	 * @param conn the connection to close.
-	 *
 	 * @since 2.4
 	 */
 	public static void close(URLConnection conn) {
@@ -672,7 +664,6 @@ public class FileUtil {
 	 * </pre>
 	 *
 	 * @param closeable the object to close, may be null or already closed
-	 *
 	 * @since 2.0
 	 */
 	public static void closeQuietly(Closeable closeable) {
@@ -706,7 +697,6 @@ public class FileUtil {
 	 * </pre>
 	 *
 	 * @param sock the Socket to close, may be null or already closed
-	 *
 	 * @since 2.0
 	 */
 	public static void closeQuietly(Socket sock) {
@@ -740,7 +730,6 @@ public class FileUtil {
 	 * </pre>
 	 *
 	 * @param selector the Selector to close, may be null or already closed
-	 *
 	 * @since 2.2
 	 */
 	public static void closeQuietly(Selector selector) {
@@ -774,7 +763,6 @@ public class FileUtil {
 	 * </pre>
 	 *
 	 * @param sock the ServerSocket to close, may be null or already closed
-	 *
 	 * @since 2.2
 	 */
 	public static void closeQuietly(ServerSocket sock) {
@@ -798,7 +786,6 @@ public class FileUtil {
 	 *
 	 * @param input  the {@code InputStream} to read from
 	 * @param output the {@code OutputStream} to write to
-	 *
 	 * @return the number of bytes copied
 	 * @throws NullPointerException if the input or output is null
 	 * @throws IOException          if an I/O error occurs
@@ -819,7 +806,6 @@ public class FileUtil {
 	 * @param input  the {@code InputStream} to read from
 	 * @param output the {@code OutputStream} to write to
 	 * @param buffer the buffer to use for the copy
-	 *
 	 * @return the number of bytes copied
 	 * @throws NullPointerException if the input or output is null
 	 * @throws IOException          if an I/O error occurs
@@ -835,7 +821,7 @@ public class FileUtil {
 				cb.downloaded(count, n);
 			}
 		}
-		if(cb != null){
+		if(cb != null) {
 			cb.doneDownloading();
 		}
 		return count;
@@ -932,7 +918,7 @@ public class FileUtil {
 
 		FileReader s = null;
 		try {
-			s = new FileReader(file);
+			s = new FileReader(file, StandardCharsets.UTF_8);
 			BufferedReader r = new BufferedReader(s);
 			StringBuffer sb = new StringBuffer();
 

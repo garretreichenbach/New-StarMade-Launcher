@@ -1,5 +1,6 @@
 package smlauncher.starmade;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import smlauncher.StarMadeLauncher;
 import smlauncher.util.OperatingSystem;
 
@@ -28,9 +29,9 @@ public class GameUpdater extends Observable {
 	public static String MIRROR_SITE = "http://files.star-made.org/mirrors";
 	public final ArrayList<IndexFileEntry> versions = new ArrayList<>();
 	private final ArrayList<String> mirrorURLs = new ArrayList<>();
+	private final StarMadeBackupTool backup = new StarMadeBackupTool();
 	boolean loading;
 	boolean versionsLoaded;
-	private final StarMadeBackupTool backup = new StarMadeBackupTool();
 	private boolean updating;
 
 	public GameUpdater(String installDir) {
@@ -41,25 +42,25 @@ public class GameUpdater extends Observable {
 		GameUpdater u = new GameUpdater(installDir);
 		try {
 			u.startLoadVersionList(branch);
-			while (u.loading) {
+			while(u.loading) {
 				Thread.sleep(100);
 			}
 
-			if (selectVersion) selectVersion(true, u, force, installDir, branch, backUp, selectVersion);
+			if(selectVersion) selectVersion(true, u, force, installDir, branch, backUp, selectVersion);
 			else {
-				if (u.isNewerVersionAvailable()) {
+				if(u.isNewerVersionAvailable()) {
 					System.err.println("A New Version Is Available!");
 					u.startUpdateNew(installDir, u.versions.get(u.versions.size() - 1), false, backUp);
 				} else System.err.println("You Are Already on the Newest Version: use -force to force an update");
 			}
-		} catch (InterruptedException e) {
+		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void selectVersion(boolean display, GameUpdater u, boolean force, String installDir, GameBranch f, int backUp, boolean selectVersion) {
-		if (display) {
-			for (int i = 0; i < u.versions.size(); i++) {
+		if(display) {
+			for(int i = 0; i < u.versions.size(); i++) {
 				System.out.println("[" + i + "] v" + u.versions.get(i).version + "; " + u.versions.get(i).build);
 			}
 		}
@@ -69,16 +70,16 @@ public class GameUpdater extends Observable {
 			System.out.println("Select the build you want to install (type in number in brackets and press Enter)");
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 			k = Integer.parseInt(br.readLine());
-		} catch (NumberFormatException e) {
+		} catch(NumberFormatException e) {
 			System.out.println("Error: Input must be number");
 			selectVersion(false, u, force, installDir, f, backUp, selectVersion);
 			return;
-		} catch (IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 			selectVersion(false, u, force, installDir, f, backUp, selectVersion);
 			return;
 		}
-		if (k < 0 || k >= u.versions.size() - 1) {
+		if(k < 0 || k >= u.versions.size() - 1) {
 			System.out.println("Error: Version does not exist");
 			selectVersion(false, u, force, installDir, f, backUp, selectVersion);
 			return;
@@ -103,7 +104,7 @@ public class GameUpdater extends Observable {
 
 		String[] options = {"Yes (Only Database)", "Yes (Everything)", "No"};
 		int n = JOptionPane.showOptionDialog(f, "Create Backup of current game data? (recommended)", "Backup?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-		switch (n) {
+		switch(n) {
 			case 0:
 				return BACK_DB;
 			case 1:
@@ -115,11 +116,24 @@ public class GameUpdater extends Observable {
 	}
 
 	private static String getJavaExec() {
-		if (smlauncher.util.OperatingSystem.getCurrent() == smlauncher.util.OperatingSystem.WINDOWS) {
+		if(smlauncher.util.OperatingSystem.getCurrent() == smlauncher.util.OperatingSystem.WINDOWS) {
 			return "javaw";
 		} else {
 			return "java";
 		}
+	}
+
+	public static ChecksumFile getChecksums(String relPath) throws IOException {
+		URL urlVersion = new URL(relPath + "/checksums");
+		URLConnection openConnection = urlVersion.openConnection();
+		openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + StarMadeLauncher.LAUNCHER_VERSION);
+		openConnection.setConnectTimeout(10000);
+		openConnection.setReadTimeout(10000);
+		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
+		ChecksumFile f = new ChecksumFile();
+		f.parse(in);
+		in.close();
+		return f;
 	}
 
 	@Override
@@ -129,18 +143,18 @@ public class GameUpdater extends Observable {
 	}
 
 	public boolean isNewerVersionAvailable() {
-		if (!versionsLoaded) {
+		if(!versionsLoaded) {
 			return false;
 		}
-		if (versions.isEmpty()) {
+		if(versions.isEmpty()) {
 			System.err.println("versions empty");
 			return false;
 		}
-		if (VersionContainer.build == null || "undefined".equals(VersionContainer.build)) {
+		if(VersionContainer.build == null || "undefined".equals(VersionContainer.build)) {
 			System.err.println("Version build null or undefined");
 			return true;
 		}
-		if ("latest".equals(VersionContainer.build)) {
+		if("latest".equals(VersionContainer.build)) {
 			System.err.println("newer version always available for develop version!");
 			return true;
 		}
@@ -156,15 +170,14 @@ public class GameUpdater extends Observable {
 		try {
 			versions.clear();
 			String version = getRemoteLauncherVersion();
-			if (!Objects.equals(version, StarMadeLauncher.LAUNCHER_VERSION))
-				throw new OldVersionException("You have an old Launcher Version.\n" + "Please download the latest Launcher Version at http://www.star-made.org/\n('retry' will let you ignore this message [not recommended!])");
-		} catch (MalformedURLException e) {
+			if(!Objects.equals(version, StarMadeLauncher.LAUNCHER_VERSION)) throw new OldVersionException("You have an old Launcher Version.\n" + "Please download the latest Launcher Version at http://www.star-made.org/\n('retry' will let you ignore this message [not recommended!])");
+		} catch(MalformedURLException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "Malformed URL", e)).setVisible(true);
-		} catch (IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
-		} catch (OldVersionException e) {
+		} catch(OldVersionException e) {
 			e.printStackTrace();
 		} finally {
 			loading = false;
@@ -185,12 +198,12 @@ public class GameUpdater extends Observable {
 			// Read all the text returned by the server
 			BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 			String str;
-			while ((str = in.readLine()) != null) mirrorURLs.add(str);
+			while((str = in.readLine()) != null) mirrorURLs.add(str);
 			in.close();
-		} catch (MalformedURLException e) {
+		} catch(MalformedURLException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "Malformed URL", e)).setVisible(true);
-		} catch (IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
 		} finally {
@@ -212,7 +225,7 @@ public class GameUpdater extends Observable {
 			// Read all the text returned by the server
 			BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 			String str;
-			while ((str = in.readLine()) != null) {
+			while((str = in.readLine()) != null) {
 				versions.add(IndexFileEntry.create(str, branch));
 			}
 
@@ -223,10 +236,10 @@ public class GameUpdater extends Observable {
 			setChanged();
 			notifyObservers("versions loaded");
 			openConnection.getInputStream().close();
-		} catch (MalformedURLException e) {
+		} catch(MalformedURLException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "Malformed URL", e)).setVisible(true);
-		} catch (IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
 		} finally {
@@ -237,7 +250,7 @@ public class GameUpdater extends Observable {
 	public void reloadVersion(String installDir) {
 		try {
 			VersionContainer.loadVersion(installDir);
-		} catch (Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -247,86 +260,106 @@ public class GameUpdater extends Observable {
 		new Thread(() -> {
 			try {
 				loadVersionList(branch);
-			} catch (IOException e) {
+			} catch(IOException e) {
 				e.printStackTrace();
 			}
 		}).start();
 	}
 
 	public void startUpdateNew(String installDirStr, IndexFileEntry newest, boolean forced, int backupFromMain) {
-		if (updating) return;
-
+		if(updating) return;
 		try {
 			Eula eula = getEula();
-			if (eula != null) {
-				//eula not accepted
-				//create new dialog
-				JDialog dialog = new JDialog();
-				dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				dialog.setModal(true);
-				dialog.setTitle("StarMade EULA");
-				dialog.setSize(500, 500);
-				dialog.setLocationRelativeTo(null);
-				dialog.setResizable(false);
-				dialog.setLayout(new BorderLayout());
-
-				JTextArea textArea = new JTextArea(eula.text);
-				JScrollPane scrollPane = new JScrollPane(textArea);
-				textArea.setLineWrap(true);
-				textArea.setWrapStyleWord(true);
-				scrollPane.setPreferredSize(new Dimension(500, 500));
-				dialog.add(scrollPane, BorderLayout.CENTER);
-
-				JPanel buttonPanel = new JPanel();
-				buttonPanel.setLayout(new FlowLayout());
-				JButton acceptButton = new JButton("I have read the EULA and accept");
-				acceptButton.addActionListener(e -> {
-					File file;
-					try {
-						file = new File(OperatingSystem.getAppDir(), "eula.properties");
-					} catch (IOException ex) {
-						throw new RuntimeException(ex);
-					}
-					Properties p = new Properties();
-
-					p.put("eula", "true");
-					try {
+			if(GraphicsEnvironment.isHeadless()) {
+				if(eula != null) {
+					System.out.println(eula.title);
+					System.out.println(eula.text);
+					System.out.println("Do you accept the EULA? (y/n)");
+					BufferedReader br = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+					String line = br.readLine();
+					if(!"y".equalsIgnoreCase(line)) {
+						System.out.println("You must accept the EULA to continue");
+						return;
+					} else {
+						File file = new File(OperatingSystem.getAppDir(), "eula.properties");
+						Properties p = new Properties();
+						p.setProperty("eula", "true");
 						p.store(new FileOutputStream(file), "StarMade EULA");
-					} catch (IOException e1) {
-						e1.printStackTrace();
+						startUpdateNew(installDirStr, newest, forced, backupFromMain);
 					}
-					dialog.dispose();
-					startUpdateNew(installDirStr, newest, forced, backupFromMain);
-				});
+				}
+			} else {
+				FlatDarkLaf.setup();
+				if(eula != null) {
+					//eula not accepted
+					//create new dialog
+					JDialog dialog = new JDialog();
+					dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+					dialog.setModal(true);
+					dialog.setTitle("StarMade EULA");
+					dialog.setSize(500, 500);
+					dialog.setLocationRelativeTo(null);
+					dialog.setResizable(false);
+					dialog.setLayout(new BorderLayout());
 
-				JButton declineButton = new JButton("I don't accept");
-				declineButton.addActionListener(e -> {
-					dialog.dispose();
-				});
-				buttonPanel.add(acceptButton);
-				buttonPanel.add(declineButton);
-				dialog.add(buttonPanel, BorderLayout.SOUTH);
-				dialog.setVisible(true);
+					JTextArea textArea = new JTextArea(eula.text);
+					JScrollPane scrollPane = new JScrollPane(textArea);
+					textArea.setLineWrap(true);
+					textArea.setWrapStyleWord(true);
+					scrollPane.setPreferredSize(new Dimension(500, 500));
+					dialog.add(scrollPane, BorderLayout.CENTER);
+
+					JPanel buttonPanel = new JPanel();
+					buttonPanel.setLayout(new FlowLayout());
+					JButton acceptButton = new JButton("I have read the EULA and accept");
+					acceptButton.addActionListener(e -> {
+						File file;
+						try {
+							file = new File(OperatingSystem.getAppDir(), "eula.properties");
+						} catch(IOException ex) {
+							throw new RuntimeException(ex);
+						}
+						Properties p = new Properties();
+
+						p.setProperty("eula", "true");
+						try {
+							p.store(new FileOutputStream(file), "StarMade EULA");
+						} catch(IOException e1) {
+							e1.printStackTrace();
+						}
+						dialog.dispose();
+						startUpdateNew(installDirStr, newest, forced, backupFromMain);
+					});
+
+					JButton declineButton = new JButton("I don't accept");
+					declineButton.addActionListener(e -> {
+						dialog.dispose();
+					});
+					buttonPanel.add(acceptButton);
+					buttonPanel.add(declineButton);
+					dialog.add(buttonPanel, BorderLayout.SOUTH);
+					dialog.setVisible(true);
+				}
 			}
-		} catch (IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
 		}
 
 		File installDir = new File(installDirStr);
-		if (!installDir.exists()) installDir.mkdirs();
-		if (!installDir.isDirectory()) {
+		if(!installDir.exists()) installDir.mkdirs();
+		if(!installDir.isDirectory()) {
 			try {
 				throw new IOException("Installation dir is not a directory");
-			} catch (IOException e1) {
+			} catch(IOException e1) {
 				(new ErrorDialog("Error", "IO Error", e1)).setVisible(true);
 			}
 		}
 
-		if (!installDir.canWrite()) {
+		if(!installDir.canWrite()) {
 			try {
 				throw new IOException("Your operating System denies access \n" + "to where you are trying to install StarMade (for good reasons)\n" + (new File(installDirStr).getAbsolutePath()) + "\n\n" + "To solve this Problem,\n" + "Please change the install destination to another directory,\n" + "Or Force the install by executing this file as administrator");
-			} catch (IOException e1) {
+			} catch(IOException e1) {
 				(new ErrorDialog("Error", "IO Error", e1)).setVisible(true);
 			}
 		}
@@ -343,7 +376,7 @@ public class GameUpdater extends Observable {
 
 		new Thread(() -> {
 			try {
-				if (backup != BACK_NONE) {
+				if(backup != BACK_NONE) {
 					setChanged();
 					notifyObservers("Creating backup!");
 					boolean removeOld = false;
@@ -384,17 +417,17 @@ public class GameUpdater extends Observable {
 
 				try {
 					Thread.sleep(500);
-				} catch (InterruptedException e) {
+				} catch(InterruptedException e) {
 					e.printStackTrace();
 				}
 				setChanged();
 				notifyObservers("reset");
-			} catch (IOException e1) {
+			} catch(IOException e1) {
 				e1.printStackTrace();
 				setChanged();
 				notifyObservers("failed IO");
 				(new ErrorDialog("Error", "IO Error", e1)).setVisible(true);
-			} catch (NoSuchAlgorithmException e1) {
+			} catch(NoSuchAlgorithmException e1) {
 				e1.printStackTrace();
 				setChanged();
 				notifyObservers("failed Sha");
@@ -419,16 +452,16 @@ public class GameUpdater extends Observable {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
 		StringBuilder b = new StringBuilder();
 		String line;
-		while ((line = in.readLine()) != null) {
-			if (e.title == null) {
+		while((line = in.readLine()) != null) {
+			if(e.title == null) {
 				e.title = line;
 				File file = new File(OperatingSystem.getAppDir(), "eula.properties");
 				Properties p = new Properties();
-				if (file.exists()) {
+				if(file.exists()) {
 					FileInputStream fs = new FileInputStream(file);
 					p.load(fs);
 					fs.close();
-					if (p.getProperty("EULA") != null && p.getProperty("EULA").equals(e.title)) return null;
+					if(p.getProperty("EULA") != null && p.getProperty("EULA").equals(e.title)) return null;
 				}
 			}
 			b.append(line + "\n");
@@ -436,19 +469,6 @@ public class GameUpdater extends Observable {
 		in.close();
 		e.text = b.toString();
 		return e;
-	}
-
-	public static ChecksumFile getChecksums(String relPath) throws IOException {
-		URL urlVersion = new URL(relPath + "/checksums");
-		URLConnection openConnection = urlVersion.openConnection();
-		openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + StarMadeLauncher.LAUNCHER_VERSION);
-		openConnection.setConnectTimeout(10000);
-		openConnection.setReadTimeout(10000);
-		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
-		ChecksumFile f = new ChecksumFile();
-		f.parse(in);
-		in.close();
-		return f;
 	}
 
 }

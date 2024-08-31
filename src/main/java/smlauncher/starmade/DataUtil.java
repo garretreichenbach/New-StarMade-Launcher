@@ -48,8 +48,10 @@ import java.io.*;
  */
 public class DataUtil {
 
-	/** The Constant dataPath. */
-	public static final String dataPath = "data"+File.separator;
+	/**
+	 * The Constant dataPath.
+	 */
+	public static final String dataPath = "data" + File.separator;
 
 	public static void copy(File src, File dst) throws IOException {
 		InputStream in = new FileInputStream(src);
@@ -57,7 +59,7 @@ public class DataUtil {
 		// Transfer bytes from in to out
 		byte[] buf = new byte[1024];
 		int len;
-		while ((len = in.read(buf)) > 0) {
+		while((len = in.read(buf)) > 0) {
 			out.write(buf, 0, len);
 		}
 		in.close();

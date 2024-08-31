@@ -78,7 +78,7 @@ public class JavaDownloader {
 
 		// Extract the file
 		UnArchiver unzipper;
-		if(currentOS.zipExtension.equals("zip")) {
+		if("zip".equals(currentOS.zipExtension)) {
 			unzipper = new ZipUnArchiver(zipFile);
 		} else {
 			unzipper = new TarGZipUnArchiver(zipFile);

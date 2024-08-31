@@ -48,7 +48,7 @@ public class BBCodeToHTMLConverter {
 	public static String insertString(String originalString, String stringToBeInserted, int index) {
 
 		// Create a new string
-		String newString = new String();
+		String newString = "";
 
 		for(int i = 0; i < originalString.length(); i++) {
 

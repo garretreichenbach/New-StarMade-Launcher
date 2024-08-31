@@ -7,29 +7,13 @@ import java.net.URI;
 import static smlauncher.StarMadeLauncher.BUG_REPORT_URL;
 
 // TODO seems like duplicate of starmade.ErrorDialog
+
 /**
  * Simple dialog for showing error messages.
  *
  * @author TheDerpGamer
  */
 public class MiscErrorDialog extends JDialog {
-
-	public enum ErrorType {
-		INFO(UIManager.getIcon("OptionPane.informationIcon")),
-		WARNING(UIManager.getIcon("OptionPane.warningIcon")),
-		ERROR(UIManager.getIcon("OptionPane.errorIcon")),
-		FATAL(UIManager.getIcon("OptionPane.errorIcon"));
-
-		public final Icon icon;
-
-		ErrorType(Icon icon) {
-			this.icon = icon;
-		}
-	}
-
-	public interface ErrorCallback {
-		void onOk();
-	}
 
 	public MiscErrorDialog(ErrorType type, String description, ErrorCallback callback) {
 		setTitle("Error");
@@ -73,5 +57,22 @@ public class MiscErrorDialog extends JDialog {
 			}
 		});
 		buttonPanel.add(reportButton);
+	}
+
+	public enum ErrorType {
+		INFO(UIManager.getIcon("OptionPane.informationIcon")),
+		WARNING(UIManager.getIcon("OptionPane.warningIcon")),
+		ERROR(UIManager.getIcon("OptionPane.errorIcon")),
+		FATAL(UIManager.getIcon("OptionPane.errorIcon"));
+
+		public final Icon icon;
+
+		ErrorType(Icon icon) {
+			this.icon = icon;
+		}
+	}
+
+	public interface ErrorCallback {
+		void onOk();
 	}
 }

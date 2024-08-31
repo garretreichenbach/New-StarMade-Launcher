@@ -22,19 +22,6 @@ import java.nio.charset.StandardCharsets;
  * @author TheDerpGamer
  */
 public class CommunityServerList extends JTable {
-	/**
-	 * Copy InputStream to byte array
-	 * <a href="https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java">From</a>
-	 */
-	public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		byte[] buffer = new byte[0xFFFF];
-		for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
-			os.write(buffer, 0, len);
-		}
-		return os.toByteArray();
-	}
-
 	private JSONObject serverList;
 
 	public CommunityServerList(String url) {
@@ -46,7 +33,7 @@ public class CommunityServerList extends JTable {
 			serverList.put("servers", new JSONArray());
 		}
 
-		DefaultTableModel tableModel = new DefaultTableModel(new Object[] {"Name", "Description"}, 0);
+		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Name", "Description"}, 0);
 		setModel(tableModel);
 		setGridColor(Palette.selectedColor);
 		setForeground(Palette.textColor);
@@ -62,7 +49,7 @@ public class CommunityServerList extends JTable {
 					server.getString("description"),
 					server.getString("url")
 			);
-			tableModel.addRow(new Object[] {communityServer.name, communityServer.description});
+			tableModel.addRow(new Object[]{communityServer.name, communityServer.description});
 		}
 
 		addMouseListener(new MouseAdapter() {
@@ -99,5 +86,18 @@ public class CommunityServerList extends JTable {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Copy InputStream to byte array
+	 * <a href="https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java">From</a>
+	 */
+	public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		byte[] buffer = new byte[0xFFFF];
+		for(int len = is.read(buffer); len != -1; len = is.read(buffer)) {
+			os.write(buffer, 0, len);
+		}
+		return os.toByteArray();
 	}
 }

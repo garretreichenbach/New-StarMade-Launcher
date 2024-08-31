@@ -107,7 +107,6 @@ public class FolderZipper {
 	 * @param srcFolder   String, the path of the srcFolder
 	 * @param destZipFile String, the path of the destination zipFile. This file will be
 	 *                    created or erased.
-	 *
 	 * @throws IOException
 	 */
 	public static void zipFolder(String srcFolder, String destZipFile, String startsWithFilter, FileFilter filter) throws IOException {

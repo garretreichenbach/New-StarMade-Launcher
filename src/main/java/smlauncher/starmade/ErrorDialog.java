@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 // TODO seems like duplicate of misc.ErrorDialog
+
 /**
  * Simple dialog for showing error messages.
  *

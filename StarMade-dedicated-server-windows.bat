@@ -1,0 +1,1 @@
+java -jar ./app/StarMade-Launcher.jar -server -port: 4242

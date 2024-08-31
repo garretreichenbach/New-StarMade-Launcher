@@ -23,7 +23,7 @@ public enum GameBranch {
 	}
 
 	public static GameBranch getForIndex(int index) {
-		switch (index) {
+		switch(index) {
 			case 1:
 				return DEV;
 			case 2:

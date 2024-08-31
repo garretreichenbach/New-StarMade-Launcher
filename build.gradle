@@ -35,9 +35,9 @@ dependencies {
 }
 
 var os = System.getProperty('os.name').toLowerCase()
-if(os.contains('win')) {
+if (os.contains('win')) {
 	os = 'windows'
-} else if(os.contains('mac')) {
+} else if (os.contains('mac')) {
 	os = 'macos'
 } else {
 	os = 'linux'
@@ -63,11 +63,11 @@ clean {
 }
 
 jpackage {
-    dependsOn(clean, jar)
-    input  = "./build/libs/"
-    destination = "./release-builds/" + os
-    mainJar = "StarMade-Launcher.jar"
-    mainClass = "smlauncher.StarMadeLauncher"
+	dependsOn(clean, jar)
+	input = "./build/libs/"
+	destination = "./release-builds/" + os
+	mainJar = "StarMade-Launcher.jar"
+	mainClass = "smlauncher.StarMadeLauncher"
 	appName = "StarMade-Launcher"
 	appVersion = project.version.toString()
 	vendor = "smlauncher"
@@ -93,6 +93,24 @@ tasks.register('package') {
 			include '**/*.ico'
 			include '**/*.icns'
 			include '**/*.png'
+		}
+		if (os == 'windows') {
+			copy {
+				from 'StarMade-dedicated-server-windows.bat'
+				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
+		}
+		if (os == 'macos') {
+			copy {
+				from 'StarMade-dedicated-server-macos.command'
+				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
+		}
+		if (os == 'linux') {
+			copy {
+				from 'StarMade-dedicated-server-linux.sh'
+				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
 		}
 	}
 }
