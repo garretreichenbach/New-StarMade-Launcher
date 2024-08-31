@@ -20,8 +20,9 @@ jobs:
       - name: 'Upload Build Artifacts'
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts-${{ matrix.os }}
+          name: build-artifacts
           path: ./release-builds
+
   publish-executables:
     name: 'Publish Executables'
     runs-on: ubuntu-latest
@@ -29,21 +30,11 @@ jobs:
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
-      - name: 'Download Build Artifacts (Linux)'
+      - name: 'Download Build Artifacts'
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts-ubuntu-latest
-          path: ./release-builds/linux
-      - name: 'Download Build Artifacts (Windows)'
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts-windows-latest
-          path: ./release-builds/windows
-      - name: 'Download Build Artifacts (MacOS)'
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts-macos-latest
-          path: ./release-builds/macos
+          name: build-artifacts
+          path: ./release-builds
       - name: 'Set Version Number'
         run: |
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
@@ -59,30 +50,22 @@ jobs:
       - name: 'Create MacOS Archive'
         run: |
           zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
-      - name: 'Publish Linux Executable'
-        id: create-release-linux
-        uses: actions/upload-artifact@v2-preview
+      - name: 'Create Release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: StarMade-Launcher (Linux)
-          path: StarMade-Launcher_Linux.zip
-      - name: 'Publish Windows Executable'
-        id: create-release-windows
-        uses: actions/upload-artifact@v2-preview
-        with:
-          name: StarMade-Launcher (Windows)
-          path: StarMade-Launcher_Windows.zip
-      - name: 'Publish MacOS Executable'
-        id: create-release-macos
-        uses: actions/upload-artifact@v2-preview
-        with:
-          name: StarMade-Launcher (MacOS)
-          path: StarMade-Launcher_MacOS.zip
+          tag_name: v${{ env.VERSION }}
+          release_name: v${{ env.VERSION }}
+          draft: true
+          prerelease: false
       - name: 'Upload Release Asset (Linux)'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create-release-linux.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: StarMade-Launcher_Linux.zip
           asset_name: StarMade Launcher (Linux)
           asset_content_type: application/zip
@@ -91,7 +74,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create-release-windows.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: StarMade-Launcher_Windows.zip
           asset_name: StarMade Launcher (Windows)
           asset_content_type: application/zip
@@ -100,7 +83,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create-release-macos.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: StarMade-Launcher_MacOS.zip
           asset_name: StarMade Launcher (MacOS)
           asset_content_type: application/zip
