@@ -60,19 +60,19 @@ jobs:
         run: |
           zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
       - name: 'Publish Linux Executable'
-        id: publish-linux
+        id: create-release-linux
         uses: actions/upload-artifact@v2-preview
         with:
           name: StarMade-Launcher (Linux)
           path: StarMade-Launcher_Linux.zip
       - name: 'Publish Windows Executable'
-        id: publish-windows
+        id: create-release-windows
         uses: actions/upload-artifact@v2-preview
         with:
           name: StarMade-Launcher (Windows)
           path: StarMade-Launcher_Windows.zip
       - name: 'Publish MacOS Executable'
-        id: publish-macos
+        id: create-release-macos
         uses: actions/upload-artifact@v2-preview
         with:
           name: StarMade-Launcher (MacOS)
@@ -82,7 +82,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.publish-linux.outputs.upload_url }}
+          upload_url: ${{ steps.create-release-linux.outputs.upload_url }}
           asset_path: StarMade-Launcher_Linux.zip
           asset_name: StarMade Launcher (Linux)
           asset_content_type: application/zip
@@ -91,7 +91,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.publish-windows.outputs.upload_url }}
+          upload_url: ${{ steps.create-release-windows.outputs.upload_url }}
           asset_path: StarMade-Launcher_Windows.zip
           asset_name: StarMade Launcher (Windows)
           asset_content_type: application/zip
@@ -100,7 +100,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.publish-macos.outputs.upload_url }}
+          upload_url: ${{ steps.create-release-macos.outputs.upload_url }}
           asset_path: StarMade-Launcher_MacOS.zip
           asset_name: StarMade Launcher (MacOS)
           asset_content_type: application/zip
