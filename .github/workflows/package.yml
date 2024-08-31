@@ -42,13 +42,13 @@ jobs:
           ls -la
       - name: 'Create Linux Archive'
         run: |
-          zip -r StarMade-Launcher_Linux.zip ./release-builds/linux
+          zip -r StarMade_Launcher_Linux.zip ./release-builds/linux
       - name: 'Create Windows Archive'
         run: |
-          zip -r StarMade-Launcher_Windows.zip ./release-builds/windows
+          zip -r StarMade_Launcher_Windows.zip ./release-builds/windows
       - name: 'Create MacOS Archive'
         run: |
-          zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
+          zip -r StarMade_Launcher_MacOS.zip ./release-builds/macos
       - name: 'Create Release'
         id: create_release
         uses: actions/create-release@v1
@@ -65,8 +65,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: StarMade-Launcher_Linux.zip
-          asset_name: StarMade-Launcher-Linux
+          asset_path: StarMade_Launcher_Linux.zip
+          asset_name: StarMade_Launcher_Linux
           asset_content_type: application/zip
       - name: 'Upload Release Asset (Windows)'
         uses: actions/upload-release-asset@v1
@@ -74,8 +74,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: StarMade-Launcher_Windows.zip
-          asset_name: StarMade-Launcher-Windows
+          asset_path: StarMade_Launcher_Windows.zip
+          asset_name: StarMade_Launcher_Windows
           asset_content_type: application/zip
       - name: 'Upload Release Asset (MacOS)'
         uses: actions/upload-release-asset@v1
@@ -83,6 +83,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: StarMade-Launcher_MacOS.zip
-          asset_name: StarMade-Launcher-MacOS
+          asset_path: StarMade_Launcher_MacOS.zip
+          asset_name: StarMade_Launcher_MacOS
           asset_content_type: application/zip
