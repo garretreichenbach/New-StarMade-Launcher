@@ -17,36 +17,6 @@ jobs:
             -   name: 'Build Executable'
                 run: |
                     ./gradlew package
-            -   name: 'Create Windows Archive'
-                if: runner.os == 'windows-latest'
-                run: |
-                    powershell Compress-Archive ./release-builds/windows ./StarMade-Launcher_Windows.zip
-            -   name: 'Create MacOS Archive'
-                if: runner.os == 'macos-latest'
-                run: |
-                    zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
-            -   name: 'Create Linux Archive'
-                if: runner.os == 'ubuntu-latest'
-                run: |
-                    zip -r StarMade-Launcher_Linux.zip ./release-builds/linux
-            -   name: 'Publish Windows Executable'
-                if: runner.os == 'windows-latest'
-                uses: actions/upload-artifact@v2-preview
-                with:
-                    name: StarMade-Launcher (Windows)
-                    path: StarMade-Launcher_Windows.zip
-            -   name: 'Publish MacOS Executable'
-                if: runner.os == 'macos-latest'
-                uses: actions/upload-artifact@v2-preview
-                with:
-                    name: StarMade-Launcher (MacOS)
-                    path: StarMade-Launcher_MacOS.zip
-            -   name: 'Publish Linux Executable'
-                if: runner.os == 'ubuntu-latest'
-                uses: actions/upload-artifact@v2-preview
-                with:
-                    name: StarMade-Launcher (Linux)
-                    path: StarMade-Launcher_Linux.zip
             -   name: 'Set Version Number'
                 run: |
                     echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
@@ -60,6 +30,16 @@ jobs:
                     release_name: ${{ env.VERSION }}
                     draft: true
                     prerelease: false
+            -   name: 'Create Windows Archive'
+                if: runner.os == 'windows-latest'
+                run: |
+                    powershell Compress-Archive ./release-builds/windows ./StarMade-Launcher_Windows.zip
+            -   name: 'Publish Windows Executable'
+                if: runner.os == 'windows-latest'
+                uses: actions/upload-artifact@v2-preview
+                with:
+                    name: StarMade-Launcher (Windows)
+                    path: StarMade-Launcher_Windows.zip
             -   name: 'Upload Release Asset (Windows)'
                 if: runner.os == 'Windows'
                 uses: actions/upload-release-asset@v1
@@ -70,6 +50,16 @@ jobs:
                     asset_path: StarMade-Launcher_Windows.zip
                     asset_name: StarMade Launcher (Windows)
                     asset_content_type: application/zip
+            -   name: 'Create MacOS Archive'
+                if: runner.os == 'macos-latest'
+                run: |
+                    zip -r StarMade-Launcher_MacOS.zip ./release-builds/macos
+            -   name: 'Publish MacOS Executable'
+                if: runner.os == 'macos-latest'
+                uses: actions/upload-artifact@v2-preview
+                with:
+                    name: StarMade-Launcher (MacOS)
+                    path: StarMade-Launcher_MacOS.zip
             -   name: 'Upload Release Asset (MacOS)'
                 if: runner.os == 'macos-latest'
                 uses: actions/upload-release-asset@v1
@@ -80,6 +70,16 @@ jobs:
                     asset_path: StarMade-Launcher_MacOS.zip
                     asset_name: StarMade Launcher (MacOS)
                     asset_content_type: application/zip
+            -   name: 'Create Linux Archive'
+                if: runner.os == 'ubuntu-latest'
+                run: |
+                    zip -r StarMade-Launcher_Linux.zip ./release-builds/linux
+            -   name: 'Publish Linux Executable'
+                if: runner.os == 'ubuntu-latest'
+                uses: actions/upload-artifact@v2-preview
+                with:
+                    name: StarMade-Launcher (Linux)
+                    path: StarMade-Launcher_Linux.zip
             -   name: 'Upload Release Asset (Linux)'
                 if: runner.os == 'ubuntu-latest'
                 uses: actions/upload-release-asset@v1
