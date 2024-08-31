@@ -40,7 +40,7 @@ if(os.contains('win')) {
 } else if(os.contains('mac')) {
 	os = 'macos'
 } else {
-	os = 'ubuntu'
+	os = 'linux'
 }
 
 jar {
