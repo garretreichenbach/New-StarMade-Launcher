@@ -68,12 +68,10 @@ jpackage {
 	destination = "./release-builds/" + os
 	mainJar = "StarMade-Launcher.jar"
 	mainClass = "smlauncher.StarMadeLauncher"
-	appName = "StarMade-Launcher"
-	appVersion = project.version.toString()
+//	appName = "StarMade-Launcher"
+//	appVersion = project.version.toString()
+	appName = "StarMade" //Dumb hack to prevent it from appending the version to the app name
 	appVersion = "Launcher"
-	setAppName("StarMade-Launcher")
-	setLinuxPackageName("StarMade-Launcher")
-	setMacPackageName("StarMade-Launcher")
 	vendor = "smlauncher"
 	copyright = "Copyright (c) 2024 Schine GmbH"
 	runtimeImage = System.getProperty("java.home")
