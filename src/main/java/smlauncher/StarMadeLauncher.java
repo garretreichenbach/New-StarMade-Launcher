@@ -236,6 +236,7 @@ public class StarMadeLauncher extends JFrame {
 		EventQueue.invokeLater(() -> {
 			try {
 				if(OperatingSystem.getCurrent() != OperatingSystem.LINUX) FlatDarkLaf.setup(); //FlatLaf isn't working on Linux right now
+				else UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				if(LauncherUpdaterHelper.checkForUpdate()) {
 					System.err.println("Launcher version doesn't match latest version, so an update must be available.");
 					JDialog updateDialog = createLauncherUpdateDialog();
