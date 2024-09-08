@@ -25,7 +25,7 @@ jobs:
       - name: 'list files'
         if: matrix.os == 'ubuntu-latest'
         run: |
-            ls -l ./release-builds/linux
+            ls -l -R ./release-builds
       - name: 'Move Linux Executable up a Directory'
         if: matrix.os == 'ubuntu-latest'
         run: |
