@@ -22,18 +22,6 @@ jobs:
         with:
           name: build-artifacts
           path: ./release-builds
-      - name: 'list files'
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-            ls -l -R ./release-builds
-      - name: 'Move Linux Executable up a Directory'
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          mv ./release-builds/linux/bin/StarMade-Launcher ./release-builds/linux/StarMade-Launcher
-      - name: 'Remove bin Directory'
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          rm -r ./release-builds/linux/bin
       - name: 'Make Linux File Executable'
         if: matrix.os == 'ubuntu-latest'
         run: |
