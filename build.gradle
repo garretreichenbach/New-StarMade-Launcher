@@ -7,7 +7,7 @@ plugins {
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
-version = '3.1.1'
+version = '3.1.2'
 
 sourceCompatibility = 18
 targetCompatibility = 18
@@ -70,7 +70,7 @@ jpackage {
 	mainClass = "smlauncher.StarMadeLauncher"
 	appName = "StarMade-Launcher"
 	appVersion = project.version.toString()
-	vendor = "smlauncher"
+	vendor = "Schine GmbH"
 	copyright = "Copyright (c) 2024 Schine GmbH"
 	runtimeImage = System.getProperty("java.home")
 	type = "app-image"
@@ -79,7 +79,6 @@ jpackage {
 	}
 	windows {
 		icon = "./src/main/resources/starmade.ico"
-//		winConsole = true
 	}
 	linux {
 		icon = "./src/main/resources/starmade.png"
