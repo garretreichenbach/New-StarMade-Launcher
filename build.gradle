@@ -110,10 +110,6 @@ tasks.register('package') {
 				from 'StarMade-dedicated-server-linux.sh'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
-			copy {
-				from 'StarMade-Launcher.sh'
-				into 'release-builds/' + os + '/StarMade-Launcher/'
-			}
 		}
 	}
 }

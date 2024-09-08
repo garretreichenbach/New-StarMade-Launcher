@@ -22,6 +22,22 @@ jobs:
         with:
           name: build-artifacts
           path: ./release-builds
+      - name: 'Move Linux Executable up a Directory'
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mv ./release-builds/linux/bin/StarMade-Launcher ./release-builds/linux/StarMade-Launcher
+      - name: 'Remove bin Directory'
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          rm -r ./release-builds/linux/bin
+      - name: 'Make Linux File Executable'
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          chmod +x ./release-builds/linux/StarMade-Launcher
+      - name: 'Make MacOS File Executable'
+        if: matrix.os == 'macos-latest'
+        run: |
+          chmod +x ./release-builds/macos/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher
   publish-executables:
     name: 'Publish Executables'
     runs-on: ubuntu-latest
