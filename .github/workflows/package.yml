@@ -45,11 +45,6 @@ jobs:
       - name: 'Set Version Number'
         run: |
           echo "VERSION=$(./gradlew properties -q | grep "version: " | awk '{print $2}')" >> $GITHUB_ENV
-#      - name: 'Remove Version Number from Executable Names'
-#        run: |
-#          mv ./release-builds/linux/StarMade-Launcher-*.app ./release-builds/linux/StarMade-Launcher.dmg
-#          mv ./release-builds/windows/StarMade-Launcher-*.exe ./release-builds/windows/StarMade-Launcher.exe
-#          mv ./release-builds/macos/StarMade-Launcher-*.dmg ./release-builds/macos/StarMade-Launcher.app
       - name: 'Create Linux Archive'
         run: |
           zip -r StarMade-Launcher-Linux.zip ./release-builds/linux
