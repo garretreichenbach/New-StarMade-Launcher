@@ -68,20 +68,17 @@ jpackage {
 	destination = "./release-builds/" + os
 	mainJar = "StarMade-Launcher.jar"
 	mainClass = "smlauncher.StarMadeLauncher"
-//	appName = "StarMade-Launcher"
-//	appVersion = project.version.toString()
-	appName = "StarMade" //Dumb hack to prevent it from appending the version to the app name
-	appVersion = "Launcher"
-	vendor = "smlauncher"
+	appName = "StarMade-Launcher"
+	appVersion = project.version.toString()
+	vendor = "Schine GmbH"
 	copyright = "Copyright (c) 2024 Schine GmbH"
 	runtimeImage = System.getProperty("java.home")
-//	type = "app-image"
+	type = "app-image"
 	mac {
 		icon = "./src/main/resources/starmade.icns"
 	}
 	windows {
 		icon = "./src/main/resources/starmade.ico"
-//		winConsole = true
 	}
 	linux {
 		icon = "./src/main/resources/starmade.png"
