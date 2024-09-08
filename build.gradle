@@ -7,7 +7,7 @@ plugins {
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
-version = '3.1.1'
+version = '3.1.2'
 
 sourceCompatibility = 18
 targetCompatibility = 18
@@ -70,6 +70,10 @@ jpackage {
 	mainClass = "smlauncher.StarMadeLauncher"
 	appName = "StarMade-Launcher"
 	appVersion = project.version.toString()
+	appVersion = "Launcher"
+	setAppName("StarMade-Launcher")
+	setLinuxPackageName("StarMade-Launcher")
+	setMacPackageName("StarMade-Launcher")
 	vendor = "smlauncher"
 	copyright = "Copyright (c) 2024 Schine GmbH"
 	runtimeImage = System.getProperty("java.home")
