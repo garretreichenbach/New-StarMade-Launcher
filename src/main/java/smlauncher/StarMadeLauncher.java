@@ -898,7 +898,7 @@ public class StarMadeLauncher extends JFrame {
 			launchArgs.setWrapStyleWord(true);
 			launchArgs.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			centerPanel.add(launchArgs, BorderLayout.CENTER);
-			JLabel launchArgsLabel = new JLabel("Launch Arguments");
+			JLabel launchArgsLabel = new JLabel("JVM Arguments");
 //			launchArgsLabel.setBackground(Palette.paneColor);
 			launchArgsLabel.setDoubleBuffered(true);
 			launchArgsLabel.setOpaque(true);
@@ -920,7 +920,7 @@ public class StarMadeLauncher extends JFrame {
 			buttonPanel.add(cancelButton);
 			saveButton.addActionListener(e1 -> {
 				LaunchSettings.setMemory(slider.getValue());
-				LaunchSettings.setLaunchArgs(launchArgs.getText());
+				LaunchSettings.setJvmArgs(launchArgs.getText());
 				LaunchSettings.saveSettings();
 				dialog.dispose();
 			});

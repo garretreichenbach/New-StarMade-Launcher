@@ -22,6 +22,9 @@ jobs:
         with:
           name: build-artifacts
           path: ./release-builds
+      - name: 'list files'
+        run: |
+          ls -R ./release-builds
       - name: 'Move Linux Executable up a Directory'
         if: matrix.os == 'ubuntu-latest'
         run: |
