@@ -73,7 +73,7 @@ jpackage {
 	vendor = "smlauncher"
 	copyright = "Copyright (c) 2024 Schine GmbH"
 	runtimeImage = System.getProperty("java.home")
-	type = "app-image"
+//	type = "app-image"
 	mac {
 		icon = "./src/main/resources/starmade.icns"
 	}
