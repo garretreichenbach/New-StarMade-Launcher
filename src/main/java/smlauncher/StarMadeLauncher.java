@@ -20,7 +20,6 @@ import smlauncher.mainui.windowcontrols.WindowDragPanel;
 import smlauncher.news.LauncherNewsPanel;
 import smlauncher.starmade.*;
 import smlauncher.util.OperatingSystem;
-import smlauncher.util.Palette;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -727,101 +725,28 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	private JPanel createVersionSelectPanel(boolean serverMode) {
-		JPanel versionPanel = new JPanel();
-		versionPanel.setDoubleBuffered(true);
-		versionPanel.setOpaque(false);
-		versionPanel.setLayout(new BorderLayout());
+		return new VersionSelectPanel(
+				serverMode, lastUsedBranch, versionRegistry
+		) {
+			@Override
+			public void onSelectBranch(int branchIndex) {
+				//Update UI components
+				updatePlayPanelButtons(playPanel, false);
 
-		JPanel versionSubPanel = new JPanel();
-		versionSubPanel.setDoubleBuffered(true);
-		versionSubPanel.setOpaque(false);
-		versionSubPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		versionPanel.add(versionSubPanel, BorderLayout.SOUTH);
-
-		//Change color of arrow
-		UIDefaults defaults = new UIDefaults();
-		defaults.put("ComboBox:\"ComboBox.arrowButton\"[Enabled].backgroundPainter", Palette.buttonColor);
-
-		//Branch dropdown
-		JComboBox<String> branchDropdown = createBranchDropdown(lastUsedBranch.index, defaults);
-		versionSubPanel.add(branchDropdown);
-
-		//Version dropdown
-		JComboBox<String> versionDropdown = new DropdownMenu(defaults);
-		versionSubPanel.add(versionDropdown);
-
-		branchDropdown.addItemListener(e -> onSelectBranch(branchDropdown, versionDropdown));
-
-		versionDropdown.addItemListener(e -> onSelectVersion(versionDropdown));
-		setDropdownVersionsList(versionDropdown, lastUsedBranch, versionRegistry);
-		selectLastUsedVersion(versionDropdown);
-
-		//Port field
-		if(serverMode) {
-			if(portField == null) portField = new PortField("4242");
-			else portField.setVisible(true);
-			versionSubPanel.add(portField);
-		} else {
-			if(portField != null) {
-				portField.setVisible(false);
-				versionSubPanel.remove(portField);
+				//Change settings
+				setBranch(GameBranch.getForIndex(branchIndex));
+				LaunchSettings.saveSettings();
 			}
-		}
-		return versionPanel;
-	}
 
-	private JComboBox<String> createBranchDropdown(int startIndex, UIDefaults defaults) {
-		JComboBox<String> branchDropdown = new DropdownMenu(defaults);
-		branchDropdown.addItem("Release");
-		branchDropdown.addItem("Dev");
-		branchDropdown.addItem("Pre-Release");
-		branchDropdown.setSelectedIndex(startIndex);
-		return branchDropdown;
-	}
-
-	private void onSelectBranch(JComboBox<String> branchDropdown, JComboBox<String> versionDropdown) {
-		//Change settings
-		int branchIndex = branchDropdown.getSelectedIndex();
-		setBranch(GameBranch.getForIndex(branchIndex));
-		LaunchSettings.saveSettings();
-
-		//Update UI components
-		GameBranch branch = GameBranch.getForIndex(branchDropdown.getSelectedIndex());
-		setDropdownVersionsList(versionDropdown, branch, versionRegistry);
-		updatePlayPanelButtons(playPanel, false);
-	}
-
-	private void onSelectVersion(JComboBox<String> versionDropdown) {
-		if(versionDropdown.getSelectedIndex() == -1) return;
-		selectedVersion = versionDropdown.getItemAt(versionDropdown.getSelectedIndex()).split(" ")[0];
-		LaunchSettings.setLastUsedVersion(selectedVersion);
-		LaunchSettings.saveSettings();
-		if(playPanel != null) updatePlayPanelButtons(playPanel, false);
-	}
-
-	// TODO maybe save and don't re-add every time
-	private static void setDropdownVersionsList(JComboBox<String> versionDropdown, GameBranch branch, VersionRegistry versionRegistry) {
-		List<IndexFileEntry> versions = versionRegistry.getVersions(branch);
-		if(versions == null) return;
-
-		// Add versions to dropdown
-		versionDropdown.removeAllItems();
-		for(IndexFileEntry version : versions) {
-			if(version.equals(versions.get(0))) versionDropdown.addItem(version.version + " (Latest)");
-			else versionDropdown.addItem(version.version);
-		}
-	}
-
-	private static void selectLastUsedVersion(JComboBox<String> versionDropdown) {
-		String lastUsedVersion = LaunchSettings.getLastUsedVersion();
-		if(lastUsedVersion.isEmpty()) lastUsedVersion = "NONE";
-		//Select last used version in dropdown if it exists
-		for(int i = 0; i < versionDropdown.getItemCount(); i++) {
-			if(versionDropdown.getItemAt(i).equals(lastUsedVersion)) {
-				versionDropdown.setSelectedIndex(i);
-				break;
+			@Override
+			public void onSelectVersion(String version) {
+				// Change settings
+				selectedVersion = version;
+				LaunchSettings.setLastUsedVersion(selectedVersion);
+				LaunchSettings.saveSettings();
+				if(playPanel != null) updatePlayPanelButtons(playPanel, false);
 			}
-		}
+		};
 	}
 
 }
