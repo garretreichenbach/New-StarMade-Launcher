@@ -16,6 +16,8 @@ public class ChecksumFile {
 	int toExecute;
 	private int failed;
 
+	public static final boolean PRINT_DOWNLOAD_MILESTONES = true;
+
 	public void parse(BufferedReader in) throws IOException {
 		String line;
 
@@ -101,12 +103,19 @@ public class ChecksumFile {
 			cb.update("Nothing to download");
 			return;
 		}
-		o.startTime = System.currentTimeMillis();
 
+		o.startTime = System.currentTimeMillis();
 		ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
 		toExecute = checksumsToDownload.size();
 		failed = 0;
 		running.clear();
+		printUpdaterMessage("[UPDATER] Starting download");
+
+		// Periodically give updates
+		float percentUpdate = 0.1f;
+		int thresholdIncreaseAmount = (int) (percentUpdate * checksumsToDownload.size());
+		int nextThreshold = 0;
+
 		for(int i = 0; i < checksumsToDownload.size(); i++) {
 			ChecksumFileEntry e = checksumsToDownload.get(i);
 			e.index = i;
@@ -132,6 +141,13 @@ public class ChecksumFile {
 				}
 				toExecute--;
 			});
+
+			if (i == nextThreshold) {
+				int percent = (int) (100f * i / checksumsToDownload.size());
+				printUpdaterMessage("[UPDATER] Downloaded %d/%d files (%d%%)\n"
+						.formatted(i, checksumsToDownload.size(), percent));
+				nextThreshold += thresholdIncreaseAmount;
+			}
 		}
 
 		while(toExecute > 0) {
@@ -145,6 +161,13 @@ public class ChecksumFile {
 			throw new IOException("Download failed on " + failed + " file" + (failed > 1 ? "s" : "") + "\nplease redownload forced from the options");
 		}
 		pool.shutdown();
+		printUpdaterMessage("Downloaded all files");
+	}
+
+	private static void printUpdaterMessage(String message) {
+		if (PRINT_DOWNLOAD_MILESTONES) {
+			System.err.println("[UPDATER] " + message);
+		}
 	}
 
 }
