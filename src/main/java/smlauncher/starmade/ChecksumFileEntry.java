@@ -11,8 +11,6 @@ public class ChecksumFileEntry {
 	public final String relativePath;
 	protected int index;
 
-	public static final boolean PRINT_DOWNLOAD_LOGS = false;
-
 	public ChecksumFileEntry(long size, String checksum, String relativePath) {
 		this.size = size;
 		this.checksum = checksum;
@@ -155,7 +153,7 @@ public class ChecksumFileEntry {
 	}
 
 	private static void printUpdaterMessage(String message) {
-		if (PRINT_DOWNLOAD_LOGS) {
+		if (GameUpdater.PRINT_ALL_DOWNLOADS) {
 			System.err.println("[UPDATER] " + message);
 		}
 	}

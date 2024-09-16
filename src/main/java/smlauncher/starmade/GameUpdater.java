@@ -28,6 +28,9 @@ public class GameUpdater extends Observable {
 	public static String LAUNCHER_VERSION_SITE = "http://files.star-made.org/version";
 	public static String MIRROR_SITE = "http://files.star-made.org/mirrors";
 
+	public static final boolean PRINT_ALL_DOWNLOADS = false;
+	public static final boolean PRINT_DOWNLOAD_MILESTONES = true;
+
 	public final ArrayList<IndexFileEntry> versions = new ArrayList<>();
 	private final ArrayList<String> mirrorURLs = new ArrayList<>();
 	private final StarMadeBackupTool backup = new StarMadeBackupTool();

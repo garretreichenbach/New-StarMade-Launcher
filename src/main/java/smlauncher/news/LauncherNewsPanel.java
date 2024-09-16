@@ -18,6 +18,8 @@ import java.util.ArrayList;
  */
 public class LauncherNewsPanel extends JPanel {
 
+	public static final boolean PRINT_HTML_MESSAGES = false;
+
 	public LauncherNewsPanel() {
 		super(true);
 		setBackground(Palette.paneColor);
@@ -41,8 +43,15 @@ public class LauncherNewsPanel extends JPanel {
 			lines.add("<p><a href=\"" + post.getUrl() + "\">Posted on " + ldt.toString() + " by " + post.getAuthor() + "</a></p>");
 			lines = BBCodeToHTMLConverter.insertColors(lines, "#eeeeee");
 			lines.add("<hr>");
-			for(String line : lines) sb.append(line);
+
+			for(String line : lines) {
+				sb.append(line);
+				if (PRINT_HTML_MESSAGES) {
+					System.out.println(line);
+				}
+			}
 		}
+
 		htmlPanel.setText(sb.toString());
 		add(htmlPanel, BorderLayout.CENTER);
 		revalidate();

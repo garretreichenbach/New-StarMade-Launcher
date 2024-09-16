@@ -16,8 +16,6 @@ public class ChecksumFile {
 	int toExecute;
 	private int failed;
 
-	public static final boolean PRINT_DOWNLOAD_MILESTONES = true;
-
 	public void parse(BufferedReader in) throws IOException {
 		String line;
 
@@ -165,7 +163,7 @@ public class ChecksumFile {
 	}
 
 	private static void printUpdaterMessage(String message) {
-		if (PRINT_DOWNLOAD_MILESTONES) {
+		if (GameUpdater.PRINT_DOWNLOAD_MILESTONES) {
 			System.err.println("[UPDATER] " + message);
 		}
 	}
