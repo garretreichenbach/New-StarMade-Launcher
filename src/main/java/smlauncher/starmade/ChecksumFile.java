@@ -95,7 +95,7 @@ public class ChecksumFile {
 		float p = 1.0f / checksums.size();
 		float g = 0;
 		for(ChecksumFileEntry e : checksums) {
-			if(force || e.needsDownload(buildPath, installDirStr)) {
+			if(force || e.needsDownload(installDirStr)) {
 				checksumsToDownload.add(e);
 				o.totalSize += e.size;
 			}
@@ -132,7 +132,7 @@ public class ChecksumFile {
 				try {
 					o.index = e.index;
 					o.total = checksumsToDownload.size();
-					e.download(force, buildPath, installDir, installDirStr, cb, o);
+					e.download(force, buildPath, installDirStr, cb, o);
 				} catch(Exception e1) {
 					e1.printStackTrace();
 					failed++;
@@ -169,7 +169,7 @@ public class ChecksumFile {
 
 	private static void printUpdaterMessage(String message) {
 		if (GameUpdater.PRINT_DOWNLOAD_MILESTONES) {
-			System.err.println("[UPDATER] " + message);
+			System.out.println("[UPDATER] " + message);
 		}
 	}
 

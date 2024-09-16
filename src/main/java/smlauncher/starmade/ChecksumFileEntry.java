@@ -30,7 +30,7 @@ public class ChecksumFileEntry {
 
 		printUpdaterMessage("Downloading " + sourceFilePath + " -> " + dst.getAbsolutePath());
 
-		boolean replace = needsDownload(buildPath, installDirStr) || force;
+		boolean replace = needsDownload(installDirStr) || force;
 		if(dst.exists() && replace) {
 			if(!dst.delete()) {
 				throw new IOException("File " + dst.getAbsolutePath() + " could not be removed! Is it still in use?");
@@ -158,7 +158,7 @@ public class ChecksumFileEntry {
 
 	private static void printUpdaterMessage(String message) {
 		if (GameUpdater.PRINT_ALL_DOWNLOADS) {
-			System.err.println("[UPDATER] " + message);
+			System.out.println("[UPDATER] " + message);
 		}
 	}
 

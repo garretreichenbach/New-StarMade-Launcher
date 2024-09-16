@@ -1,10 +1,15 @@
 plugins {
-	id "java"
-	id "application"
-	id "org.panteleyev.jpackageplugin" version "1.6.0"
-	id 'com.github.johnrengelman.shadow' version "8.1.1"
+	id 'java'
+	id 'application'
+	id 'org.panteleyev.jpackageplugin' version '1.6.0'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(18)
+    }
+}
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
 version = '3.1.2'
@@ -48,6 +53,8 @@ if (os.contains('win')) {
 } else {
 	os = 'linux'
 }
+
+// Tasks
 
 test {
     useJUnitPlatform()
