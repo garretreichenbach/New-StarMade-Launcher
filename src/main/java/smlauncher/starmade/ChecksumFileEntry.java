@@ -11,28 +11,29 @@ public class ChecksumFileEntry {
 	public final String relativePath;
 	protected int index;
 
+	public static final boolean PRINT_DOWNLOAD_LOGS = false;
+
 	public ChecksumFileEntry(long size, String checksum, String relativePath) {
 		this.size = size;
 		this.checksum = checksum;
 		this.relativePath = relativePath.replaceFirst("\\.", "");
 	}
 
-	public boolean needsDownload(String buildPath, String installDirStr) throws NoSuchAlgorithmException, IOException {
+	public boolean needsDownload(String buildPath, String installDirStr) throws IOException {
 		String sourceFilePath = buildPath + relativePath;
-
 		File dst = new File(installDirStr, relativePath);
 
-		boolean replace = false;
+		boolean replace;
 		if(dst.exists()) {
 			String localChecksum = FileUtil.getSha1Checksum(dst.getAbsolutePath());
 			replace = !localChecksum.equals(checksum);
 			if(replace) {
-				System.err.println("[UPDATER] Checksum Differs for " + relativePath + ": " + localChecksum + " :: " + checksum);
+				printUpdaterMessage("[UPDATER] Checksum differs for " + relativePath + ": " + localChecksum + " :: " + checksum);
 			} else {
-				System.err.println("[UPDATER] Not downloading " + relativePath + ": remote file same as local");
+				printUpdaterMessage("[UPDATER] Not downloading " + relativePath + ": remote file same as local");
 			}
 		} else {
-			System.err.println("[UPDATER] Does Not Exist " + dst.getAbsolutePath() + ": Downloading");
+			printUpdaterMessage("[UPDATER] Does not exist " + dst.getAbsolutePath() + ": Downloading");
 			replace = true;
 		}
 		return replace;
@@ -41,13 +42,11 @@ public class ChecksumFileEntry {
 	public void download(boolean force, String buildPath, File installDir, String installDirStr, FileDowloadCallback cb, FileUpdateTotal o) throws NoSuchAlgorithmException, IOException {
 		String sourceFilePath = buildPath + relativePath;
 		File dst = new File(installDirStr, relativePath);
-
 //		File dst = destFilePath;//new File(destFilePath);
 
-		System.err.println("Downloading " + sourceFilePath + " -> " + dst.getAbsolutePath());
+		printUpdaterMessage("Downloading " + sourceFilePath + " -> " + dst.getAbsolutePath());
 
 		boolean replace = needsDownload(buildPath, installDirStr) || force;
-
 		if(dst.exists() && replace) {
 			if(!dst.delete()) {
 				throw new IOException("File " + dst.getAbsolutePath() + " could not be removed! Is it still in use?");
@@ -80,14 +79,12 @@ public class ChecksumFileEntry {
 					if(s == index) {
 						cb.done(e);
 					} else {
-
 //						System.err.println(s+" INDNN "+index+": "+ChecksumFile.running);
 					}
 				}
 
 				@Override
 				public void downloaded(long size, long diff) {
-
 					o.lastSpeedSize += diff;
 
 					o.currentSize += diff;
@@ -155,6 +152,12 @@ public class ChecksumFileEntry {
 	public String toString() {
 		return "ChecksumFileEntry [size=" + size + ", checksum=" + checksum
 				+ ", relativePath=" + relativePath + ", index " + index + "]";
+	}
+
+	private static void printUpdaterMessage(String message) {
+		if (PRINT_DOWNLOAD_LOGS) {
+			System.err.println("[UPDATER] " + message);
+		}
 	}
 
 }

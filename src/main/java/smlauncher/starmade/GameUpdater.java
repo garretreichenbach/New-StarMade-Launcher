@@ -27,6 +27,7 @@ public class GameUpdater extends Observable {
 	public static String FILES_URL = "http://files.star-made.org/";
 	public static String LAUNCHER_VERSION_SITE = "http://files.star-made.org/version";
 	public static String MIRROR_SITE = "http://files.star-made.org/mirrors";
+
 	public final ArrayList<IndexFileEntry> versions = new ArrayList<>();
 	private final ArrayList<String> mirrorURLs = new ArrayList<>();
 	private final StarMadeBackupTool backup = new StarMadeBackupTool();
@@ -116,24 +117,11 @@ public class GameUpdater extends Observable {
 	}
 
 	private static String getJavaExec() {
-		if(smlauncher.util.OperatingSystem.getCurrent() == smlauncher.util.OperatingSystem.WINDOWS) {
+		if(OperatingSystem.getCurrent() == OperatingSystem.WINDOWS) {
 			return "javaw";
 		} else {
 			return "java";
 		}
-	}
-
-	public static ChecksumFile getChecksums(String relPath) throws IOException {
-		URL urlVersion = new URL(relPath + "/checksums");
-		URLConnection openConnection = urlVersion.openConnection();
-		openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + StarMadeLauncher.LAUNCHER_VERSION);
-		openConnection.setConnectTimeout(10000);
-		openConnection.setReadTimeout(10000);
-		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
-		ChecksumFile f = new ChecksumFile();
-		f.parse(in);
-		in.close();
-		return f;
 	}
 
 	@Override
@@ -469,6 +457,19 @@ public class GameUpdater extends Observable {
 		in.close();
 		e.text = b.toString();
 		return e;
+	}
+
+	public static ChecksumFile getChecksums(String relPath) throws IOException {
+		URL urlVersion = new URL(relPath + "/checksums");
+		URLConnection openConnection = urlVersion.openConnection();
+		openConnection.setRequestProperty("User-Agent", "StarMade-Updater_" + StarMadeLauncher.LAUNCHER_VERSION);
+		openConnection.setConnectTimeout(10000);
+		openConnection.setReadTimeout(10000);
+		BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8));
+		ChecksumFile f = new ChecksumFile();
+		f.parse(in);
+		in.close();
+		return f;
 	}
 
 }

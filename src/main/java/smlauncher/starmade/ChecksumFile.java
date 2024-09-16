@@ -83,9 +83,7 @@ public class ChecksumFile {
 	}
 
 	public void download(boolean force, String buildPath, File installDir, String installDirStr, FileDowloadCallback cb) throws NoSuchAlgorithmException, IOException {
-
-		ArrayList<ChecksumFileEntry> checksumsToDownload = new ArrayList<ChecksumFileEntry>();
-
+		ArrayList<ChecksumFileEntry> checksumsToDownload = new ArrayList<>();
 		cb.update("Determining files to download... ");
 
 		FileUpdateTotal o = new FileUpdateTotal();
@@ -111,7 +109,6 @@ public class ChecksumFile {
 		running.clear();
 		for(int i = 0; i < checksumsToDownload.size(); i++) {
 			ChecksumFileEntry e = checksumsToDownload.get(i);
-
 			e.index = i;
 
 			synchronized(running) {
@@ -119,28 +116,22 @@ public class ChecksumFile {
 //				System.err.println("STARTED: "+e+"; "+running);
 				assert (add);
 			}
-			pool.execute(new Runnable() {
-
-				@Override
-				public void run() {
-
-					try {
-						o.index = e.index;
-						o.total = checksumsToDownload.size();
-						e.download(force, buildPath, installDir, installDirStr, cb, o);
-					} catch(Exception e1) {
-						e1.printStackTrace();
-						failed++;
-					}
-					synchronized(running) {
-						boolean remove = running.remove(e);
-//						System.err.println("FINISHED: "+e);
-						assert (remove);
-					}
-					toExecute--;
+			pool.execute(() -> {
+				try {
+					o.index = e.index;
+					o.total = checksumsToDownload.size();
+					e.download(force, buildPath, installDir, installDirStr, cb, o);
+				} catch(Exception e1) {
+					e1.printStackTrace();
+					failed++;
 				}
+				synchronized(running) {
+					boolean remove = running.remove(e);
+//						System.err.println("FINISHED: "+e);
+					assert (remove);
+				}
+				toExecute--;
 			});
-
 		}
 
 		while(toExecute > 0) {
