@@ -17,7 +17,7 @@ java {
 
 application {
 	mainClassName = 'smlauncher.StarMadeLauncher'
-	mainModule = 'smlauncher'
+//	mainModule = 'smlauncher'
 }
 
 repositories {

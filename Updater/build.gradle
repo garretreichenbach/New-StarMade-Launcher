@@ -3,11 +3,14 @@ plugins {
     id "application"
 }
 
-targetCompatibility = 11
-sourceCompatibility = 11
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
 
 group = 'smlauncher.updater'
-mainClassName = 'smlauncher.StarMadeLauncher'
+mainClassName = 'smlauncher.updater.LauncherUpdater'
 
 repositories {
     mavenCentral()
@@ -15,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'commons-io:commons-io:2.16.1'
 }
 
 jar {
