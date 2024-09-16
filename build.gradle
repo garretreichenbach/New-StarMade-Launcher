@@ -2,7 +2,7 @@ plugins {
 	id "java"
 	id "application"
 	id "org.panteleyev.jpackageplugin" version "1.6.0"
-	id 'com.github.johnrengelman.shadow' version '7.0.0'
+	id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
 
 group 'smlauncher'
@@ -26,11 +26,11 @@ repositories {
 
 dependencies {
 	implementation 'org.codehaus.plexus:plexus-archiver:4.10.0'
-	implementation 'commons-io:commons-io:2.11.0'
-	implementation 'org.json:json:20231013'
-	implementation 'it.unimi.dsi:fastutil:8.5.12'
+	implementation 'commons-io:commons-io:2.16.1'
+	implementation 'org.json:json:20240303'
+	implementation 'it.unimi.dsi:fastutil:8.5.14'
 	implementation 'org.jasypt:jasypt:1.9.3'
-	implementation 'com.formdev:flatlaf:3.0'
+	implementation 'com.formdev:flatlaf:3.5.1'
 	implementation 'org.panteleyev:jpackage-gradle-plugin:1.6.0'
 }
 
