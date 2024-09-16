@@ -107,6 +107,10 @@ tasks.register('package') {
 				from 'StarMade-dedicated-server-macos.command'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
+			copy {
+				from 'release-builds/' + os + '/StarMade-Launcher.app'
+				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
 		}
 		if (os == 'linux') {
 			copy {

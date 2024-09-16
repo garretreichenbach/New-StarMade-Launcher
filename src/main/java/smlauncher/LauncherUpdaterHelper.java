@@ -92,7 +92,7 @@ public class LauncherUpdaterHelper {
 		String s = "StarMade-Launcher-";
 		OperatingSystem currentOS = OperatingSystem.getCurrent();
 		if(currentOS == OperatingSystem.WINDOWS) s += "Windows.zip";
-		else if(currentOS == OperatingSystem.MAC) s += "Mac.zip";
+		else if(currentOS == OperatingSystem.MAC) s += "MacOS.zip";
 		else s += "Linux.zip";
 		return s;
 	}
