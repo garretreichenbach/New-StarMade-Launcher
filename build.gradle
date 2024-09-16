@@ -9,8 +9,11 @@ group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
 version = '3.1.2'
 
-sourceCompatibility = 18
-targetCompatibility = 18
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(18)
+	}
+}
 
 application {
 	mainClassName = 'smlauncher.StarMadeLauncher'
@@ -25,12 +28,12 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.codehaus.plexus:plexus-archiver:4.10.0'
-	implementation 'commons-io:commons-io:2.16.1'
-	implementation 'org.json:json:20240303'
-	implementation 'it.unimi.dsi:fastutil:8.5.14'
-	implementation 'org.jasypt:jasypt:1.9.3'
 	implementation 'com.formdev:flatlaf:3.5.1'
+	implementation 'commons-io:commons-io:2.16.1'
+	implementation 'it.unimi.dsi:fastutil:8.5.14'
+	implementation 'org.codehaus.plexus:plexus-archiver:4.10.0'
+	implementation 'org.jasypt:jasypt:1.9.3'
+	implementation 'org.json:json:20240303'
 	implementation 'org.panteleyev:jpackage-gradle-plugin:1.6.0'
 }
 
