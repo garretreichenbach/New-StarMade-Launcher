@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -43,25 +44,30 @@ import java.util.Objects;
 public class StarMadeLauncher extends JFrame {
 
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.0.15";
+	public static final String LAUNCHER_VERSION = "3.1.2";
 	private static final String[] J18ARGS = {"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED", "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED", "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED", "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED", "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED", "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED", "--add-opens=java.base/java.io=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"};
 	private static IndexFileEntry gameVersion;
 	private static GameBranch lastUsedBranch = GameBranch.RELEASE;
 	private static boolean debugMode;
-	private static boolean useSteam;
 	private static String selectedVersion;
 	private static boolean serverMode;
 	private static int port;
-	private final OperatingSystem currentOS;
+	private static OperatingSystem currentOS;
 	private final VersionRegistry versionRegistry;
 	private final DownloadStatus dlStatus = new DownloadStatus();
 	private GameUpdaterThread updaterThread;
 	private JButton updateButton;
-	private JTextField portField;
+	private static JTextField portField;
+	private JPanel mainPanel;
+	private JPanel centerPanel;
+	private JPanel footerPanel;
 	private JPanel versionPanel;
 	private JPanel playPanel;
 	private JPanel serverPanel;
 	private JPanel playPanelButtons;
+	private JScrollPane centerScrollPane;
+	private LauncherNewsPanel newsPanel;
+	private LauncherCommunityPanel communityPanel;
 
 	public StarMadeLauncher() {
 		// Set window properties
@@ -111,6 +117,7 @@ public class StarMadeLauncher extends JFrame {
 			downloadJRE(JavaVersion.JAVA_18);
 		} catch(Exception exception) {
 			System.out.println("Could not download JREs");
+			exception.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -130,52 +137,103 @@ public class StarMadeLauncher extends JFrame {
 		boolean headless = false;
 		int backupMode = GameUpdater.BACK_DB;
 		boolean selectVersion = false;
+		boolean autoUpdate = true;
 
 		if(args == null || args.length == 0) startup();
 		else {
 			GameBranch buildBranch = GameBranch.RELEASE;
-			for(String arg : args) {
-				arg = arg.toLowerCase();
-				if(arg.equals("-debug_mode")) debugMode = true;
-				if(arg.contains("-version")) {
-					selectVersion = true;
-					if(arg.contains("-dev")) buildBranch = GameBranch.DEV;
-					else if(arg.contains("-pre")) buildBranch = GameBranch.PRE;
-					else buildBranch = GameBranch.RELEASE;
-				} else if("-no_gui".equals(arg) || "-nogui".equals(arg)) {
-					if(GraphicsEnvironment.isHeadless()) {
-						displayHelp();
-						System.out.println("Please use the '-nogui' parameter to run the launcher in text mode!");
-						return;
-					} else headless = true;
+			List<String> argList = new ArrayList<>(Arrays.asList(args));
+			if(argList.contains("-debug_mode")) debugMode = true;
+			if(argList.contains("-no_update")) autoUpdate = false;
+			if(argList.contains("-version")) {
+				selectVersion = true;
+				if(argList.contains("-dev")) buildBranch = GameBranch.DEV;
+				else if(argList.contains("-pre")) buildBranch = GameBranch.PRE;
+				else buildBranch = GameBranch.RELEASE;
+			} else if(argList.contains("-no_gui") || argList.contains("-nogui")) {
+				displayHelp();
+				headless = true;
+			} else if(argList.contains("-backup")) {
+				backupMode = GameUpdater.BACK_ALL;
+			} else if(argList.contains("-no_backup")) {
+				backupMode = GameUpdater.BACK_NONE;
+			} else if(argList.contains("-help")) {
+				displayHelp();
+				return;
+			} else if(argList.contains("-headless")) {
+				headless = true;
+			} else if(argList.contains("-server")) {
+				boolean hasPort = false;
+				if(argList.contains("-port:")) {
+					try {
+						port = Integer.parseInt(argList.get(argList.indexOf("-port:") + 1).trim());
+						hasPort = true;
+					} catch(NumberFormatException ignored) {}
 				}
-				if(headless) {
-					switch (arg) {
-						case "-h":
-						case "-help":
-							displayHelp();
-							return;
-						case "-backup":
-						case "-backup_all":
-							backupMode = GameUpdater.BACK_ALL;
-							break;
-						case "-no_backup":
-							backupMode = GameUpdater.BACK_NONE;
-							break;
-						case "-server":
-							serverMode = true;
-							break;
-					}
-					if(arg.startsWith("-port:")) {
-						try {
-							port = Integer.parseInt(arg.substring(6));
-						} catch(NumberFormatException ignored) {
-						}
-					}
-					GameUpdater.withoutGUI((args.length > 1 && "-force".equals(args[1])), LaunchSettings.getInstallDir(), buildBranch, backupMode, selectVersion);
-				} else startup();
-				startup();
+				if(!hasPort) {
+					displayHelp();
+					System.out.println("Please specify a port for the server to run on");
+					return;
+				}
+				headless = true;
+				serverMode = true;
 			}
+			LaunchSettings.readSettings();
+			if(autoUpdate) {
+				if(headless) GameUpdater.withoutGUI(true, LaunchSettings.getInstallDir(), buildBranch, backupMode, selectVersion);
+				else LauncherUpdaterHelper.checkForUpdate();
+			}
+
+			if(headless) {
+				System.out.println("Running in headless mode");
+				JavaVersion javaVersion = JavaVersion.JAVA_8;
+				gameVersion = new VersionRegistry().getLatestVersion(buildBranch);
+				if(gameVersion == null) {
+					System.err.println("Could not get latest game version, defaulting to Java 8");
+					//Get last used version from config
+					try {
+						gameVersion = new VersionRegistry().getLatestVersion(GameBranch.values()[LaunchSettings.getLastUsedBranch()]);
+					} catch(Exception e) {
+						e.printStackTrace();
+						gameVersion = new VersionRegistry().getLatestVersion(GameBranch.RELEASE);
+					}
+					setGameVersion(gameVersion);
+				} else if(!gameVersion.version.startsWith("0.2") && !gameVersion.version.startsWith("0.1")) javaVersion = JavaVersion.JAVA_18;
+				setGameVersion(gameVersion);
+				System.out.println("Using game version " + gameVersion.version + " on branch " + gameVersion.branch + " with Java " + javaVersion);
+				if(serverMode) startServerHeadless();
+				else startGameHeadless();
+			} else startup();
+		}
+	}
+
+	private static void startGameHeadless() {
+		ArrayList<String> commandComponents = getCommandComponents(false);
+		ProcessBuilder process = new ProcessBuilder(commandComponents);
+		process.directory(new File(LaunchSettings.getInstallDir()));
+		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+		process.redirectError(ProcessBuilder.Redirect.INHERIT);
+		try {
+			System.out.println("Command: " + String.join(" ", commandComponents));
+			process.start();
+			System.exit(0);
+		} catch(Exception exception) {
+			throw new RuntimeException(exception);
+		}
+	}
+
+	private static void startServerHeadless() {
+		ArrayList<String> commandComponents = getCommandComponents(true);
+		ProcessBuilder process = new ProcessBuilder(commandComponents);
+		process.directory(new File(LaunchSettings.getInstallDir()));
+		process.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+		process.redirectError(ProcessBuilder.Redirect.INHERIT);
+		try {
+			System.out.println("Command: " + String.join(" ", commandComponents));
+			process.start();
+			System.exit(0);
+		} catch(Exception exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 
@@ -233,7 +291,7 @@ public class StarMadeLauncher extends JFrame {
 		System.out.println("-backup_all : Create backup of everything (default backup is server database only)");
 		System.out.println("-pre : Use pre branch (default is release)");
 		System.out.println("-dev : Use dev branch (default is release)");
-		System.out.println("-server -port:<port> : Start in server mode");
+		System.out.println("-server -port: <port> : Start in server mode");
 	}
 
 	private void runStarMade(boolean server) {
@@ -252,7 +310,7 @@ public class StarMadeLauncher extends JFrame {
 		}
 	}
 
-	public ArrayList<String> getCommandComponents(boolean server) {
+	public static ArrayList<String> getCommandComponents(boolean server) {
 		boolean useJava8 = gameVersion.version.startsWith("0.2") || gameVersion.version.startsWith("0.1");
 		String bundledJavaPath = new File(useJava8 ? getJavaPath(JavaVersion.JAVA_8) : getJavaPath(JavaVersion.JAVA_18)).getAbsolutePath();
 
@@ -393,11 +451,35 @@ public class StarMadeLauncher extends JFrame {
 
 	private void downloadJRE(JavaVersion version) throws Exception {
 		if(new File(getJavaPath(version)).exists()) {
-			System.out.println("JRE " + version + " already downloaded");
+			System.out.println(version + " already downloaded");
 			return;
 		}
-		System.out.println("Downloading JRE " + version);
-		(new JavaDownloader(version)).downloadAndUnzip();
+		System.out.println("Downloading " + version + "...");
+		JavaDownloader downloader = new JavaDownloader(version);
+		JDialog dialog = new JDialog();
+		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		dialog.setModal(true);
+		dialog.setResizable(false);
+		dialog.setTitle("Performing First Time Setup");
+		dialog.setSize(500, 100);
+		dialog.setLocationRelativeTo(null);
+		dialog.setLayout(new BorderLayout());
+		dialog.setAlwaysOnTop(true);
+
+		JPanel dialogPanel = new JPanel();
+		dialogPanel.setDoubleBuffered(true);
+		dialogPanel.setOpaque(true);
+		dialogPanel.setLayout(new BorderLayout());
+		dialog.add(dialogPanel);
+
+		JLabel downloadLabel = new JLabel("Downloading " + version + "...");
+		downloadLabel.setDoubleBuffered(true);
+		downloadLabel.setOpaque(true);
+		downloadLabel.setFont(new Font("Roboto", Font.BOLD, 16));
+		downloadLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		dialogPanel.add(downloadLabel, BorderLayout.CENTER);
+
+		downloader.downloadAndUnzip(dialog);
 	}
 
 	private IndexFileEntry getLastUsedVersion() {
@@ -420,7 +502,7 @@ public class StarMadeLauncher extends JFrame {
 		return versionRegistry.getLatestVersion(GameBranch.RELEASE);
 	}
 
-	private String getJavaPath(JavaVersion version) {
+	private static String getJavaPath(JavaVersion version) {
 		return LaunchSettings.getInstallDir() + "/" + String.format(currentOS.javaPath, version.number);
 	}
 

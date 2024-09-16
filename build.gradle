@@ -1,125 +1,130 @@
 plugins {
-    id "java"
-    id "application"
-    id "com.github.johnrengelman.shadow" version "7.1.0"
-    id 'maven-publish'
+	id "java"
+	id "application"
+	id "org.panteleyev.jpackageplugin" version "1.6.0"
+	id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
-
-targetCompatibility = 8
-sourceCompatibility = 8
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
+version = '3.1.2'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(18)
+	}
+}
+
+application {
+	mainClassName = 'smlauncher.StarMadeLauncher'
+//	mainModule = 'smlauncher'
+}
 
 repositories {
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
+	maven { url "https://plugins.gradle.org/m2/" }
+	gradlePluginPortal()
 }
 
 dependencies {
-    implementation 'com.formdev:flatlaf:3.4.1'
-    implementation 'commons-io:commons-io:2.16.1'
-    implementation 'org.codehaus.plexus:plexus-archiver:4.9.2'
-    implementation 'org.jasypt:jasypt:1.9.3'
-    implementation 'org.json:json:20231013'
-    implementation 'it.unimi.dsi:fastutil:8.5.13'
+	implementation 'com.formdev:flatlaf:3.5.1'
+	implementation 'commons-io:commons-io:2.16.1'
+	implementation 'it.unimi.dsi:fastutil:8.5.14'
+	implementation 'org.codehaus.plexus:plexus-archiver:4.10.0'
+	implementation 'org.jasypt:jasypt:1.9.3'
+	implementation 'org.json:json:20240303'
+	implementation 'org.panteleyev:jpackage-gradle-plugin:1.6.0'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
 }
 
-/*
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            name = "StarMade Launcher Repository"
-            url = uri("") //Todo: Add repo url
-        }
-    }
+var os = System.getProperty('os.name').toLowerCase()
+if (os.contains('win')) {
+	os = 'windows'
+} else if (os.contains('mac')) {
+	os = 'macos'
+} else {
+	os = 'linux'
 }
- */
-
-// Tasks
 
 test {
     useJUnitPlatform()
 }
 
 wrapper {
-    gradleVersion = "8.7"
+    gradleVersion = "8.10.1"
     distributionType = Wrapper.DistributionType.BIN
 }
 
-tasks.register('all_jar', Jar) {
-    dependsOn('win_jar')
-    dependsOn('linux_jar')
-    dependsOn('mac_jar')
+jar {
+	manifest {
+		attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
+	}
+	from {
+		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+	archiveFileName = 'StarMade-Launcher.jar'
+	from(sourceSets.main.output)
+	from('resources/Updater.jar') {
+		into 'Updater.jar'
+	}
 }
 
-tasks.register('win_jar', Jar) {
-    manifest {
-        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
-    }
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./release-builds/StarMade Launcher-win32-ia32"))
-
-    setArchivesBaseName("starmade-launcher")
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    from(sourceSets.main.output)
-    from('resources/Updater.jar') {
-        into 'Updater.jar'
-    }
-    copy {
-        from('release-assets/windows/')
-        into 'release-builds/StarMade Launcher-win32-ia32'
-    }
+clean {
+	delete 'release-builds'
 }
 
-tasks.register('linux_jar', Jar) {
-    manifest {
-        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
-    }
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./release-builds/StarMade Launcher-linux-x64"))
-
-    setArchivesBaseName("starmade-launcher")
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    from(sourceSets.main.output)
-    from('resources/Updater.jar') {
-        into 'Updater.jar'
-    }
-    copy {
-        from('release-assets/linux/')
-        into 'release-builds/StarMade Launcher-linux-x64'
-    }
+jpackage {
+	dependsOn(clean, jar)
+	input = "./build/libs/"
+	destination = "./release-builds/" + os
+	mainJar = "StarMade-Launcher.jar"
+	mainClass = "smlauncher.StarMadeLauncher"
+	appName = "StarMade-Launcher"
+	appVersion = project.version.toString()
+	vendor = "Schine GmbH"
+	copyright = "Copyright (c) 2024 Schine GmbH"
+	runtimeImage = System.getProperty("java.home")
+	type = "app-image"
+	mac {
+		icon = "./src/main/resources/starmade.icns"
+	}
+	windows {
+		icon = "./src/main/resources/starmade.ico"
+	}
+	linux {
+		icon = "./src/main/resources/starmade.png"
+	}
 }
 
-tasks.register('mac_jar', Jar) {
-    manifest {
-        attributes 'Main-Class': 'smlauncher.StarMadeLauncher'
-    }
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    destinationDirectory.set(file("./release-builds/StarMade Launcher-darwin-x64"))
-
-    setArchivesBaseName("starmade-launcher")
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    from(sourceSets.main.output)
-    from('resources/Updater.jar') {
-        into 'Updater.jar'
-    }
-    copy {
-        from('release-assets/macos/')
-        into 'release-builds/StarMade Launcher-darwin-x64'
-    }
+tasks.register('package') {
+	dependsOn(jpackage)
+	doLast {
+		delete fileTree('release-builds/' + os).matching {
+			include '**/*.ico'
+			include '**/*.icns'
+			include '**/*.png'
+		}
+		if (os == 'windows') {
+			copy {
+				from 'StarMade-dedicated-server-windows.bat'
+				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
+		}
+		if (os == 'macos') {
+			copy {
+				from 'StarMade-dedicated-server-macos.command'
+				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
+		}
+		if (os == 'linux') {
+			copy {
+				from 'StarMade-dedicated-server-linux.sh'
+				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
+		}
+	}
 }

@@ -26,16 +26,17 @@ public class ChecksumFileEntry {
 	public void download(boolean force, String buildPath, String installDirStr, FileDownloadCallback cb, FileUpdateTotal o) throws NoSuchAlgorithmException, IOException {
 		String sourceFilePath = buildPath + relativePath;
 		File dst = new File(installDirStr, relativePath);
+//		File dst = destFilePath;//new File(destFilePath);
 
-		printUpdaterMessage(String.format("Downloading %s -> %s", sourceFilePath, dst.getAbsolutePath()));
-		boolean replace = needsDownload(installDirStr) || force;
+		printUpdaterMessage("Downloading " + sourceFilePath + " -> " + dst.getAbsolutePath());
 
-		if (dst.exists() && replace) {
-			if (!dst.delete()) {
+		boolean replace = needsDownload(buildPath, installDirStr) || force;
+		if(dst.exists() && replace) {
+			if(!dst.delete()) {
 				throw new IOException("File " + dst.getAbsolutePath() + " could not be removed! Is it still in use?");
 			}
 		}
-		if (!dst.getParentFile().exists()) {
+		if(!dst.getParentFile().exists()) {
 			System.err.println("Creating path: " + dst.getParentFile().getAbsolutePath());
 		}
 
@@ -46,7 +47,7 @@ public class ChecksumFileEntry {
 		File file = new File(dst.getAbsolutePath() + ".filepart");
 		//remove file part
 		file.delete();
-//		final long[] update = new long[2];
+		// final long[] update = new long[2];
 		FileDownloadUpdate e = new FileDownloadUpdate();
 		try {
 			FileUtil.copyURLToFile(FileUtil.convertToURLEscapingIllegalCharacters(sourceFilePath), file, 50000, 50000, new DownloadCallback() {
@@ -54,22 +55,20 @@ public class ChecksumFileEntry {
 				@Override
 				public void doneDownloading() {
 					int s = Integer.MAX_VALUE;
-					synchronized (ChecksumFile.running) {
-						for (ChecksumFileEntry en : ChecksumFile.running) {
+					synchronized(ChecksumFile.running) {
+						for(ChecksumFileEntry en : ChecksumFile.running) {
 							s = Math.min(en.index, s);
 						}
 					}
-					if (s == index) {
+					if(s == index) {
 						cb.done(e);
 					} else {
-
 //						System.err.println(s+" INDNN "+index+": "+ChecksumFile.running);
 					}
 				}
 
 				@Override
 				public void downloaded(long size, long diff) {
-
 					o.lastSpeedSize += diff;
 
 					o.currentSize += diff;
@@ -82,7 +81,7 @@ public class ChecksumFileEntry {
 					e.currentSize = o.currentSize;
 
 					long diffTime = System.currentTimeMillis() - o.startTime;
-					if (diffTime / 200 > 1) {
+					if(diffTime / 200 > 1) {
 						double secs = diffTime / 200.0d;
 
 						o.downloadSpeed = o.lastSpeedSize / secs;
@@ -93,12 +92,12 @@ public class ChecksumFileEntry {
 					e.downloadSpeed = o.downloadSpeed;
 
 					int s = Integer.MAX_VALUE;
-					synchronized (ChecksumFile.running) {
-						for (ChecksumFileEntry en : ChecksumFile.running) {
+					synchronized(ChecksumFile.running) {
+						for(ChecksumFileEntry en : ChecksumFile.running) {
 							s = Math.min(en.index, s);
 						}
 					}
-					if (s == index) {
+					if(s == index) {
 //						System.err.println("INDNN "+index+": "+ChecksumFile.running);
 						cb.update(e);
 					} else {
@@ -108,7 +107,7 @@ public class ChecksumFileEntry {
 			}, "dev", "dev", true);
 
 			file.renameTo(dst);
-		} catch (URISyntaxException e1) {
+		} catch(URISyntaxException e1) {
 			e1.printStackTrace();
 			throw new IOException(e1);
 		}
@@ -158,7 +157,7 @@ public class ChecksumFileEntry {
 	}
 
 	private static void printUpdaterMessage(String message) {
-		if (GameUpdater.PRINT_DOWNLOAD_LOGS) {
+		if (GameUpdater.PRINT_ALL_DOWNLOADS) {
 			System.err.println("[UPDATER] " + message);
 		}
 	}

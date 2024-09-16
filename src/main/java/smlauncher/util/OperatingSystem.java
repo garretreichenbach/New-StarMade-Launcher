@@ -20,11 +20,10 @@ public enum OperatingSystem {
 
 	// Instance
 	private static OperatingSystem currentOS;
-
-	// Fields
-	private final String[] names; // Names used by Java
 	public final String zipExtension; // The archive file extension
 	public final String javaPath; // Path to the java executable
+	// Fields
+	private final String[] names; // Names used by Java
 //	private String serial;
 
 	OperatingSystem(String[] names, String zipExtension, String javaPath) {
@@ -39,12 +38,12 @@ public enum OperatingSystem {
 	 * @return the current OS
 	 */
 	public static OperatingSystem getCurrent() {
-		if (currentOS != null) return currentOS;
+		if(currentOS != null) return currentOS;
 
 		String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-		for (OperatingSystem os : OperatingSystem.values()) {
-			for (String name : os.names) {
-				if (osName.contains(name)) {
+		for(OperatingSystem os : values()) {
+			for(String name : os.names) {
+				if(osName.contains(name)) {
 					// do some stuff with serial
 //					os.serial = "not retrieved";
 //					System.err.println("READ SERIAL for " + os.name() + ": " + os.serial);
@@ -72,10 +71,10 @@ public enum OperatingSystem {
 		String homeDir = System.getProperty("user.home", ".");
 		File appDir;
 
-		switch (getCurrent()) {
+		switch(getCurrent()) {
 			case WINDOWS:
 				String appDataDir = System.getenv("APPDATA");
-				if (appDataDir != null) appDir = new File(appDataDir, "." + appName + '/');
+				if(appDataDir != null) appDir = new File(appDataDir, "." + appName + '/');
 				else appDir = new File(homeDir, '.' + appName + '/');
 				break;
 			case MAC:
@@ -90,9 +89,9 @@ public enum OperatingSystem {
 				break;
 		}
 
-		if (!appDir.exists() && !appDir.mkdirs()) {
+		if(!appDir.exists() && !appDir.mkdirs()) {
 			throw new IOException("Error: Failed to create working directory: " + appDir);
-		} else if (!appDir.isDirectory()) {
+		} else if(!appDir.isDirectory()) {
 			throw new IOException("Error: File is not a directory: " + appDir);
 		} else {
 			return appDir;

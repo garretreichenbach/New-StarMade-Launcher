@@ -13,6 +13,13 @@ public class DownloadStatus {
 
 	// Setter Methods
 
+	private static String formatBytes(long bytes) {
+		if(bytes < 1024) return bytes + " B";
+		else if(bytes < 1024 * 1024) return bytes / 1024 + " KB";
+		else if(bytes < 1024 * 1024 * 1024) return bytes / (1024 * 1024) + " MB";
+		else return bytes / (1024 * 1024 * 1024) + " GB";
+	}
+
 	public void setInstallProgress(float installProgress) {
 		this.installProgress = installProgress;
 	}
@@ -29,17 +36,10 @@ public class DownloadStatus {
 		this.totalMb = totalMb;
 	}
 
-	public void setSpeedMb(long speedMb) {
-		this.speedMb = speedMb;
-	}
-
 	// To String Methods
 
-	private static String formatBytes(long bytes) {
-		if (bytes < 1024) return bytes + " B";
-		else if (bytes < 1024 * 1024) return bytes / 1024 + " KB";
-		else if (bytes < 1024 * 1024 * 1024) return bytes / (1024 * 1024) + " MB";
-		else return bytes / (1024 * 1024 * 1024) + " GB";
+	public void setSpeedMb(long speedMb) {
+		this.speedMb = speedMb;
 	}
 
 	@Override

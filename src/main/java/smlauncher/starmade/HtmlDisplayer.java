@@ -14,13 +14,13 @@ import javax.swing.text.html.StyleSheet;
  */
 public class HtmlDisplayer extends JEditorPane {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
 	 *
 	 */
-	
+
 	private final HTMLEditorKit kit;
 
 	public HtmlDisplayer() {

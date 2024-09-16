@@ -1,14 +1,16 @@
 plugins {
     id 'java'
     id "application"
-    id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
-targetCompatibility = 8
-sourceCompatibility = 8
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
 
 group = 'smlauncher.updater'
-mainClassName = 'smlauncher.StarMadeLauncher'
+mainClassName = 'smlauncher.updater.LauncherUpdater'
 
 repositories {
     mavenCentral()
@@ -16,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'commons-io:commons-io:2.16.1'
 }
 
 jar {

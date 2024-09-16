@@ -13,13 +13,15 @@ import java.io.IOException;
  */
 public final class LaunchSettings {
 
+	// TODO store more properties
+
 	private static final String SETTINGS_FILENAME = "launch-settings.json";
 	private static JSONObject launchSettings;
 
-	static {
-		// Make sure this isn't null on startup
-		launchSettings = getDefaultLaunchSettings();
-	}
+//	static {
+//		// Make sure this isn't null on startup
+//		launchSettings = getDefaultLaunchSettings();
+//	}
 
 	private LaunchSettings() {
 	}
@@ -31,14 +33,14 @@ public final class LaunchSettings {
 		JSONObject defaultSettings = getDefaultLaunchSettings();
 
 		// Create file if not present
-		if (!jsonFile.exists()) {
+		if(!jsonFile.exists()) {
 			launchSettings = defaultSettings;
 			saveSettings();
 		} else {
 			// Read the settings file
 			try {
-				LaunchSettings.launchSettings = new JSONObject(TextFileUtil.readText(jsonFile));
-			} catch (IOException e) {
+				launchSettings = new JSONObject(TextFileUtil.readText(jsonFile));
+			} catch(IOException e) {
 				System.out.println("Could not read launch settings from file");
 			}
 		}
@@ -48,7 +50,7 @@ public final class LaunchSettings {
 		File settingsFile = new File(SETTINGS_FILENAME);
 		try {
 			TextFileUtil.writeText(settingsFile, launchSettings.toString());
-		} catch (IOException exception) {
+		} catch(IOException exception) {
 			System.out.println("Could not save launch settings to file");
 		}
 	}

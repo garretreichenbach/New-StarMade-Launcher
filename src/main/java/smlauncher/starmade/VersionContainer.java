@@ -33,7 +33,7 @@ public class VersionContainer {
 			VERSION = new Version(0, 0, 0);
 			build = "undefined";
 			if(f.exists()) {
-				BufferedReader b = new BufferedReader(new FileReader(f));
+				BufferedReader b = new BufferedReader(new FileReader(f, StandardCharsets.UTF_8));
 
 				VERSION = Version.parseFrom(b.readLine());
 				build = "latest";
@@ -42,7 +42,7 @@ public class VersionContainer {
 			} else {
 				f = new File(installDir + versionFile);
 				if(f.exists()) {
-					BufferedReader b = new BufferedReader(new FileReader(f));
+					BufferedReader b = new BufferedReader(new FileReader(f, StandardCharsets.UTF_8));
 					String[] st = b.readLine().split("#");
 					VERSION = Version.parseFrom(st[0].trim());
 					build = st[1].trim();
@@ -67,7 +67,6 @@ public class VersionContainer {
 
 	/**
 	 * @param version
-	 *
 	 * @return 1 if provided version is bigger, -1 if provided version is smaller, 0 if equal to current version
 	 */
 	public static int compareVersion(Version version) {

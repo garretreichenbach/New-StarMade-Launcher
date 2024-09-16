@@ -54,7 +54,7 @@ public class LauncherCommunityPanel extends ScrollablePanel {
 		});
 		mainDiscordButton.setIcon(ImageFileUtil.getIcon("sprites/icon.png", 32, 32));
 		mainDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, mainDiscordButton.getMinimumSize().height));
-		mainDiscordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		mainDiscordButton.setAlignmentX(CENTER_ALIGNMENT);
 		mainDiscordButton.setBackground(Palette.buttonColor);
 		mainDiscordPanel.add(mainDiscordButton);
 		mainDiscordPanel.add(Box.createRigidArea(new Dimension(4, 0)));
@@ -79,7 +79,7 @@ public class LauncherCommunityPanel extends ScrollablePanel {
 		});
 		starLoaderDiscordButton.setIcon(ImageFileUtil.getIcon("sprites/starloader.png", 32, 32));
 		starLoaderDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, starLoaderDiscordButton.getMinimumSize().height));
-		starLoaderDiscordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		starLoaderDiscordButton.setAlignmentX(CENTER_ALIGNMENT);
 		starLoaderDiscordButton.setBackground(Palette.buttonColor);
 		mainDiscordPanel.add(starLoaderDiscordButton);
 		add(mainDiscordPanel);
@@ -93,7 +93,7 @@ public class LauncherCommunityPanel extends ScrollablePanel {
 		CommunityServerList communityServerList = new CommunityServerList(COMMUNITY_SERVER_JSON_URL);
 		communityServerList.setBackground(Palette.paneColor);
 		communityServerList.setOpaque(true);
-		communityServerList.setAlignmentX(Component.CENTER_ALIGNMENT);
+		communityServerList.setAlignmentX(CENTER_ALIGNMENT);
 		communityServerPanel.add(communityServerList);
 		add(communityServerPanel);
 	}

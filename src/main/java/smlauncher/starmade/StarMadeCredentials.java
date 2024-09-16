@@ -35,7 +35,7 @@ public class StarMadeCredentials {
 		String passwd;
 		String user;
 
-		try(BufferedReader r = new BufferedReader(new FileReader(new File(getPath(), "cred")))) {
+		try(BufferedReader r = new BufferedReader(new FileReader(new File(getPath(), "cred"), StandardCharsets.UTF_8))) {
 			user = r.readLine();
 			String encryptedPasswd = r.readLine();
 			BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
@@ -69,7 +69,7 @@ public class StarMadeCredentials {
 		File starmadeFile = new File(starMadePath);
 		String[] command = null;
 		//-XX:+ShowMessageBoxOnError
-		command = new String[] {getJavaExec(), "-jar", starmadeFile.getAbsolutePath()};
+		command = new String[]{getJavaExec(), "-jar", starmadeFile.getAbsolutePath()};
 
 		ProcessBuilder pb = new ProcessBuilder(command);
 		Map<String, String> env = pb.environment();
@@ -117,7 +117,7 @@ public class StarMadeCredentials {
 		String mac = getMac();
 		textEncryptor.setPassword(mac);
 		String encryptedPasswd = textEncryptor.encrypt(passwd);
-		FileWriter fw = new FileWriter(new File(getPath(), "cred"));
+		FileWriter fw = new FileWriter(new File(getPath(), "cred"), StandardCharsets.UTF_8);
 		BufferedWriter bfw = new BufferedWriter(fw);
 		bfw.append(user);
 		bfw.newLine();

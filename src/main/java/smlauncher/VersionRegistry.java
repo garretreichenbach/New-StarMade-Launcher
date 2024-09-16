@@ -23,7 +23,7 @@ public class VersionRegistry {
 	private final Map<GameBranch, List<IndexFileEntry>> branchVersions;
 
 	public VersionRegistry() {
-		this.branchVersions = new HashMap<>();
+		branchVersions = new HashMap<>();
 	}
 
 	// Read Version Method
@@ -34,8 +34,8 @@ public class VersionRegistry {
 	 * @throws IOException if the URL of versions cannot be read.
 	 */
 	public void createRegistry() throws IOException {
-		for (GameBranch branch : GameBranch.values()) {
-			if (branch == GameBranch.ARCHIVE) continue; // don't run archive versions
+		for(GameBranch branch : GameBranch.values()) {
+			if(branch == GameBranch.ARCHIVE) continue; // don't run archive versions
 
 			List<IndexFileEntry> versions = readVersions(branch);
 			branchVersions.put(branch, versions);
@@ -52,21 +52,21 @@ public class VersionRegistry {
 
 		// Read all versions
 		List<IndexFileEntry> versions = new ArrayList<>();
-		try (BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8))) {
+		try(BufferedReader in = new BufferedReader(new InputStreamReader(new BufferedInputStream(openConnection.getInputStream()), StandardCharsets.UTF_8))) {
 			String line;
-			while ((line = in.readLine()) != null) {
+			while((line = in.readLine()) != null) {
 				IndexFileEntry entry = IndexFileEntry.create(line, branch);
 				versions.add(entry);
 			}
 			// Sort versions from old to recent
 			versions.sort(Collections.reverseOrder());
-		} catch (Exception e) {
+		} catch(Exception e) {
 			System.out.println("Could not read versions list");
 			throw new IOException(e);
 		}
 		openConnection.getInputStream().close();
 
-		if (branch == GameBranch.DEV) { // Remove old dev versions
+		if(branch == GameBranch.DEV) { // Remove old dev versions
 			versions.removeIf(v -> v.build.startsWith("2017"));
 		}
 		return versions;
@@ -81,9 +81,9 @@ public class VersionRegistry {
 	 * @return the version, or null if not found
 	 */
 	public IndexFileEntry searchForVersion(Predicate<IndexFileEntry> query) {
-		for (List<IndexFileEntry> list : branchVersions.values()) {
-			for (IndexFileEntry entry : list) {
-				if (query.test(entry)) return entry;
+		for(List<IndexFileEntry> list : branchVersions.values()) {
+			for(IndexFileEntry entry : list) {
+				if(query.test(entry)) return entry;
 			}
 		}
 		return null;
@@ -98,9 +98,9 @@ public class VersionRegistry {
 	 */
 	public IndexFileEntry searchForVersion(GameBranch branch, Predicate<IndexFileEntry> query) {
 		List<IndexFileEntry> versions = branchVersions.get(branch);
-		if (versions == null) return null;
-		for (IndexFileEntry entry : versions) {
-			if (query.test(entry)) return entry;
+		if(versions == null) return null;
+		for(IndexFileEntry entry : versions) {
+			if(query.test(entry)) return entry;
 		}
 		return null;
 	}
@@ -132,7 +132,7 @@ public class VersionRegistry {
 	 */
 	public IndexFileEntry getLatestVersion(GameBranch branch) {
 		List<IndexFileEntry> versions = branchVersions.get(branch);
-		if (versions != null) return versions.get(0);
+		if(versions != null) return versions.get(0);
 		return null;
 	}
 

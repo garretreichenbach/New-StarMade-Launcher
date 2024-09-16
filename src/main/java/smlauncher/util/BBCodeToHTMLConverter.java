@@ -1,5 +1,7 @@
 package smlauncher.util;
 
+import smlauncher.news.LauncherNewsPanel;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +19,6 @@ public class BBCodeToHTMLConverter {
 			line = line.replace("<*>", "<li>");
 
 			output.add(line);
-			System.out.println(line);
 		}
 		return output;
 	}
@@ -48,7 +49,7 @@ public class BBCodeToHTMLConverter {
 	public static String insertString(String originalString, String stringToBeInserted, int index) {
 
 		// Create a new string
-		String newString = new String();
+		String newString = "";
 
 		for(int i = 0; i < originalString.length(); i++) {
 

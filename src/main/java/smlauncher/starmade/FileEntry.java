@@ -4,12 +4,10 @@ import java.io.IOException;
 
 public class FileEntry implements Comparable<FileEntry> {
 
+	private final String checksum;
 	String name;
 	long size;
-
 	private String version;
-
-	private final String checksum;
 
 	public FileEntry(String name, long size, String checksum) {
 		this.name = name;
@@ -45,7 +43,7 @@ public class FileEntry implements Comparable<FileEntry> {
 		System.err.println("star-made.org: " + checksum);
 		System.err.println("downloaded file: " + sha1Checksum);
 
-		if (!checksum.equals(sha1Checksum)) {
+		if(!checksum.equals(sha1Checksum)) {
 			throw new CheckSumFailedException("The downloaded mirror file didn't match the checksum give from star-made.org. The file might be modified!");
 		}
 

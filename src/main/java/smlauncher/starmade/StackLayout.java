@@ -20,19 +20,14 @@
  */
 package smlauncher.starmade;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.LayoutManager2;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <p><code>StackLayout</code> is a Swing layout aimed to act as the layers
+ * <p>{@code StackLayout} is a Swing layout aimed to act as the layers
  * stack of most popuplar graphics editing tools like <i>The GIMP</i> or
- * <i>Photoshop</i>. While similar to <code>CardLayout</code>, this layout
+ * <i>Photoshop</i>. While similar to {@code CardLayout}, this layout
  * displays all the components of the container. If you are using non-rectangular
  * components (i.e. transparent) you will see them from top to bottom of the
  * stack.</p>
@@ -49,31 +44,32 @@ import java.util.List;
  * the container itself. The minimum, maximum and preferred size of the
  * container are based upon the largest minimum, maximum and preferred size of
  * the children components.</p>
- * <p><code>StackLayout</code> works only with JSE 1.5 and Java SE 6 and
+ * <p>{@code StackLayout} works only with JSE 1.5 and Java SE 6 and
  * greater.</p>
  *
  * @author Romain Guy <romain.guy@mac.com>
  */
 
 public class StackLayout implements LayoutManager2 {
-	/** Use this constraint to add a component at the bottom of the stack. */
+	/**
+	 * Use this constraint to add a component at the bottom of the stack.
+	 */
 	public static final String BOTTOM = "bottom";
-	/** Use this contrainst to add a component at the top of the stack. */
+	/**
+	 * Use this contrainst to add a component at the top of the stack.
+	 */
 	public static final String TOP = "top";
 
 	// removing components does not happen often compared to adding components
 	// hence we choose a linked list to make insertion at the bottom faster
-	private List<Component> components = new LinkedList<Component>();
+	private final List<Component> components = new LinkedList<Component>();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addLayoutComponent(final Component comp,
-	                               final Object constraints) {
-		synchronized (comp.getTreeLock()) {
-			if (BOTTOM.equals(constraints)) {
+	public void addLayoutComponent(Component comp,
+	                               Object constraints) {
+		synchronized(comp.getTreeLock()) {
+			if(BOTTOM.equals(constraints)) {
 				components.add(0, comp);
-			} else if (TOP.equals(constraints)) {
+			} else if(TOP.equals(constraints)) {
 				components.add(comp);
 			} else {
 				components.add(comp);
@@ -81,51 +77,33 @@ public class StackLayout implements LayoutManager2 {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addLayoutComponent(final String name, final Component comp) {
+	public void addLayoutComponent(String name, Component comp) {
 		addLayoutComponent(comp, TOP);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void removeLayoutComponent(final Component comp) {
-		synchronized (comp.getTreeLock()) {
+	public void removeLayoutComponent(Component comp) {
+		synchronized(comp.getTreeLock()) {
 			components.remove(comp);
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public float getLayoutAlignmentX(final Container target) {
+	public float getLayoutAlignmentX(Container target) {
 		return 0.5f;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public float getLayoutAlignmentY(final Container target) {
+	public float getLayoutAlignmentY(Container target) {
 		return 0.5f;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void invalidateLayout(final Container target) {
+	public void invalidateLayout(Container target) {
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Dimension preferredLayoutSize(final Container parent) {
-		synchronized (parent.getTreeLock()) {
+	public Dimension preferredLayoutSize(Container parent) {
+		synchronized(parent.getTreeLock()) {
 			int width = 0;
 			int height = 0;
 
-			for (Component comp: components) {
+			for(Component comp : components) {
 				Dimension size = comp.getPreferredSize();
 				width = Math.max(size.width, width);
 				height = Math.max(size.height, height);
@@ -139,15 +117,12 @@ public class StackLayout implements LayoutManager2 {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Dimension minimumLayoutSize(final Container parent) {
-		synchronized (parent.getTreeLock()) {
+	public Dimension minimumLayoutSize(Container parent) {
+		synchronized(parent.getTreeLock()) {
 			int width = 0;
 			int height = 0;
 
-			for (Component comp: components) {
+			for(Component comp : components) {
 				Dimension size = comp.getMinimumSize();
 				width = Math.max(size.width, width);
 				height = Math.max(size.height, height);
@@ -161,19 +136,13 @@ public class StackLayout implements LayoutManager2 {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Dimension maximumLayoutSize(final Container target) {
+	public Dimension maximumLayoutSize(Container target) {
 		return new Dimension(Integer.MAX_VALUE,
 				Integer.MAX_VALUE);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void layoutContainer(final Container parent) {
-		synchronized (parent.getTreeLock()) {
+	public void layoutContainer(Container parent) {
+		synchronized(parent.getTreeLock()) {
 			int width = parent.getWidth();
 			int height = parent.getHeight();
 
@@ -181,7 +150,7 @@ public class StackLayout implements LayoutManager2 {
 
 			int componentsCount = components.size();
 
-			for (int i = 0; i < componentsCount; i++) {
+			for(int i = 0; i < componentsCount; i++) {
 				Component comp = components.get(i);
 				comp.setBounds(bounds);
 				parent.setComponentZOrder(comp, componentsCount - i - 1);

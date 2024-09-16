@@ -1,6 +1,5 @@
 package smlauncher;
 
-
 import smlauncher.starmade.*;
 
 import java.io.File;
@@ -36,33 +35,32 @@ public class GameUpdaterThread extends Thread {
 
 			// Back up the database
 			boolean dbOnly = backupMode == BACKUP_MODE_DATABASE;
-			if (backupMode != BACKUP_MODE_NONE && installDir.exists()) {
-				(new StarMadeBackupTool())
-						.backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
+			if(backupMode != BACKUP_MODE_NONE && installDir.exists()) {
+				(new StarMadeBackupTool()).backUp(installDir.getPath(), "server-database", String.valueOf(System.currentTimeMillis()), ".zip", false, dbOnly, null);
 			}
 
 			// Get checksums
 			String buildDir = GameUpdater.FILES_URL + version.path; // build dir is same as path
 			ChecksumFile checksums = GameUpdater.getChecksums(buildDir);
 
-			if (!installDir.exists()) installDir.mkdirs();
+			if(!installDir.exists()) installDir.mkdirs();
 			float finalSize = checksums.checksums.size();
-			if (finalSize == 0) {
+			if(finalSize == 0) {
 				onFinished();
 				return;
 			}
 			checksums.download(false, buildDir, installDir.getPath(), new FileDownloadCallback() {
 				@Override
 				public void update(FileDownloadUpdate u) {
-					if (u.total == 0) {
+					if(u.total == 0) {
 						onFinished();
 						return;
 					}
 					float progress = (float) u.currentSize / u.totalSize;
-					if (progress < 0) progress = (float) u.total / u.index; //Somehow its negative sometimes
+					if(progress < 0) progress = (float) u.total / u.index; //Somehow its negative sometimes
 					onProgress(progress, u.fileName, u.downloaded, u.totalSize, (long) u.downloadSpeed);
 //					System.out.println(u.index + " " + u.total + " " + u.currentSize + " " + u.totalSize);
-					if (u.index >= u.total - 1 && u.currentSize >= u.totalSize) {
+					if(u.index >= u.total - 1 && u.currentSize >= u.totalSize) {
 						updating = false;
 //						onFinished();
 					}
@@ -70,23 +68,23 @@ public class GameUpdaterThread extends Thread {
 
 				@Override
 				public void update(String u) {
-					if (u.contains("Nothing to download")) onFinished();
+					if(u.contains("Nothing to download")) onFinished();
 				}
 
 				@Override
 				public void done(FileDownloadUpdate u) {
-					if (u.index == 0 || u.total == 0) return;//idk
-					if (u.index >= u.total - 1) {
+					if(u.index == 0 || u.total == 0) return;//idk
+					if(u.index >= u.total - 1) {
 						updating = false;
 						onFinished();
 					}
 				}
 			});
 			//onFinished();
-		} catch (IOException exception) {
+		} catch(IOException exception) {
 			System.out.println("Could not download file checksums");
 			onError(exception);
-		} catch (NoSuchAlgorithmException exception) {
+		} catch(NoSuchAlgorithmException exception) {
 			throw new RuntimeException(exception);
 		}
 	}
