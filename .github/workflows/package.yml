@@ -34,10 +34,6 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           codesign --force --deep --sign - ./release-builds/macos/StarMade-Launcher.app
-      - name: 'Set Extra MacOS Attributes'
-        if: matrix.os == 'macos-latest'
-        run: |
-          xattr -cr ./release-builds/macos/StarMade-Launcher.app
   publish-executables:
     name: 'Publish Executables'
     runs-on: ubuntu-latest
