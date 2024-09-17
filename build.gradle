@@ -103,12 +103,9 @@ tasks.register('package') {
 			}
 		}
 		if (os == 'macos') {
+			ant.move(file: 'release-builds/' + os + '/StarMade-Launcher.app', toFile: 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app')
 			copy {
 				from 'StarMade-dedicated-server-macos.command'
-				into 'release-builds/' + os + '/StarMade-Launcher/'
-			}
-			copy {
-				from 'release-builds/' + os + '/StarMade-Launcher.app'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
 		}
