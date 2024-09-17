@@ -49,7 +49,7 @@ public class CommunityServerList extends JTable {
 					server.getString("description"),
 					server.getString("url")
 			);
-			tableModel.addRow(new Object[]{communityServer.name, communityServer.description});
+			tableModel.addRow(new Object[]{communityServer.name(), communityServer.description()});
 		}
 
 		addMouseListener(new MouseAdapter() {
