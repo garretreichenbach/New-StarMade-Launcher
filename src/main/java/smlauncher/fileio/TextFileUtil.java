@@ -19,6 +19,13 @@ public final class TextFileUtil {
 	private TextFileUtil() {
 	}
 
+	/**
+	 * Read a single string from a text file
+	 *
+	 * @param file the text file
+	 * @return the string
+	 * @throws IOException if the file is not found
+	 */
 	public static String readText(File file) throws IOException {
 		try(FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
 			return IOUtils.toString(reader);
@@ -27,6 +34,13 @@ public final class TextFileUtil {
 		}
 	}
 
+	/**
+	 * Read an array of strings from a text file
+	 *
+	 * @param file the text file
+	 * @return the lines
+	 * @throws IOException if the file is not found
+	 */
 	public static List<String> readLines(File file) throws IOException {
 		try(FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
 			return IOUtils.readLines(reader);
@@ -35,6 +49,13 @@ public final class TextFileUtil {
 		}
 	}
 
+	/**
+	 * Write a single string to a text file and override its contents.
+	 *
+	 * @param file the text file
+	 * @param text the string
+	 * @throws IOException if the file cannot be written to
+	 */
 	public static void writeText(File file, String text) throws IOException {
 		try(FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
 			IOUtils.write(text, writer);
@@ -44,6 +65,13 @@ public final class TextFileUtil {
 		}
 	}
 
+	/**
+	 * Write an array of strings to a text file and override its contents.
+	 *
+	 * @param file  the text file
+	 * @param lines the lines
+	 * @throws IOException if the file cannot be written to
+	 */
 	public static void writeLines(File file, List<String> lines) throws IOException {
 		try(FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
 			IOUtils.writeLines(lines, "\n", writer);

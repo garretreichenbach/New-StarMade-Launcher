@@ -133,6 +133,8 @@ public class JavaDownloader {
 	}
 
 	void cleanupFolder() {
+		String folderName = getJreFolderName();
+		System.out.println(folderName);
 		File jreFolder = new File(getJreFolderName());
 		try {
 			if(jreFolder.exists()) {

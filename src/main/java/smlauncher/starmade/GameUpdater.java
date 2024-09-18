@@ -19,7 +19,8 @@ import java.util.*;
  *
  * @author TheDerpGamer
  */
-// todo move to new package
+// TODO move to new package
+// TODO replace deprecated observable
 public class GameUpdater extends Observable {
 	public static final int BACK_NONE = 0;
 	public static final int BACK_DB = 1;
@@ -105,7 +106,6 @@ public class GameUpdater extends Observable {
 	}
 
 	public static int askBackup(JFrame f) {
-
 		String[] options = {"Yes (Only Database)", "Yes (Everything)", "No"};
 		int n = JOptionPane.showOptionDialog(f, "Create Backup of current game data? (recommended)", "Backup?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		switch(n) {
@@ -359,10 +359,10 @@ public class GameUpdater extends Observable {
 		notifyObservers("updating");
 
 		File instalDir = new File(installDirStr);
-		downloadDiff(instalDir, installDirStr, newest, backupFromMain, forced);
+		downloadDiff(installDirStr, newest, backupFromMain, forced);
 	}
 
-	private void downloadDiff(File installDir, String installDirStr, IndexFileEntry version, int backup, boolean forced) {
+	private void downloadDiff(String installDirStr, IndexFileEntry version, int backup, boolean forced) {
 		updating = true;
 
 		new Thread(() -> {
@@ -384,7 +384,7 @@ public class GameUpdater extends Observable {
 				ChecksumFile checksums = getChecksums(buildDir);
 				System.err.println("Downloaded checksums: \n" + checksums);
 
-				checksums.download(forced, buildDir, installDir, installDirStr, new FileDowloadCallback() {
+				checksums.download(forced, buildDir, installDirStr, new FileDownloadCallback() {
 					@Override
 					public void update(FileDownloadUpdate u) {
 						setChanged();

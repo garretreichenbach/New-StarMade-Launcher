@@ -1,6 +1,6 @@
 package smlauncher.starmade;
 
-public interface FileDowloadCallback {
+public interface FileDownloadCallback {
 	void update(FileDownloadUpdate u);
 
 	void update(String u);

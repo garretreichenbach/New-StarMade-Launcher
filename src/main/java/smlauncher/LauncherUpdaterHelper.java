@@ -66,6 +66,7 @@ public class LauncherUpdaterHelper {
 					System.err.println("Could not open launcher website");
 				}
 			}).setVisible(true);
+			System.exit(1);
 		}
 	}
 

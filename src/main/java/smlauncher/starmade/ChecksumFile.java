@@ -1,18 +1,25 @@
 package smlauncher.starmade;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * A list of checksum entries for a game release, used to determine which game
+ * files should be updated.
+ *
+ * @author TheDerpGamer
+ */
 public class ChecksumFile {
-	public static Set<ChecksumFileEntry> running = new HashSet<ChecksumFileEntry>();
-	public ArrayList<ChecksumFileEntry> checksums = new ArrayList<ChecksumFileEntry>();
+
+	public static Set<ChecksumFileEntry> running = new HashSet<>();
+	public List<ChecksumFileEntry> checksums = new ArrayList<>();
 	int toExecute;
 	private int failed;
 
@@ -51,9 +58,7 @@ public class ChecksumFile {
 			line = line.substring(0, sizeIndex).trim();
 
 			String relativePath = line.trim();
-
 			ChecksumFileEntry e = new ChecksumFileEntry(size, checksum, relativePath);
-
 			checksums.add(e);
 		}
 
@@ -82,15 +87,15 @@ public class ChecksumFile {
 		return sb.toString();
 	}
 
-	public void download(boolean force, String buildPath, File installDir, String installDirStr, FileDowloadCallback cb) throws NoSuchAlgorithmException, IOException {
-		ArrayList<ChecksumFileEntry> checksumsToDownload = new ArrayList<>();
+	public void download(boolean force, String buildPath, String installDirStr, FileDownloadCallback cb) throws NoSuchAlgorithmException, IOException {
+		List<ChecksumFileEntry> checksumsToDownload = new ArrayList<>();
 		cb.update("Determining files to download... ");
 
 		FileUpdateTotal o = new FileUpdateTotal();
 		float p = 1.0f / checksums.size();
 		float g = 0;
 		for(ChecksumFileEntry e : checksums) {
-			if(force || e.needsDownload(buildPath, installDirStr)) {
+			if(force || e.needsDownload(installDirStr)) {
 				checksumsToDownload.add(e);
 				o.totalSize += e.size;
 			}
@@ -127,7 +132,7 @@ public class ChecksumFile {
 				try {
 					o.index = e.index;
 					o.total = checksumsToDownload.size();
-					e.download(force, buildPath, installDir, installDirStr, cb, o);
+					e.download(force, buildPath, installDirStr, cb, o);
 				} catch(Exception e1) {
 					e1.printStackTrace();
 					failed++;
@@ -164,7 +169,7 @@ public class ChecksumFile {
 
 	private static void printUpdaterMessage(String message) {
 		if (GameUpdater.PRINT_DOWNLOAD_MILESTONES) {
-			System.err.println("[UPDATER] " + message);
+			System.out.println("[UPDATER] " + message);
 		}
 	}
 

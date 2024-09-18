@@ -11,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author TheDerpGamer (TheDerpGamer#0027)
  */
-public class UpdaterThread extends Thread {
+public class GameUpdaterThread extends Thread {
 
 	public static final int BACKUP_MODE_NONE = 0;
 	public static final int BACKUP_MODE_DATABASE = 1;
@@ -22,7 +22,7 @@ public class UpdaterThread extends Thread {
 	private final File installDir;
 	public boolean updating;
 
-	public UpdaterThread(IndexFileEntry version, int backupMode, File installDir) {
+	public GameUpdaterThread(IndexFileEntry version, int backupMode, File installDir) {
 		this.version = version;
 		this.backupMode = backupMode;
 		this.installDir = installDir;
@@ -49,7 +49,7 @@ public class UpdaterThread extends Thread {
 				onFinished();
 				return;
 			}
-			checksums.download(false, buildDir, installDir, installDir.getPath(), new FileDowloadCallback() {
+			checksums.download(false, buildDir, installDir.getPath(), new FileDownloadCallback() {
 				@Override
 				public void update(FileDownloadUpdate u) {
 					if(u.total == 0) {

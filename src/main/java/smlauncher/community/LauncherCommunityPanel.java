@@ -1,6 +1,7 @@
 package smlauncher.community;
 
-import smlauncher.StarMadeLauncher;
+import smlauncher.fileio.ImageFileUtil;
+import smlauncher.mainui.scrolldisplay.ScrollablePanel;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
@@ -16,18 +17,13 @@ import java.net.URISyntaxException;
  *
  * @author TheDerpGamer
  */
-public class LauncherCommunityPanel extends JPanel {
+public class LauncherCommunityPanel extends ScrollablePanel {
 
 	private static final String MAIN_DISCORD_URL = "https://discord.gg/SXbkYpU";
 	private static final String STARLOADER_DISCORD_URL = "https://discord.gg/Y2UR7AXfsE";
 	private static final String COMMUNITY_SERVER_JSON_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/community-servers.json";
 
-	public LauncherCommunityPanel() {
-		super(true);
-		setBackground(Palette.paneColor);
-		setOpaque(true);
-	}
-
+	@Override
 	public void updatePanel() {
 		removeAll();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -56,7 +52,7 @@ public class LauncherCommunityPanel extends JPanel {
 				}
 			}
 		});
-		mainDiscordButton.setIcon(StarMadeLauncher.getIcon("sprites/icon.png", 32, 32));
+		mainDiscordButton.setIcon(ImageFileUtil.getIcon("sprites/icon.png", 32, 32));
 		mainDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, mainDiscordButton.getMinimumSize().height));
 		mainDiscordButton.setAlignmentX(CENTER_ALIGNMENT);
 		mainDiscordButton.setBackground(Palette.buttonColor);
@@ -81,7 +77,7 @@ public class LauncherCommunityPanel extends JPanel {
 				}
 			}
 		});
-		starLoaderDiscordButton.setIcon(StarMadeLauncher.getIcon("sprites/starloader.png", 32, 32));
+		starLoaderDiscordButton.setIcon(ImageFileUtil.getIcon("sprites/starloader.png", 32, 32));
 		starLoaderDiscordButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, starLoaderDiscordButton.getMinimumSize().height));
 		starLoaderDiscordButton.setAlignmentX(CENTER_ALIGNMENT);
 		starLoaderDiscordButton.setBackground(Palette.buttonColor);

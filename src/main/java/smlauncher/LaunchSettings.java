@@ -18,6 +18,11 @@ public final class LaunchSettings {
 	private static final String SETTINGS_FILENAME = "launch-settings.json";
 	private static JSONObject launchSettings;
 
+//	static {
+//		// Make sure this isn't null on startup
+//		launchSettings = getDefaultLaunchSettings();
+//	}
+
 	private LaunchSettings() {
 	}
 
