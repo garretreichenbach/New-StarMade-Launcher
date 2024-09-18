@@ -33,7 +33,7 @@ jobs:
       - name: 'Codesign MacOS File'
         if: matrix.os == 'macos-latest'
         run: |
-          codesign -sign - -force ./release-builds/macos/StarMade-Launcher/StarMade-Launcher.app
+          codesign -s - -f ./release-builds/macos/StarMade-Launcher/StarMade-Launcher.app
   publish-executables:
     name: 'Publish Executables'
     runs-on: ubuntu-latest
