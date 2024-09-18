@@ -68,6 +68,13 @@ public class StarMadeLauncher extends JFrame {
 	public StarMadeLauncher() {
 		// Set window properties
 		super("StarMade Launcher [" + LAUNCHER_VERSION + "]");
+
+		// If on mac, change cwd to outside the .app
+		if(OperatingSystem.getCurrent() == OperatingSystem.MAC) {
+			String cwd = System.getProperty("user.dir");
+			if(cwd.endsWith(".app/Contents/MacOS")) System.setProperty("user.dir", cwd.substring(0, cwd.length() - 20));
+		}
+
 		setBounds(100, 100, 800, 550);
 		setMinimumSize(new Dimension(800, 550));
 		setLocationRelativeTo(null);
@@ -163,7 +170,8 @@ public class StarMadeLauncher extends JFrame {
 					try {
 						port = Integer.parseInt(argList.get(argList.indexOf("-port:") + 1).trim());
 						hasPort = true;
-					} catch(NumberFormatException ignored) {}
+					} catch(NumberFormatException ignored) {
+					}
 				}
 				if(!hasPort) {
 					displayHelp();
