@@ -97,5 +97,4 @@ public class UpdaterThread extends Thread {
 
 	public void onError(Exception exception) {
 	}
-
 }

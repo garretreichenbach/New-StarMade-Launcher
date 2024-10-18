@@ -26,6 +26,7 @@ public class JavaDownloader {
 
 	private final OperatingSystem currentOS;
 	private final JavaVersion version;
+	private Thread downloadThread;
 
 	public JavaDownloader(JavaVersion version) {
 		this(OperatingSystem.getCurrent(), version);
@@ -40,7 +41,7 @@ public class JavaDownloader {
 	public void downloadAndUnzip(JDialog dialog) throws IOException {
 		// Don't unzip if the folder already exists
 		if(doesJreFolderExist()) return;
-		new Thread(() -> {
+		(downloadThread = new Thread(() -> {
 			try {
 				download();
 				unzip();
@@ -48,7 +49,7 @@ public class JavaDownloader {
 			} catch(IOException e) {
 				LogManager.logWarning("Failed to download or unzip Java", e);
 			}
-		}).start();
+		})).start();
 		dialog.setVisible(true);
 		while(dialog.isVisible()) {
 			try {
@@ -144,4 +145,7 @@ public class JavaDownloader {
 		}
 	}
 
+	public void forceStopThread() {
+		if(downloadThread != null) downloadThread.interrupt();
+	}
 }

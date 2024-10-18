@@ -51,7 +51,8 @@ public class StarMadeLauncher extends JFrame {
 	private static JTextField portField;
 	private final VersionRegistry versionRegistry;
 	private final DownloadStatus dlStatus = new DownloadStatus();
-	private UpdaterThread updaterThread;
+	private static UpdaterThread updaterThread;
+	private static JavaDownloader downloader;
 	private int mouseX;
 	private int mouseY;
 	private JButton updateButton;
@@ -144,7 +145,6 @@ public class StarMadeLauncher extends JFrame {
 		boolean selectVersion = false;
 		boolean autoUpdate = true;
 
-
 		if(args == null || args.length == 0) startup();
 		else {
 			GameBranch buildBranch = GameBranch.RELEASE;
@@ -174,7 +174,8 @@ public class StarMadeLauncher extends JFrame {
 					try {
 						port = Integer.parseInt(argList.get(argList.indexOf("-port:") + 1).trim());
 						hasPort = true;
-					} catch(NumberFormatException ignored) {}
+					} catch(NumberFormatException ignored) {
+					}
 				}
 				if(!hasPort) {
 					displayHelp();
@@ -211,6 +212,11 @@ public class StarMadeLauncher extends JFrame {
 				else startGameHeadless();
 			} else startup();
 		}
+	}
+
+	public static void emergencyStop() {
+		if(updaterThread != null) updaterThread.interrupt();
+		if(downloader != null) downloader.forceStopThread();
 	}
 
 	private static void startGameHeadless() {
@@ -555,7 +561,7 @@ public class StarMadeLauncher extends JFrame {
 			return;
 		}
 		System.out.println("Downloading " + version + "...");
-		JavaDownloader downloader = new JavaDownloader(version);
+		downloader = new JavaDownloader(version);
 		JDialog dialog = new JDialog();
 		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		dialog.setModal(true);
@@ -564,7 +570,6 @@ public class StarMadeLauncher extends JFrame {
 		dialog.setSize(500, 100);
 		dialog.setLocationRelativeTo(null);
 		dialog.setLayout(new BorderLayout());
-		dialog.setAlwaysOnTop(true);
 
 		JPanel dialogPanel = new JPanel();
 		dialogPanel.setDoubleBuffered(true);
@@ -592,11 +597,10 @@ public class StarMadeLauncher extends JFrame {
 				version = LaunchSettings.getLastUsedVersion();
 			}
 			String shortVersion = version.substring(0, version.indexOf('#'));
-
 			IndexFileEntry entry = versionRegistry.searchForVersion(e -> shortVersion.equals(e.version));
 			if(entry != null) return entry;
 		} catch(Exception exception) {
-			LogManager.logException("Failed to get last used version", exception);
+			LogManager.logWarning("Failed to get last used version", exception);
 		}
 		// Return latest release if nothing found
 		return versionRegistry.getLatestVersion(GameBranch.RELEASE);

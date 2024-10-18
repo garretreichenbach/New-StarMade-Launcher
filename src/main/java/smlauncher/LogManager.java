@@ -1,5 +1,7 @@
 package smlauncher;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import smlauncher.starmade.ErrorDialog;
 import smlauncher.starmade.GameBranch;
 
@@ -15,21 +17,23 @@ import java.util.Date;
  */
 public class LogManager {
 
+	private static final int STACKTRACE_LIMIT = 10;
+	private static final Logger log = LoggerFactory.getLogger(LogManager.class);
 	private static FileWriter logWriter;
 	private static File logFile;
 
 	public static void initialize() {
 		try {
 			File logsFolder = new File(LaunchSettings.getInstallDir() + "/logs");
+			if(!logsFolder.exists()) logsFolder.mkdirs();
 			File[] logFiles = logsFolder.listFiles();
 			if(logFiles != null) {
 				for(File logFile : logFiles) {
 					try {
 						String fileName = logFile.getName();
 						if(fileName.startsWith("launcher.") && fileName.endsWith(".log")) {
-							String[] split = fileName.split("\\.");
-							int logNumber = Integer.parseInt(split[1]);
-							File newLogFile = new File(LaunchSettings.getInstallDir() + "/logs/launcher." + (logNumber + 1) + ".log");
+							int logNumber = Integer.parseInt(fileName.substring(9, fileName.length() - 4)) + 1;
+							File newLogFile = new File(LaunchSettings.getInstallDir() + "/logs/launcher." + logNumber + ".log");
 							logFile.renameTo(newLogFile);
 						}
 					} catch(Exception exception) {
@@ -71,6 +75,16 @@ public class LogManager {
 		try {
 			logWriter.append("[WARNING]: ").append(message).append("\n");
 			logWriter.append(exception.getMessage()).append("\n");
+			logWriter.append("Stack Trace:\n");
+			int i = 0;
+			for(StackTraceElement element : exception.getStackTrace()) {
+				if(i > STACKTRACE_LIMIT) {
+					logWriter.append("\t...").append("\n");
+					break;
+				}
+				logWriter.append("\t").append(element.toString()).append("\n");
+				i ++;
+			}
 			logWriter.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -82,6 +96,16 @@ public class LogManager {
 		try {
 			logWriter.append("[ERROR]: ").append(message).append("\n");
 			logWriter.append(exception.getMessage()).append("\n");
+			logWriter.append("Stack Trace:\n");
+			int i = 0;
+			for(StackTraceElement element : exception.getStackTrace()) {
+				if(i > STACKTRACE_LIMIT) {
+					logWriter.append("\t...").append("\n");
+					break;
+				}
+				logWriter.append("\t").append(element.toString()).append("\n");
+				i ++;
+			}
 			logWriter.flush();
 			(new ErrorDialog("Error", message, exception, false)).setVisible(true);
 		} catch(Exception e) {
@@ -94,8 +118,18 @@ public class LogManager {
 		try {
 			logWriter.append("[FATAL]: ").append(message).append("\n");
 			logWriter.append(exception.getMessage()).append("\n");
+			logWriter.append("Stack Trace:\n");
+			int i = 0;
+			for(StackTraceElement element : exception.getStackTrace()) {
+				if(i > STACKTRACE_LIMIT) {
+					logWriter.append("\t...").append("\n");
+					break;
+				}
+				logWriter.append("\t").append(element.toString()).append("\n");
+				i ++;
+			}
 			logWriter.flush();
-			(new ErrorDialog("Fatal Error", message, exception, true)).setVisible(true);	
+			(new ErrorDialog("Fatal Error", message, exception, true)).setVisible(true);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -115,7 +149,7 @@ public class LogManager {
 			writer.append("\tJava Vendor: ").append(System.getProperty("java.vendor")).append("\n");
 			writer.append("\tJava Home: ").append(System.getProperty("java.home")).append("\n");
 			writer.append("\tCurrent Directory: ").append(System.getProperty("user.dir")).append("\n\n");
-			
+
 			writer.append("Launcher State Information:\n");
 			writer.append("\tInstall Directory: ").append(LaunchSettings.getInstallDir()).append("\n");
 			writer.append("\tLast Used Branch: ").append(GameBranch.values()[LaunchSettings.getLastUsedBranch()].name).append("\n");
@@ -124,14 +158,16 @@ public class LogManager {
 			writer.append("\tMemory: ").append(String.valueOf(LaunchSettings.getMemory())).append("\n");
 			writer.append("\tJVM Arguments: ").append(LaunchSettings.getJvmArgs()).append("\n");
 			writer.append("\tStarMade.jar Exists: ").append(String.valueOf(new File(LaunchSettings.getInstallDir() + "/StarMade.jar").exists())).append("\n\n");
-			writer.append("\tJava 8 Folder Exists: ").append(String.valueOf(new File(LaunchSettings.getInstallDir() + "/jre8"))).append("\n");
+			writer.append("\tJava 8 Folder Exists: ").append(String.valueOf(new File(LaunchSettings.getInstallDir() + "/jre8").exists())).append("\n");
 			writer.append("\tJava 18 Folder Exists: ").append(String.valueOf(new File(LaunchSettings.getInstallDir() + "/jre18").exists())).append("\n");
 			writer.append("\tData Folder Exists: ").append(String.valueOf(new File(LaunchSettings.getInstallDir() + "/data").exists())).append("\n\n");
-			
+
 			writer.append("Error Details:\n");
 			writer.append("\tError: ").append(error).append("\n");
 			writer.append("\tDescription: ").append(description).append("\n");
 			writer.append("\tException: ").append(exception.getMessage()).append("\n");
+			writer.append("\tStack Trace:");
+			for(StackTraceElement element : exception.getStackTrace()) writer.append("\t\t").append(element.toString()).append("\n");
 			writer.flush();
 			writer.close();
 			return errorReport;
