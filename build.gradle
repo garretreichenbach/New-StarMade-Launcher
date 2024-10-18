@@ -124,7 +124,7 @@ tasks.register('package') {
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
 			exec {
-				commandLine 'ls', '-l', '-R', 'release-builds/' + os + '/StarMade-Launcher/'
+				commandLine 'ls', '-l', '-R', 'release-builds/' + os + '/StarMade-Launcher/bin/'
 			}
 			exec { //Mark as executable
 				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher'
