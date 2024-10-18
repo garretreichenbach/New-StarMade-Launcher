@@ -18,8 +18,7 @@ public final class LaunchSettings {
 	private static final String SETTINGS_FILENAME = "launch-settings.json";
 	private static JSONObject launchSettings;
 
-	private LaunchSettings() {
-	}
+	private LaunchSettings() {}
 
 	// Settings File Methods
 
@@ -35,8 +34,8 @@ public final class LaunchSettings {
 			// Read the settings file
 			try {
 				launchSettings = new JSONObject(TextFileUtil.readText(jsonFile));
-			} catch(IOException e) {
-				System.out.println("Could not read launch settings from file");
+			} catch(IOException exception) {
+				LogManager.logException("Could not read launch settings from file!", exception);
 			}
 		}
 	}
@@ -46,7 +45,7 @@ public final class LaunchSettings {
 		try {
 			TextFileUtil.writeText(settingsFile, launchSettings.toString());
 		} catch(IOException exception) {
-			System.out.println("Could not save launch settings to file");
+			LogManager.logException("Could not save launch settings to file!", exception);
 		}
 	}
 

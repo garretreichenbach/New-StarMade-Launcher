@@ -3,7 +3,7 @@ package smlauncher;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import smlauncher.misc.MiscErrorDialog;
+import smlauncher.community.CommunityServerList;
 import smlauncher.util.OperatingSystem;
 
 import java.awt.*;
@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
  */
 public class LauncherUpdaterHelper {
 
-	private static final String DOWNLOAD_URL = "https://www.star-made.org/download";
 	private static final String UPDATE_URL_BASE = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases/download/v";
 	private static final String INDEX_URL = "https://raw.githubusercontent.com/garretreichenbach/New-StarMade-Launcher/main/versions.json";
 
@@ -55,17 +54,12 @@ public class LauncherUpdaterHelper {
 			processBuilder.start();
 			System.exit(0);
 		} catch(Exception exception) {
-			exception.printStackTrace();
-			System.err.println("Could not update launcher");
-			// Open website to launcher download
-			new MiscErrorDialog(MiscErrorDialog.ErrorType.ERROR, "Failed to update launcher. Please download the new launcher manually.", () -> {
-				try {
-					Desktop.getDesktop().browse(new URL(DOWNLOAD_URL).toURI());
-				} catch(Exception exception1) {
-					exception1.printStackTrace();
-					System.err.println("Could not open launcher website");
-				}
-			}).setVisible(true);
+			LogManager.logException("Failed to update launcher. Please download the new launcher manually.", exception);
+			try {
+				Desktop.getDesktop().browse(new URL(StarMadeLauncher.DOWNLOAD_URL).toURI());
+			} catch(Exception exception1) {
+				LogManager.logWarning("Failed to open download page", exception1);
+			}
 		}
 	}
 
@@ -79,7 +73,7 @@ public class LauncherUpdaterHelper {
 			JSONObject latestVersion = versions.getJSONObject(versions.length() - 1);
 			return latestVersion.getString("version");
 		} catch(IOException exception) {
-			System.out.println("Could not get latest version");
+			LogManager.logWarning("Failed to get latest version", exception);
 			return "UNKNOWN";
 		}
 	}
@@ -108,8 +102,7 @@ public class LauncherUpdaterHelper {
 			assert inputStream != null;
 			IOUtils.copy(inputStream, outputStream);
 		} catch(Exception exception) {
-			exception.printStackTrace();
-			System.err.println("Could not extract updater jar");
+			LogManager.logFatal("Failed to extract updater jar", exception);
 		}
 	}
 
@@ -118,11 +111,6 @@ public class LauncherUpdaterHelper {
 	 * <a href="https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java">From</a>
 	 */
 	public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		byte[] buffer = new byte[0xFFFF];
-		for(int len = is.read(buffer); len != -1; len = is.read(buffer)) {
-			os.write(buffer, 0, len);
-		}
-		return os.toByteArray();
+		return CommunityServerList.getBytesFromInputStream(is);
 	}
 }

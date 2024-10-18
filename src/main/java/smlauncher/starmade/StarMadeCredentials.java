@@ -2,6 +2,7 @@ package smlauncher.starmade;
 
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.jasypt.util.text.BasicTextEncryptor;
+import smlauncher.LogManager;
 import smlauncher.util.OperatingSystem;
 
 import java.io.*;
@@ -26,7 +27,7 @@ public class StarMadeCredentials {
 		try {
 			return (new File(getPath(), "cred")).exists();
 		} catch(IOException e) {
-			e.printStackTrace();
+			LogManager.logWarning("Error checking for credentials file", e);
 		}
 		return false;
 	}
@@ -80,21 +81,19 @@ public class StarMadeCredentials {
 			return r.readLine();
 		} catch(IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			LogManager.logFatal("Error getting mac jar", e);
 		}
+		return null;
 	}
 
 	public static void main(String[] args) throws Exception {
 		try {
 			StarMadeCredentials c = read();
 			c = read();
-
 			System.err.println(c.passwd);
 		} catch(IOException e) {
-			e.printStackTrace();
+			LogManager.logException("Error reading credentials", e);
 		}
-
 	}
 
 	/**

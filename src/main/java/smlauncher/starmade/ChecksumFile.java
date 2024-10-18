@@ -1,5 +1,7 @@
 package smlauncher.starmade;
 
+import smlauncher.LogManager;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -129,7 +131,7 @@ public class ChecksumFile {
 					o.total = checksumsToDownload.size();
 					e.download(force, buildPath, installDir, installDirStr, cb, o);
 				} catch(Exception e1) {
-					e1.printStackTrace();
+					LogManager.logWarning("Failed to download file", e1);
 					failed++;
 				}
 				synchronized(running) {
@@ -152,7 +154,7 @@ public class ChecksumFile {
 			try {
 				Thread.sleep(300);
 			} catch(InterruptedException e1) {
-				e1.printStackTrace();
+				LogManager.logWarning("Interrupted while waiting for download to finish", e1);
 			}
 		}
 		if(failed > 0) {

@@ -1,5 +1,7 @@
 package smlauncher.starmade;
 
+import smlauncher.LogManager;
+
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -93,7 +95,7 @@ public class FolderZipper {
 				}
 				in.close();
 			} catch(Exception ex) {
-				ex.printStackTrace();
+				LogManager.logWarning("Error while adding file to zip: " + srcFile, ex);
 			}
 		}
 	}

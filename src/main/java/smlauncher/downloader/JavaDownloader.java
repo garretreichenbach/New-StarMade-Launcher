@@ -5,6 +5,7 @@ import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import smlauncher.LaunchSettings;
+import smlauncher.LogManager;
 import smlauncher.util.OperatingSystem;
 
 import javax.swing.*;
@@ -45,7 +46,7 @@ public class JavaDownloader {
 				unzip();
 				dialog.setVisible(false);
 			} catch(IOException e) {
-				e.printStackTrace();
+				LogManager.logWarning("Failed to download or unzip Java", e);
 			}
 		}).start();
 		dialog.setVisible(true);
@@ -53,7 +54,7 @@ public class JavaDownloader {
 			try {
 				Thread.sleep(100);
 			} catch(InterruptedException e) {
-				e.printStackTrace();
+				LogManager.logWarning("Thread interrupted while waiting for download to finish", e);
 			}
 		}
 	}

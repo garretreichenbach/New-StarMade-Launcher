@@ -2,6 +2,7 @@ package smlauncher.community;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import smlauncher.LogManager;
 import smlauncher.util.Palette;
 
 import javax.swing.*;
@@ -28,7 +29,7 @@ public class CommunityServerList extends JTable {
 		try {
 			serverList = new JSONObject(new String(getBytesFromInputStream(new URL(url).openStream()), StandardCharsets.UTF_8));
 		} catch(IOException exception) {
-			exception.printStackTrace();
+			LogManager.logWarning("Failed to load community server list from URL: " + url, exception);
 			serverList = new JSONObject();
 			serverList.put("servers", new JSONArray());
 		}

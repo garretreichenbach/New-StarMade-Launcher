@@ -37,8 +37,9 @@ import java.util.Objects;
  */
 public class StarMadeLauncher extends JFrame {
 
+	public static final String DOWNLOAD_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/releases";
 	public static final String BUG_REPORT_URL = "https://github.com/garretreichenbach/New-StarMade-Launcher/issues";
-	public static final String LAUNCHER_VERSION = "3.1.3";
+	public static final String LAUNCHER_VERSION = "3.1.4";
 	private static final String[] J18ARGS = {"--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED", "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED", "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED", "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED", "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED", "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED", "--add-opens=java.base/java.io=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED"};
 	private static IndexFileEntry gameVersion;
 	private static GameBranch lastUsedBranch = GameBranch.RELEASE;
@@ -68,6 +69,7 @@ public class StarMadeLauncher extends JFrame {
 	public StarMadeLauncher() {
 		// Set window properties
 		super("StarMade Launcher [" + LAUNCHER_VERSION + "]");
+		Thread.currentThread().setUncaughtExceptionHandler((t, e) -> LogManager.logFatal("Encountered an unexpected error \"" + e.getClass().getSimpleName() + "\"", e));
 
 		// If on mac, change cwd to outside the .app
 		if(OperatingSystem.getCurrent() == OperatingSystem.MAC) {
@@ -85,7 +87,7 @@ public class StarMadeLauncher extends JFrame {
 			URL resource = StarMadeLauncher.class.getResource("/sprites/icon.png");
 			if(resource != null) setIconImage(Toolkit.getDefaultToolkit().getImage(resource));
 		} catch(Exception exception) {
-			System.out.println("Could not set window icon");
+			LogManager.logException("Failed to set window icon", exception);
 		}
 
 		// Fetch game versions
@@ -93,12 +95,13 @@ public class StarMadeLauncher extends JFrame {
 		try {
 			versionRegistry.createRegistry();
 		} catch(Exception exception) {
-			System.out.println("Could not load versions list, switching to offline");
-			//Todo: Offline Mode
+			LogManager.logException("Failed to fetch version list! Check your internet connection!", exception);
+			JOptionPane.showMessageDialog(this, "Failed to fetch version list! Check your internet connection!", "Warning", JOptionPane.WARNING_MESSAGE);
 		}
 
 		// Read launch settings
 		LaunchSettings.readSettings();
+		LogManager.initialize();
 
 		// Read game version and branch
 		gameVersion = getLastUsedVersion();
@@ -119,8 +122,7 @@ public class StarMadeLauncher extends JFrame {
 			downloadJRE(JavaVersion.JAVA_8);
 			downloadJRE(JavaVersion.JAVA_18);
 		} catch(Exception exception) {
-			System.out.println("Could not download JREs");
-			exception.printStackTrace();
+			LogManager.logException("Failed to download Java Runtimes for first time setup", exception);
 			JOptionPane.showMessageDialog(this, "Failed to download Java Runtimes for first time setup. Please make sure you have a stable internet connection and try again.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -136,10 +138,12 @@ public class StarMadeLauncher extends JFrame {
 	}
 
 	public static void main(String[] args) {
+		Thread.currentThread().setUncaughtExceptionHandler((t, e) -> LogManager.logFatal("Encountered an unexpected error \"" + e.getClass().getSimpleName() + "\"", e));
 		boolean headless = false;
 		int backupMode = GameUpdater.BACK_DB;
 		boolean selectVersion = false;
 		boolean autoUpdate = true;
+
 
 		if(args == null || args.length == 0) startup();
 		else {
@@ -170,8 +174,7 @@ public class StarMadeLauncher extends JFrame {
 					try {
 						port = Integer.parseInt(argList.get(argList.indexOf("-port:") + 1).trim());
 						hasPort = true;
-					} catch(NumberFormatException ignored) {
-					}
+					} catch(NumberFormatException ignored) {}
 				}
 				if(!hasPort) {
 					displayHelp();
@@ -196,8 +199,8 @@ public class StarMadeLauncher extends JFrame {
 					//Get last used version from config
 					try {
 						gameVersion = new VersionRegistry().getLatestVersion(GameBranch.values()[LaunchSettings.getLastUsedBranch()]);
-					} catch(Exception e) {
-						e.printStackTrace();
+					} catch(Exception exception) {
+						LogManager.logException("Failed to get last used game version", exception);
 						gameVersion = new VersionRegistry().getLatestVersion(GameBranch.RELEASE);
 					}
 					setGameVersion(gameVersion);
@@ -221,7 +224,7 @@ public class StarMadeLauncher extends JFrame {
 			process.start();
 			System.exit(0);
 		} catch(Exception exception) {
-			throw new RuntimeException(exception);
+			LogManager.logFatal("Failed to start game in headless mode", exception);
 		}
 	}
 
@@ -236,7 +239,7 @@ public class StarMadeLauncher extends JFrame {
 			process.start();
 			System.exit(0);
 		} catch(Exception exception) {
-			throw new RuntimeException(exception);
+			LogManager.logFatal("Failed to start server in headless mode", exception);
 		}
 	}
 
@@ -249,9 +252,8 @@ public class StarMadeLauncher extends JFrame {
 					JDialog updateDialog = createLauncherUpdateDialog();
 					updateDialog.setVisible(true);
 				} else startLauncherFrame();
-			} catch(Exception e) {
-				e.printStackTrace();
-				System.out.println("Error occurred while running launcher");
+			} catch(Exception exception) {
+				LogManager.logException("Failed to start launcher", exception);
 			}
 		});
 	}
@@ -315,13 +317,13 @@ public class StarMadeLauncher extends JFrame {
 			try {
 				Thread.sleep(1200);
 			} catch(InterruptedException e) {
-				e.printStackTrace();
+				LogManager.logWarning("Failed to sleep thread", e);
 			}
 			while(frame.isVisible()) {
 				try {
 					Thread.sleep(500);
 				} catch(InterruptedException exception) {
-					exception.printStackTrace();
+					LogManager.logException("Failed to sleep thread", exception);
 				}
 				EventQueue.invokeLater(frame::repaint);
 			}
@@ -340,6 +342,7 @@ public class StarMadeLauncher extends JFrame {
 		try {
 			return new ImageIcon(ImageIO.read(Objects.requireNonNull(StarMadeLauncher.class.getResource("/" + s))).getScaledInstance(width, height, Image.SCALE_SMOOTH));
 		} catch(IOException exception) {
+			LogManager.logException("Failed to get icon", exception);
 			return new ImageIcon();
 		}
 	}
@@ -358,8 +361,9 @@ public class StarMadeLauncher extends JFrame {
 	private static String getCurrentUser() {
 		try {
 			return StarMadeCredentials.read().getUser();
-		} catch(Exception ignored) {
-			return null;
+		} catch(Exception exception) {
+			LogManager.logException("Failed to get current user", exception);
+			return "";
 		}
 	}
 
@@ -367,7 +371,7 @@ public class StarMadeLauncher extends JFrame {
 		try {
 			StarMadeCredentials.removeFile();
 		} catch(IOException exception) {
-			exception.printStackTrace();
+			LogManager.logException("Failed to remove current user", exception);
 		}
 	}
 
@@ -591,8 +595,8 @@ public class StarMadeLauncher extends JFrame {
 
 			IndexFileEntry entry = versionRegistry.searchForVersion(e -> shortVersion.equals(e.version));
 			if(entry != null) return entry;
-		} catch(Exception e) {
-			System.out.println("Could not read game version from file");
+		} catch(Exception exception) {
+			LogManager.logException("Failed to get last used version", exception);
 		}
 		// Return latest release if nothing found
 		return versionRegistry.getLatestVersion(GameBranch.RELEASE);
@@ -672,7 +676,7 @@ public class StarMadeLauncher extends JFrame {
 			image = image.getScaledInstance(150, 500, Image.SCALE_SMOOTH);
 			leftLabel.setIcon(new ImageIcon(image));
 		} catch(IOException exception) {
-			exception.printStackTrace();
+			LogManager.logWarning("Failed to load left panel image", exception);
 		}
 		//Stretch the image to the left panel
 		leftPanel.add(leftLabel, StackLayout.BOTTOM);
@@ -1105,7 +1109,7 @@ public class StarMadeLauncher extends JFrame {
 			image = image.getScaledInstance(800, 500, Image.SCALE_SMOOTH);
 			background.setIcon(new ImageIcon(image));
 		} catch(IOException exception) {
-			exception.printStackTrace();
+			LogManager.logException("Failed to load background image", exception);
 		}
 		centerPanel.add(background, BorderLayout.CENTER);
 
@@ -1133,7 +1137,7 @@ public class StarMadeLauncher extends JFrame {
 			com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 			return (int) (os.getTotalPhysicalMemorySize() / (1024 * 1024));
 		} catch(Exception exception) {
-			exception.printStackTrace();
+			LogManager.logException("Failed to get system memory", exception);
 		}
 		return 8192;
 	}
@@ -1196,8 +1200,7 @@ public class StarMadeLauncher extends JFrame {
 					if(usingOldVersion()) downloadJRE(JavaVersion.JAVA_8);
 					else downloadJRE(JavaVersion.JAVA_18);
 				} catch(Exception exception) {
-					exception.printStackTrace();
-					(new ErrorDialog("Error", "Failed to unzip java, manual installation required", exception)).setVisible(true);
+					LogManager.logException("Failed to download java, will require manual installation", exception);
 					return;
 				}
 				runStarMade(serverMode);
@@ -1231,7 +1234,7 @@ public class StarMadeLauncher extends JFrame {
 			process.start();
 			System.exit(0);
 		} catch(Exception exception) {
-			throw new RuntimeException(exception);
+			LogManager.logFatal("Failed to start StarMade", exception);
 		}
 	}
 
@@ -1389,7 +1392,7 @@ public class StarMadeLauncher extends JFrame {
 
 			@Override
 			public void onError(Exception exception) {
-				exception.printStackTrace();
+				LogManager.logException("Failed to update game", exception);
 				updateButton.setIcon(getIcon("sprites/update_btn.png"));
 			}
 		}).start();
@@ -1423,7 +1426,7 @@ public class StarMadeLauncher extends JFrame {
 			try {
 				Desktop.getDesktop().browse(new URI(ccURL));
 			} catch(IOException | URISyntaxException exception) {
-				exception.printStackTrace();
+				LogManager.logWarning("Failed to open forums", exception);
 			}
 		}
 		/* Todo: Create forums panel
@@ -1443,7 +1446,7 @@ public class StarMadeLauncher extends JFrame {
 			try {
 				Desktop.getDesktop().browse(new URI(ccURL));
 			} catch(IOException | URISyntaxException exception) {
-				exception.printStackTrace();
+				LogManager.logWarning("Failed to open content", exception);
 			}
 		}
 		/* Todo: Create content panel

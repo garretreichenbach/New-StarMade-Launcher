@@ -1,5 +1,7 @@
 package smlauncher.starmade;
 
+import smlauncher.LogManager;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -54,8 +56,7 @@ public class VersionContainer {
 				throw new VersionNotFoundException("no version file found, or coudn't parse");
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error loading version", "Could not load version from file", e)).setVisible(true);
+			LogManager.logException("Error loading version", e);
 		}
 		System.out.println("[VERSION] VERSION: " + VERSION);
 		System.out.println("[VERSION] BUILD: " + build);

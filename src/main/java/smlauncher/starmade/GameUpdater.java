@@ -1,17 +1,16 @@
 package smlauncher.starmade;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import smlauncher.LogManager;
 import smlauncher.StarMadeLauncher;
 import smlauncher.util.OperatingSystem;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -58,7 +57,7 @@ public class GameUpdater extends Observable {
 				} else System.err.println("You Are Already on the Newest Version: use -force to force an update");
 			}
 		} catch(InterruptedException e) {
-			e.printStackTrace();
+			LogManager.logWarning("Error while checking Launcher Version", e);
 		}
 	}
 
@@ -79,7 +78,7 @@ public class GameUpdater extends Observable {
 			selectVersion(false, u, force, installDir, f, backUp, selectVersion);
 			return;
 		} catch(IOException e) {
-			e.printStackTrace();
+			LogManager.logWarning("Error while checking Launcher Version", e);
 			selectVersion(false, u, force, installDir, f, backUp, selectVersion);
 			return;
 		}
@@ -161,15 +160,9 @@ public class GameUpdater extends Observable {
 		try {
 			versions.clear();
 			String version = getRemoteLauncherVersion();
-			if(!Objects.equals(version, StarMadeLauncher.LAUNCHER_VERSION)) throw new OldVersionException("You have an old Launcher Version.\n" + "Please download the latest Launcher Version at http://www.star-made.org/\n('retry' will let you ignore this message [not recommended!])");
-		} catch(MalformedURLException e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error", "Malformed URL", e)).setVisible(true);
-		} catch(IOException e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
-		} catch(OldVersionException e) {
-			e.printStackTrace();
+			if(!Objects.equals(version, StarMadeLauncher.LAUNCHER_VERSION)) throw new OldVersionException("You have an old Launcher Version.\n" + "Please download the latest Launcher Version at " + StarMadeLauncher.DOWNLOAD_URL + "\n('retry' will let you ignore this message [not recommended!])");
+		} catch(Exception exception) {
+			LogManager.logWarning("Error while checking Launcher Version", exception);
 		} finally {
 			loading = false;
 		}
@@ -191,12 +184,8 @@ public class GameUpdater extends Observable {
 			String str;
 			while((str = in.readLine()) != null) mirrorURLs.add(str);
 			in.close();
-		} catch(MalformedURLException e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error", "Malformed URL", e)).setVisible(true);
-		} catch(IOException e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
+		} catch(Exception exception) {
+			LogManager.logWarning("Error while checking Launcher Version", exception);
 		} finally {
 			loading = false;
 		}
@@ -227,12 +216,8 @@ public class GameUpdater extends Observable {
 			setChanged();
 			notifyObservers("versions loaded");
 			openConnection.getInputStream().close();
-		} catch(MalformedURLException e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error", "Malformed URL", e)).setVisible(true);
-		} catch(IOException e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
+		} catch(Exception exception) {
+			LogManager.logWarning("Error while checking Launcher Version", exception);
 		} finally {
 			loading = false;
 		}
@@ -241,8 +226,8 @@ public class GameUpdater extends Observable {
 	public void reloadVersion(String installDir) {
 		try {
 			VersionContainer.loadVersion(installDir);
-		} catch(Exception e) {
-			e.printStackTrace();
+		} catch(Exception exception) {
+			LogManager.logWarning("Error while checking Launcher Version", exception);
 		}
 	}
 
@@ -251,8 +236,8 @@ public class GameUpdater extends Observable {
 		new Thread(() -> {
 			try {
 				loadVersionList(branch);
-			} catch(IOException e) {
-				e.printStackTrace();
+			} catch(IOException exception) {
+				LogManager.logWarning("Error while checking Launcher Version", exception);
 			}
 		}).start();
 	}
@@ -304,19 +289,18 @@ public class GameUpdater extends Observable {
 					buttonPanel.setLayout(new FlowLayout());
 					JButton acceptButton = new JButton("I have read the EULA and accept");
 					acceptButton.addActionListener(e -> {
-						File file;
+						File file = null;
 						try {
 							file = new File(OperatingSystem.getAppDir(), "eula.properties");
 						} catch(IOException ex) {
-							throw new RuntimeException(ex);
+							LogManager.logFatal("An unexpected error occurred while attempting to accept EULA", ex);
 						}
 						Properties p = new Properties();
-
 						p.setProperty("eula", "true");
 						try {
 							p.store(new FileOutputStream(file), "StarMade EULA");
 						} catch(IOException e1) {
-							e1.printStackTrace();
+							LogManager.logFatal("An unexpected error occurred while attempting to accept EULA", e1);
 						}
 						dialog.dispose();
 						startUpdateNew(installDirStr, newest, forced, backupFromMain);
@@ -332,9 +316,8 @@ public class GameUpdater extends Observable {
 					dialog.setVisible(true);
 				}
 			}
-		} catch(IOException e) {
-			e.printStackTrace();
-			(new ErrorDialog("Error", "IO Error", e)).setVisible(true);
+		} catch(IOException exception) {
+			LogManager.logFatal("An unexpected error occurred while attempting to accept EULA", exception);
 		}
 
 		File installDir = new File(installDirStr);
@@ -343,7 +326,7 @@ public class GameUpdater extends Observable {
 			try {
 				throw new IOException("Installation dir is not a directory");
 			} catch(IOException e1) {
-				(new ErrorDialog("Error", "IO Error", e1)).setVisible(true);
+				LogManager.logFatal("An unexpected error occurred while attempting install game", e1);
 			}
 		}
 
@@ -351,7 +334,7 @@ public class GameUpdater extends Observable {
 			try {
 				throw new IOException("Your operating System denies access \n" + "to where you are trying to install StarMade (for good reasons)\n" + (new File(installDirStr).getAbsolutePath()) + "\n\n" + "To solve this Problem,\n" + "Please change the install destination to another directory,\n" + "Or Force the install by executing this file as administrator");
 			} catch(IOException e1) {
-				(new ErrorDialog("Error", "IO Error", e1)).setVisible(true);
+				LogManager.logFatal("An unexpected error occurred while attempting install game", e1);
 			}
 		}
 
@@ -409,20 +392,14 @@ public class GameUpdater extends Observable {
 				try {
 					Thread.sleep(500);
 				} catch(InterruptedException e) {
-					e.printStackTrace();
+					LogManager.logWarning("Error while checking Launcher Version", e);
 				}
 				setChanged();
 				notifyObservers("reset");
-			} catch(IOException e1) {
-				e1.printStackTrace();
+			} catch(Exception e1) {
 				setChanged();
 				notifyObservers("failed IO");
-				(new ErrorDialog("Error", "IO Error", e1)).setVisible(true);
-			} catch(NoSuchAlgorithmException e1) {
-				e1.printStackTrace();
-				setChanged();
-				notifyObservers("failed Sha");
-				(new ErrorDialog("Error", "Sha Error", e1)).setVisible(true);
+				LogManager.logException("Error occurred while updating game", e1);
 			} finally {
 				updating = false;
 				setChanged();

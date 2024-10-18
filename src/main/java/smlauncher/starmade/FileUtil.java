@@ -1,6 +1,7 @@
 package smlauncher.starmade;
 
 import org.apache.commons.io.output.StringBuilderWriter;
+import smlauncher.LogManager;
 
 import java.io.*;
 import java.net.*;
@@ -260,7 +261,7 @@ public class FileUtil {
 			System.err.println((new File("./sector-export/mm/")).delete());
 
 		} catch(IOException e) {
-			e.printStackTrace();
+			LogManager.logWarning("Failed to extract", e);
 		}
 	}
 
@@ -339,7 +340,7 @@ public class FileUtil {
 					System.err.println("Disconnected: " + e.getClass() + ": " + e.getMessage() + "! Trying to resume download!");
 					Thread.sleep(1000);
 				} catch(InterruptedException e1) {
-					e1.printStackTrace();
+					LogManager.logWarning("Interrupted while waiting to resume download", e1);
 				}
 				copyURLToFile(source, destination, connectionTimeout, readTimeout, cb, user, pass, resume);
 			} else {

@@ -2,6 +2,7 @@ package smlauncher.util;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import smlauncher.LogManager;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -38,7 +39,7 @@ public class SteamNewsAPI {
 			}
 			return result.toString();
 		} catch(Exception e) {
-			e.printStackTrace();
+			LogManager.logWarning("Failed to get news from Steam API" + e.getMessage());
 		}
 		return "";
 	}

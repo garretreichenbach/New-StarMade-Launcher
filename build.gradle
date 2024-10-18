@@ -7,7 +7,7 @@ plugins {
 
 group 'smlauncher'
 mainClassName = 'smlauncher.StarMadeLauncher'
-version = '3.1.3'
+version = '3.1.4'
 
 java {
 	toolchain {
@@ -108,11 +108,20 @@ tasks.register('package') {
 				from 'StarMade-dedicated-server-macos.command'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
+			exec { //Mark as executable AND sign because MacOS is picky
+				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher'
+			}
+			exec {
+				commandLine 'codesign', '--deep', '--force', '--verbose', '--sign', 'Developer ID Application: Schine GmbH', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
+			}
 		}
 		if (os == 'linux') {
 			copy {
 				from 'StarMade-dedicated-server-linux.sh'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
+			}
+			exec { //Mark as executable
+				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher'
 			}
 		}
 	}

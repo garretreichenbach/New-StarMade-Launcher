@@ -1,5 +1,7 @@
 package smlauncher.starmade;
 
+import smlauncher.LogManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -122,8 +124,7 @@ public class ChecksumFileEntry {
 
 			file.renameTo(dst);
 		} catch(URISyntaxException e1) {
-			e1.printStackTrace();
-			throw new IOException(e1);
+			LogManager.logException("Error downloading file", e1);
 		}
 	}
 
