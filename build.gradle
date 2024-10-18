@@ -116,8 +116,8 @@ tasks.register('package') {
 			exec { //Mark as executable AND sign because MacOS is picky
 				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/app/StarMade-Launcher.jar'
 			}
-			exec {
-				commandLine 'codesign', '--deep', '--force', '--verbose', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
+			exec {//codesign -sign - -force
+				commandLine 'codesign', '-sign', '-', '-force', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
 			}
 		}
 		if (os == 'linux') {
