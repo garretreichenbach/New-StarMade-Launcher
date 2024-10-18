@@ -104,6 +104,9 @@ tasks.register('package') {
 		}
 		if (os == 'macos') {
 			exec {
+				commandLine 'ls', '-l', '-R', 'release-builds/' + os + '/'
+			}
+			exec {
 				commandLine 'mv', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher'
 			}
 			copy {
