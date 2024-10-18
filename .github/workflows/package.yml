@@ -28,18 +28,6 @@ jobs:
         with:
           name: build-artifacts
           path: ./release-builds
-      - name: 'Make Linux File Executable'
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          chmod +x ./release-builds/linux/StarMade-Launcher
-      - name: 'Make MacOS File Executable'
-        if: matrix.os == 'macos-latest'
-        run: |
-          chmod +x ./release-builds/macos/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher
-      - name: 'Codesign MacOS File'
-        if: matrix.os == 'macos-latest'
-        run: |
-          codesign -s - -f ./release-builds/macos/StarMade-Launcher/StarMade-Launcher.app
   publish-executables:
     name: 'Publish Executables'
     runs-on: ubuntu-latest
