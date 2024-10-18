@@ -107,6 +107,9 @@ tasks.register('package') {
 				from 'StarMade-dedicated-server-macos.command'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
+			exec { //Move /macos/StarMade-Launcher.app to /macos/StarMade-Launcher/StarMade-Launcher.app for consistency
+				commandLine 'mv', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
+			}
 			exec { //Mark as executable AND sign because MacOS is picky
 				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
 			}
