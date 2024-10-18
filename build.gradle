@@ -117,7 +117,7 @@ tasks.register('package') {
 				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/app/StarMade-Launcher.jar'
 			}
 			exec {
-				commandLine 'codesign', '--deep', '--force', '--verbose', '--sign', 'Developer ID Application: Schine GmbH', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
+				commandLine 'codesign', '--deep', '--force', '--verbose', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
 			}
 		}
 		if (os == 'linux') {
