@@ -120,6 +120,9 @@ tasks.register('package') {
 				from 'StarMade-dedicated-server-linux.sh'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
+			exec {
+				commandLine 'ls', '-l', 'release-builds/' + os + '/StarMade-Launcher/'
+			}
 			exec { //Mark as executable
 				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher'
 			}
