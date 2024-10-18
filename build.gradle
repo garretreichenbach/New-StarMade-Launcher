@@ -103,13 +103,15 @@ tasks.register('package') {
 			}
 		}
 		if (os == 'macos') {
-			ant.move(file: 'release-builds/' + os + '/StarMade-Launcher.app', toFile: 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app')
+			exec {
+				commandLine 'ls', '-l', '-R', 'release-builds/' + os + '/StarMade-Launcher/'
+			}
+			exec {
+				commandLine 'mv', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher'
+			}
 			copy {
 				from 'StarMade-dedicated-server-macos.command'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
-			}
-			exec {
-				commandLine 'ls', '-l', '-R', 'release-builds/' + os + '/StarMade-Launcher/'
 			}
 			exec { //Mark as executable AND sign because MacOS is picky
 				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher'
@@ -124,7 +126,7 @@ tasks.register('package') {
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
 			exec {
-				commandLine 'ls', '-l', '-R', 'release-builds/' + os + '/StarMade-Launcher/bin/'
+				commandLine 'mv', 'release-builds/' + os + '/StarMade-Launcher/bin/StarMade-Launcher', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher'
 			}
 			exec { //Mark as executable
 				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher'
