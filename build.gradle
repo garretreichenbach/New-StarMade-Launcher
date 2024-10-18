@@ -103,18 +103,15 @@ tasks.register('package') {
 			}
 		}
 		if (os == 'macos') {
-			exec {
-				commandLine 'ls', '-l', '-R', 'release-builds/' + os + '/'
-			}
-			exec {
-				commandLine 'mv', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher'
-			}
 			copy {
 				from 'StarMade-dedicated-server-macos.command'
 				into 'release-builds/' + os + '/StarMade-Launcher/'
 			}
 			exec { //Mark as executable AND sign because MacOS is picky
-				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/MacOS/StarMade-Launcher'
+				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'
+			}
+			exec { //Mark as executable AND sign because MacOS is picky
+				commandLine 'chmod', '+x', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app/Contents/app/StarMade-Launcher.jar'
 			}
 			exec {
 				commandLine 'codesign', '--deep', '--force', '--verbose', '--sign', 'Developer ID Application: Schine GmbH', 'release-builds/' + os + '/StarMade-Launcher/StarMade-Launcher.app'

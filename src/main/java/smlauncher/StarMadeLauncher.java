@@ -75,7 +75,7 @@ public class StarMadeLauncher extends JFrame {
 		// If on mac, change cwd to outside the .app
 		if(OperatingSystem.getCurrent() == OperatingSystem.MAC) {
 			String cwd = System.getProperty("user.dir");
-			if(cwd.endsWith("StarMade-Launcher.app/Contents/MacOS")) System.setProperty("user.dir", cwd.replace("StarMade-Launcher.app/Contents/MacOS", ""));
+			if(cwd.contains("StarMade-Launcher.app/Contents/app")) System.setProperty("user.dir", cwd.replace("StarMade-Launcher.app/Contents/app", ""));
 		}
 
 		setBounds(100, 100, 800, 550);
