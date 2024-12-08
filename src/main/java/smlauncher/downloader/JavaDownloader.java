@@ -45,9 +45,13 @@ public class JavaDownloader {
 			try {
 				download();
 				unzip();
+				//If on Linux or Mac, mark the Java executable as executable
+				if(currentOS == OperatingSystem.LINUX || currentOS == OperatingSystem.MAC) (new File(getJreFolderName() + "/bin/java")).setExecutable(true);
+				else if(currentOS == OperatingSystem.WINDOWS) (new File(getJreFolderName() + "/bin/java.exe")).setExecutable(true);
+				else throw new IOException("Downloaded Java, but failed to mark it as executable due to unknown OS: " + currentOS);
 				dialog.setVisible(false);
-			} catch(IOException e) {
-				LogManager.logWarning("Failed to download or unzip Java", e);
+			} catch(IOException exception) {
+				LogManager.logException("Failed to download or unzip Java", exception);
 			}
 		})).start();
 		dialog.setVisible(true);
