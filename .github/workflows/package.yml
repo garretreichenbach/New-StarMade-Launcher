@@ -1,4 +1,4 @@
-name: package.yml
+name: package
 on:
   push:
     branches:
